@@ -135,6 +135,25 @@ public sealed class DocCommentTests : IDisposable
     }
 
     [Fact]
+    public void A_line_break_the_author_wrote_is_kept()
+    {
+        // The editor's own wrapping is joined; a <br/> is a break the author asked for.
+        Assert.Equal("Paid\nShipped", Xml("Paid<br/>Shipped"));
+    }
+
+    [Fact]
+    public void A_line_break_leaves_no_spaces_around_it()
+    {
+        Assert.Equal("Paid\nShipped", Xml("Paid <br/> Shipped"));
+    }
+
+    [Fact]
+    public void A_line_break_at_the_end_of_a_paragraph_leaves_no_blank_line()
+    {
+        Assert.Equal("Paid\n\nShipped", Xml("<br/>Paid<br/><para>Shipped<br/></para>"));
+    }
+
+    [Fact]
     public void A_list_reads_as_items()
     {
         Assert.Equal("States:\n\n- Paid\n- Shipped", Xml("States:<list type=\"bullet\"><item>Paid</item><item>Shipped</item></list>"));
