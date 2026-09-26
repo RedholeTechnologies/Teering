@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "treering",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": [
+        "run",
+        "--project",
+        "src/Treering.Cli",
+        "-c",
+        "Release",
+        "--no-launch-profile",
+        "--",
+        "serve",
+        "--port",
+        "7378"
+      ],
+      "port": 7378,
+      "url": "http://127.0.0.1:7378"
+    }
+  ]
+}

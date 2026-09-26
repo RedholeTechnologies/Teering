@@ -1,0 +1,4069 @@
+<!DOCTYPE html>
+<!-- The page speaks English and Korean itself. A browser translating it would rewrite class
+     and method names too - OrderRepository into something that is not in the code. -->
+<html lang="en" translate="no">
+<head>
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#faf9f7">
+<title>Treering</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22 width=%2232%22 height=%2232%22%3E%3Ctitle%3ETreering%3C/title%3E%3Cstyle%3Epath %7B fill: none; stroke: %238a857b; stroke-width: 1.5; %7D.bark %7B stroke: %236d4fe0; stroke-width: 2.6; %7D.pith %7B fill: %232b2a27; %7Dmask path %7B fill: %23000; stroke: none; %7D%40media %28prefers-color-scheme: dark%29 %7B  path %7B stroke: %239a968d; %7D  .bark %7B stroke: %23a88bff; %7D  .pith %7B fill: %23ecebe7; %7D%7D%3C/style%3E%3Cmask id=%22crack%22%3E%3Crect width=%2232%22 height=%2232%22 fill=%22%23fff%22/%3E%3Cpath d=%22M17.3 13.34L26.39 3.18L28.93 5.75Z%22 fill=%22%23000%22/%3E%3C/mask%3E%3Cg mask=%22url%28%23crack%29%22%3E%3Cpath d=%22M19.04 16.67C19.05 17.24 18.83 17.87 18.59 18.4C18.35 18.94 18.02 19.47 17.6 19.87C17.19 20.27 16.64 20.62 16.11 20.79C15.57 20.95 14.95 20.88 14.4 20.84C13.85 20.79 13.33 20.68 12.81 20.49C12.3 20.31 11.74 20.1 11.32 19.74C10.91 19.39 10.58 18.86 10.34 18.35C10.1 17.84 9.94 17.25 9.89 16.67C9.85 16.09 9.84 15.4 10.06 14.87C10.28 14.33 10.74 13.82 11.19 13.46C11.64 13.09 12.22 12.88 12.76 12.7C13.29 12.52 13.86 12.37 14.4 12.38C14.94 12.39 15.52 12.55 16.01 12.77C16.51 12.99 16.94 13.35 17.35 13.71C17.77 14.08 18.23 14.47 18.52 14.96C18.8 15.45 19.02 16.09 19.04 16.67Z%22/%3E%3Cpath d=%22M24.23 16.35C24.25 17.47 23.83 18.7 23.36 19.74C22.89 20.79 22.24 21.84 21.43 22.61C20.62 23.39 19.54 24.08 18.5 24.4C17.45 24.71 16.24 24.59 15.16 24.5C14.09 24.4 13.07 24.19 12.06 23.83C11.06 23.47 9.96 23.06 9.15 22.36C8.34 21.66 7.69 20.64 7.23 19.64C6.76 18.63 6.45 17.48 6.36 16.35C6.26 15.21 6.26 13.88 6.68 12.83C7.1 11.79 8.01 10.78 8.89 10.07C9.77 9.37 10.91 8.95 11.95 8.6C13 8.25 14.1 7.95 15.16 7.97C16.22 7.99 17.36 8.29 18.32 8.73C19.28 9.16 20.12 9.86 20.93 10.58C21.75 11.29 22.66 12.06 23.21 13.02C23.76 13.98 24.2 15.23 24.23 16.35Z%22/%3E%3Cpath class=%22bark%22 d=%22M29.91 16C29.95 17.72 29.3 19.61 28.58 21.21C27.86 22.81 26.86 24.42 25.61 25.61C24.37 26.8 22.72 27.87 21.12 28.36C19.52 28.84 17.65 28.65 16 28.51C14.35 28.36 12.78 28.03 11.24 27.48C9.7 26.94 8.01 26.3 6.77 25.23C5.53 24.16 4.53 22.59 3.82 21.05C3.1 19.51 2.62 17.74 2.48 16C2.34 14.26 2.33 12.21 2.98 10.61C3.63 9 5.02 7.45 6.37 6.37C7.71 5.28 9.47 4.64 11.07 4.1C12.68 3.57 14.37 3.11 16 3.14C17.63 3.17 19.37 3.64 20.84 4.3C22.32 4.97 23.61 6.05 24.86 7.14C26.11 8.24 27.5 9.41 28.35 10.89C29.19 12.36 29.87 14.28 29.91 16Z%22/%3E%3C/g%3E%3Ccircle class=%22pith%22 cx=%2213.6%22 cy=%2217%22 r=%221.5%22/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #faf9f7; --panel: #ffffff; --line: #e3e0d8;
+    --fg: #2c2c2a; --muted: #6f6d66; --warn: #854f0b; --warn-bg: #faeeda;
+    --born: #2f8f4e; --died: #b4453f;
+    --depth: #ffffff; --accent: #6d4fe0;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+    color-scheme: dark;
+      --bg: #1a1a18; --panel: #242422; --line: #3a3a36;
+      --fg: #eceae4; --muted: #9b998f; --warn: #fac775; --warn-bg: #3a2c12;
+      --born: #67c98a; --died: #e07b74; --depth: #1a1a18; --accent: #a88bff;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #1a1a18; --panel: #242422; --line: #3a3a36;
+    --fg: #eceae4; --muted: #9b998f; --warn: #fac775; --warn-bg: #3a2c12;
+    --born: #67c98a; --died: #e07b74; --depth: #1a1a18; --accent: #a88bff;
+  }
+  /* Slate: drawn from ui-ux-pro-max's system for developer tools - slate ground, "run" green
+     accent, a code face for names and a humanist sans for the chrome. The fonts are used when
+     they are installed and never fetched: Treering makes no network calls, and a page that
+     pulled Google Fonts would. Low white emission - the text is slate-200, not white. */
+  :root[data-theme="slate"] {
+    color-scheme: dark;
+    --bg: #0f172a; --panel: #1b2336; --line: #334155;
+    --fg: #e2e8f0; --muted: #94a3b8; --warn: #fbbf24; --warn-bg: #2a2413;
+    --born: #4ade80; --died: #f87171; --depth: #0f172a; --accent: #22c55e;
+  }
+  :root[data-theme="slate"] body {
+    font-family: "IBM Plex Sans", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  }
+  :root[data-theme="slate"] .label,
+  :root[data-theme="slate"] #panel code, :root[data-theme="slate"] #panel .sig,
+  :root[data-theme="slate"] #hits b {
+    font-family: "JetBrains Mono", "Cascadia Code", "Cascadia Mono", Consolas, ui-monospace, monospace;
+  }
+
+  /* Obsidian's graph view: flat charcoal, plain dots, hairline links, a violet accent. */
+  :root[data-theme="obsidian"] {
+    color-scheme: dark;
+    --bg: #1e1e1e; --panel: #262626; --line: #363636;
+    --fg: #dcddde; --muted: #8b8b8b; --warn: #e0c47a; --warn-bg: #3a3222;
+    --born: #7ec699; --died: #e06c75; --depth: #1e1e1e; --accent: #a882ff; --edge: #6e6e6e;
+  }
+  :root[data-theme="obsidian"] body,
+  :root[data-theme="obsidian"] .label {
+    font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  /* Q branch. Dark navy, a faint grid, glowing filaments. */
+  :root[data-theme="skyfall"] {
+    color-scheme: dark;
+    --bg: #04090f; --panel: #060e18; --line: #10283f;
+    --fg: #cfe9f7; --muted: #5d8bab; --warn: #7fd7ff; --warn-bg: #08202f;
+    --born: #58e0a8; --died: #ff7a6b; --depth: #04090f; --accent: #ffd166;
+  }
+  :root[data-theme="skyfall"] #stage {
+    background-color: #04090f;
+    background-image:
+      linear-gradient(rgba(64,160,210,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(64,160,210,0.06) 1px, transparent 1px),
+      radial-gradient(ellipse at 50% 45%, rgba(40,120,170,0.18), transparent 64%);
+    background-size: 46px 46px, 46px 46px, 100% 100%;
+  }
+  :root[data-theme="skyfall"] .label {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font: 14px/1.5 -apple-system, "Segoe UI", "Malgun Gothic", system-ui, sans-serif;
+    display: flex; flex-direction: column;
+  }
+  header, footer {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 10px 16px; background: var(--panel);
+  }
+  /* One bar. What you reach for all the time sits on it - where you are, search, the shape,
+     our code or everything. What you set now and then folds into three small menus: time,
+     view, and settings. */
+  header {
+    border-bottom: 1px solid var(--line); flex-wrap: nowrap; gap: 6px;
+    padding: 8px 10px 8px 14px; min-height: 52px; box-sizing: border-box; position: relative; z-index: 15;
+  }
+  .brand-name { font-weight: 650; letter-spacing: -0.01em; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  header .icon {
+    width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  #projectBox { margin-left: 6px; }
+  #projectBox select {
+    font-weight: 600; background: transparent; border-color: transparent; border-radius: 8px;
+    height: 32px; padding: 0 8px; max-width: 260px; cursor: pointer;
+  }
+  #projectBox select:hover { background: color-mix(in srgb, var(--fg) 7%, transparent); }
+  /* The open list takes its colours from the select. This one is transparent to sit in the
+     bar, and Windows paints a transparent list white - under the theme's pale text. Every list
+     gets the panel's colours outright. */
+  select option, select optgroup { background-color: var(--panel); color: var(--fg); }
+  header .where {
+    display: flex; align-items: center; gap: 2px; min-width: 0; flex: 0 1 auto;
+    padding-left: 8px; margin-left: 2px; border-left: 1px solid var(--line);
+  }
+  #crumbs { min-width: 0; overflow: hidden; white-space: nowrap; }
+  header .icon-btn, header .tool {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: none;
+    height: 32px; border-radius: 8px; border: 1px solid transparent; background: transparent;
+    color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; padding: 0 10px;
+  }
+  header .icon-btn, header .tool.icon-only { width: 32px; padding: 0; }
+  header .icon-btn:hover:not(:disabled), header .tool:hover, header .tool[aria-expanded="true"] {
+    background: color-mix(in srgb, var(--fg) 8%, transparent); color: var(--fg);
+  }
+  header .icon-btn:disabled { opacity: 0.35; cursor: default; }
+  header .tool .icon:last-child:not(:first-child) { width: 12px; height: 12px; }
+  #search { flex: 0 1 340px; min-width: 140px; }
+  #q { width: 100%; box-sizing: border-box; height: 32px; padding: 0 10px; border-radius: 8px; }
+  header .tools { display: flex; align-items: center; gap: 6px; flex: none; }
+
+  /* The shape: five icons, one of them on. It is a choice among five, so it reads as one. */
+  .segmented {
+    display: inline-flex; gap: 2px; padding: 2px; border-radius: 10px;
+    background: color-mix(in srgb, var(--fg) 6%, transparent);
+  }
+  .segmented button {
+    width: 30px; height: 28px; display: grid; place-items: center; border: none; border-radius: 8px;
+    background: none; color: var(--muted); cursor: pointer;
+  }
+  .segmented button:hover { color: var(--fg); }
+  .segmented button[aria-checked="true"] {
+    background: var(--panel); color: var(--accent);
+    box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(0, 0, 0, 0.16);
+  }
+
+  /* Our code or everything: a switch, so it says which way it is at a glance. */
+  .toggle {
+    display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px; flex: none;
+    border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--muted);
+    font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap;
+  }
+  .toggle::before {
+    content: ""; width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid currentColor; flex: none;
+  }
+  .toggle:hover { color: var(--fg); }
+  .toggle[aria-pressed="true"] {
+    color: var(--fg); border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+  .toggle[aria-pressed="true"]::before { background: var(--accent); border-color: var(--accent); }
+
+  .pop { position: relative; flex: none; }
+  #timeLabel { color: var(--fg); font-variant-numeric: tabular-nums; }
+  .menu {
+    position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; min-width: 260px;
+    display: grid; gap: 10px; padding: 12px; box-sizing: border-box;
+    background: var(--panel); color: var(--fg); border: 1px solid var(--line); border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.12);
+    transform-origin: top right;
+    transition: opacity 150ms var(--ease-out, ease-out), transform 150ms var(--ease-out, ease-out);
+  }
+  .menu[hidden] { display: none; }
+  @starting-style { .menu { opacity: 0; transform: scale(0.97) translateY(-2px); } }
+  .menu label {
+    display: grid; grid-template-columns: 76px minmax(0, 1fr); align-items: center; gap: 10px;
+    font-size: 13px; color: var(--muted);
+  }
+  .menu label[hidden] { display: none; }
+  /* A switch row: the box, then what it does and when it last did it. */
+  .menu label.check {
+    grid-template-columns: 16px minmax(0, 1fr); align-items: start; cursor: pointer;
+    padding-top: 8px; border-top: 1px solid var(--line);
+  }
+  .menu label.check input { margin: 2px 0 0; width: 14px; height: 14px; accent-color: var(--accent); }
+  .menu label.check b { display: block; font-weight: 600; color: var(--fg); }
+  .menu label.check small { display: block; margin-top: 2px; font-size: 12px; color: var(--muted); }
+  .menu select { width: 100%; min-width: 0; height: 32px; border-radius: 8px; }
+  .menu .narrow-only { display: none; }
+  @media (max-width: 1180px) { #timeLabel, .brand-name { display: none; } }
+  @media (max-width: 940px) {
+    #shapes, #ownToggle { display: none; }
+    .menu .narrow-only { display: grid; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    @starting-style { .menu { transform: none; } }
+  }
+  /* The mark: a sawn log's end - uneven rings round an off-centre pith, a drying crack from
+     the bark inward, and the outermost ring, now, in the theme's accent. */
+  .brand { display: inline-flex; align-items: center; gap: 7px; }
+  .mark { width: 20px; height: 20px; flex: none; }
+  .mark path { fill: none; stroke: var(--muted); stroke-width: 1.05; }
+  .mark path.bark { stroke: var(--accent); stroke-width: 2.2; }
+  .mark mask path { fill: #000; stroke: none; }
+  .mark .pith { fill: var(--fg); }
+  footer { border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+  #crumbs { display: flex; align-items: center; gap: 6px; }
+  #search { position: relative; }
+  /* Importing. Opened from the project menu it is a dialog over the map; with nothing imported
+     yet it is the whole first screen, drawn beside the rings the tool is named for. One form,
+     four states: choosing a folder, waiting on the folder window, importing, and stopped. */
+  #importer {
+    position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center;
+    background: color-mix(in srgb, #000 45%, transparent); padding: 16px;
+  }
+  #importer[hidden] { display: none; }
+  #importer .box {
+    width: min(540px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; overscroll-behavior: contain;
+    background: var(--panel); color: var(--fg);
+    border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px 22px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.12);
+  }
+  /* Korean breaks between words, not inside them. */
+  #importer .form { word-break: keep-all; overflow-wrap: anywhere; }
+  #importer .icon {
+    width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  #importer .head { display: flex; align-items: flex-start; gap: 12px; }
+  #importer h2 { flex: 1; margin: 0; font-size: 18px; font-weight: 650; line-height: 1.3; text-wrap: balance; }
+  #importer .close {
+    margin: -4px -6px 0 0; width: 32px; height: 32px; display: grid; place-items: center; flex: none;
+    border: none; border-radius: 8px; background: none; color: var(--muted); cursor: pointer;
+  }
+  #importer .close:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); color: var(--fg); }
+  #importer .lead { display: none; }
+  #rings { display: none; }
+
+  #importer .choose, #importer .progress { display: none; margin-top: 16px; }
+  #importer[data-state="idle"] .choose, #importer[data-state="picking"] .choose { display: block; }
+  #importer[data-state="running"] .progress, #importer[data-state="failed"] .progress { display: block; }
+
+  /* The one thing to press: a folder, and what will happen to it. */
+  #importer .pick {
+    width: 100%; display: flex; align-items: center; gap: 14px; text-align: left;
+    padding: 14px 16px; border-radius: 12px; cursor: pointer; font: inherit; color: var(--fg);
+    background: color-mix(in srgb, var(--accent) 7%, var(--panel));
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
+    transition: background-color 150ms ease-out, border-color 150ms ease-out, transform 120ms ease-out;
+  }
+  #importer .pick:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 13%, var(--panel)); border-color: var(--accent);
+  }
+  #importer .pick:active:not(:disabled) { transform: scale(0.99); }
+  #importer .pick:disabled { cursor: progress; }
+  #importer .badge {
+    width: 40px; height: 40px; flex: none; display: grid; place-items: center; border-radius: 10px;
+    background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent);
+  }
+  #importer .badge .icon { width: 20px; height: 20px; }
+  #importer .words { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  #importer .words b { font-size: 15px; font-weight: 600; }
+  #importer .words small { color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+
+  #importer details summary {
+    display: inline-flex; align-items: center; gap: 6px; cursor: pointer; list-style: none;
+    color: var(--muted); font-size: 13px; padding: 4px 6px 4px 2px; border-radius: 6px;
+  }
+  #importer details summary::-webkit-details-marker { display: none; }
+  #importer details summary:hover { color: var(--fg); }
+  #importer details summary .icon { width: 14px; height: 14px; transition: transform 150ms ease-out; }
+  #importer details[open] > summary .icon { transform: rotate(90deg); }
+  #byPath { margin-top: 12px; }
+  #importer .field { display: block; margin: 10px 0 6px; font-size: 13px; font-weight: 600; }
+  #importer .row { display: flex; gap: 8px; }
+  #importPath {
+    flex: 1; min-width: 0; color: var(--fg); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font-size: 13.5px;
+    font-family: "JetBrains Mono", "Cascadia Code", "Cascadia Mono", Consolas, ui-monospace, monospace;
+  }
+  #importPath:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+  #importer button:not(.pick):not(.close) {
+    font: inherit; color: var(--fg); background: transparent; border: 1px solid var(--line);
+    border-radius: 8px; padding: 7px 16px; cursor: pointer; white-space: nowrap;
+  }
+  #importer button:not(.pick):not(.close):hover:not(:disabled) { border-color: var(--muted); }
+  #importer button.primary, #importer.no-pick #importGo {
+    background: var(--accent) !important; border-color: var(--accent) !important; color: var(--bg) !important; font-weight: 600;
+  }
+  #importer button.primary:hover:not(:disabled) { filter: brightness(1.08); }
+  #importer button:disabled { cursor: default; }
+  /* Without a folder window (Linux with no zenity), typing the path is the way in. */
+  #importer.no-pick .pick, #importer.no-pick #byPath > summary { display: none; }
+  #importer.no-pick #byPath { margin-top: 0; }
+
+  /* Importing: which folder, then one row per indexer. */
+  #importer .where { display: flex; align-items: center; gap: 12px; }
+  #importer .where code {
+    color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-family: "JetBrains Mono", "Cascadia Code", "Cascadia Mono", Consolas, ui-monospace, monospace;
+  }
+  #importSteps { list-style: none; margin: 14px 0 0; padding: 0; border-top: 1px solid var(--line); }
+  #importSteps:empty { display: none; }
+  #importSteps li {
+    display: grid; grid-template-columns: 16px auto minmax(0, 1fr) auto; column-gap: 10px; align-items: center;
+    padding: 10px 2px; border-bottom: 1px solid var(--line); font-size: 13px;
+  }
+  #importSteps .lang { font-weight: 600; }
+  #importSteps .name {
+    color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px;
+    font-family: "JetBrains Mono", "Cascadia Code", "Cascadia Mono", Consolas, ui-monospace, monospace;
+  }
+  #importSteps .state { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #importSteps .why { grid-column: 2 / -1; margin: 6px 0 0; color: var(--fg); font-size: 12.5px; line-height: 1.5; }
+  /* A running step: a bar, and what the indexer last said. The bar fills against the last time
+     this step took; with no last time it is a band that travels, so it still says "working". */
+  #importSteps .live { grid-column: 2 / -1; margin-top: 8px; display: grid; gap: 5px; }
+  #importSteps .bar {
+    position: relative; height: 4px; border-radius: 999px; overflow: hidden;
+    background: color-mix(in srgb, var(--fg) 10%, transparent);
+  }
+  #importSteps .bar > span {
+    position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--accent);
+    transition: width 600ms linear;
+  }
+  #importSteps .bar.unknown > span { width: 32%; animation: travel 1.4s ease-in-out infinite; }
+  @keyframes travel { from { left: -32%; } to { left: 100%; } }
+  #importSteps .phase {
+    color: var(--muted); font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-family: "JetBrains Mono", "Cascadia Code", "Cascadia Mono", Consolas, ui-monospace, monospace;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #importSteps .bar.unknown > span { animation: none; left: 0; opacity: 0.6; }
+    #importSteps .bar > span { transition: none; }
+  }
+  /* Work going on behind the page: an import or an automatic re-index. */
+  #work {
+    display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 12.5px; color: var(--fg);
+    background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
+    border-radius: 999px; padding: 3px 10px; cursor: pointer; font-variant-numeric: tabular-nums;
+  }
+  #work[hidden] { display: none; }
+  #work.idle { cursor: default; }
+  #work .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+  #work.busy .dot { animation: pulse 1.2s ease-in-out infinite; }
+  #work.done .dot { background: var(--born); }
+  #work.failed .dot { background: var(--died); }
+  @keyframes pulse { 50% { opacity: 0.35; } }
+  @media (prefers-reduced-motion: reduce) { #work.busy .dot { animation: none; } }
+  #importSteps .why code {
+    display: block; margin-top: 6px; padding: 6px 8px; border-radius: 6px; font-size: 11.5px; color: var(--muted);
+    background: color-mix(in srgb, var(--fg) 6%, transparent); white-space: pre-wrap; user-select: all;
+    font-family: "JetBrains Mono", "Cascadia Code", "Cascadia Mono", Consolas, ui-monospace, monospace;
+  }
+  #importSteps li.done .icon { color: var(--born); }
+  #importSteps li.running .icon { color: var(--accent); }
+  #importSteps li.failed .icon, #importSteps li.skipped .icon { color: var(--died); }
+  #importSteps li.waiting .icon { color: var(--muted); }
+  #importSteps li.running .state { color: var(--fg); }
+  #importSteps li.running .icon { animation: spin 900ms linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #importProblem {
+    display: flex; gap: 10px; margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: 13px; line-height: 1.5;
+    background: color-mix(in srgb, var(--died) 9%, var(--panel));
+    border: 1px solid color-mix(in srgb, var(--died) 40%, var(--line));
+  }
+  #importProblem[hidden] { display: none; }
+  #importProblem .icon { color: var(--died); margin-top: 2px; }
+  #importProblem b { display: block; font-weight: 600; }
+  #importProblem span { color: var(--muted); }
+  #importDetails { margin-top: 12px; }
+  #importLog {
+    margin: 8px 0 0; max-height: 28vh; overflow: auto; overscroll-behavior: contain; font-size: 11.5px; line-height: 1.6;
+    color: var(--muted); white-space: pre-wrap; padding: 10px 12px; border-radius: 8px;
+    background: color-mix(in srgb, var(--fg) 5%, transparent);
+    font-family: "JetBrains Mono", "Cascadia Code", "Cascadia Mono", Consolas, ui-monospace, monospace;
+  }
+  #importer .note { margin: 12px 0 0; color: var(--muted); font-size: 12.5px; }
+  #importer[data-state="failed"] .note { display: none; }
+  #importer .foot { display: none; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+  #importer[data-state="failed"] .foot { display: flex; }
+
+  /* Nothing imported yet: the map has nothing to show, so its controls go and the page is
+     the invitation. The rings sit on the left; the text keeps a readable measure. */
+  body.empty .needs-map, body.empty #projectBox { display: none !important; }
+  body.empty #importer .form { max-width: 500px; }
+  body.empty #importer { position: static; flex: 1; background: none; padding: 32px 24px; }
+  body.empty #importer .box {
+    width: min(920px, 100%); max-height: none; overflow: visible;
+    display: grid; grid-template-columns: minmax(180px, 300px) minmax(0, 1fr);
+    gap: 56px; align-items: center; background: none; border: none; box-shadow: none; padding: 0;
+  }
+  body.empty #rings { display: block; width: 100%; height: auto; overflow: visible; }
+  body.empty #importer h2 { font-size: 30px; letter-spacing: -0.01em; }
+  body.empty #importer .lead { display: block; margin: 10px 0 0; color: var(--muted); font-size: 15px; line-height: 1.55; max-width: 52ch; }
+  body.empty #importer .choose, body.empty #importer .progress { margin-top: 26px; }
+  body.empty #importer .close, body.empty #importer .note { display: none; }
+  @media (max-width: 720px) {
+    body.empty #importer .box { grid-template-columns: 1fr; gap: 24px; }
+    body.empty #rings { width: 150px; }
+    body.empty #importer h2 { font-size: 24px; }
+  }
+
+  #rings path { fill: none; stroke: var(--muted); stroke-opacity: 0.4; stroke-width: 1.1; vector-effect: non-scaling-stroke; }
+  #rings path.bark { stroke: var(--accent); stroke-opacity: 1; stroke-width: 2; }
+  #rings circle { fill: var(--muted); }
+  /* The one moment on this page: the rings lay down from the pith outward, once. */
+  #rings path { animation: ring-in 500ms var(--ease-out, ease-out) both; animation-delay: calc(var(--i) * 70ms); }
+  @keyframes ring-in { from { opacity: 0; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    #rings path { animation: none; }
+    /* A spinner that does not spin still says "working" - the words beside it carry it. */
+    #importSteps li.running .icon { animation: none; }
+    #importer .pick:active:not(:disabled) { transform: none; }
+  }
+  #q {
+    font: inherit; color: var(--fg); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; width: 170px;
+  }
+  #q:focus { outline: none; border-color: var(--accent); }
+  #hits {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 20; margin: 0; padding: 4px 0;
+    list-style: none; min-width: 360px; max-width: 520px; max-height: 60vh; overflow-y: auto;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); font-size: 13px;
+  }
+  #hits li { padding: 6px 12px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #hits li.on { background: var(--bg); box-shadow: inset 3px 0 0 var(--accent); }
+  #hits li.theirs b { font-weight: 500; color: var(--muted); }
+  #hits li .meta { color: var(--muted); margin-left: 6px; }
+  #hits li.none { color: var(--muted); cursor: default; }
+  #crumbs button {
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font: inherit; padding: 2px 4px; border-radius: 4px;
+  }
+  #crumbs button:hover { background: var(--bg); color: var(--fg); }
+  #crumbs b { font-weight: 600; }
+  .spacer { flex: 1; }
+  select, #panel button {
+    font: inherit; color: var(--fg); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px;
+  }
+  #panel button { cursor: pointer; }
+
+  /* Motion, kept to what carries meaning. One curve for things arriving - a strong ease-out
+     that lands quickly and settles. Nothing here runs on the keyboard paths (search, Esc). */
+  :root { --ease-out: cubic-bezier(0.23, 1, 0.32, 1); }
+
+  /* A press answers the hand. */
+  #up, #panel button:not(.link), #importer .foot button, #importer .row button, #crumbs button { transition: transform 120ms ease-out; }
+  #up:active:not(:disabled), #panel button:not(.link):active,
+  #importer .foot button:active:not(:disabled), #importer .row button:active:not(:disabled), #crumbs button:active { transform: scale(0.97); }
+
+  /* The panel does not blank out to "Loading..." on every click: it keeps what it shows and,
+     only if the answer is slow, dims it. A fast answer never flickers. */
+  #panel { transition: opacity 120ms ease-out; }
+  #panel.stale { opacity: 0.55; transition: opacity 120ms ease-out 100ms; }
+  @starting-style { #panel { opacity: 0; } }
+
+  /* The import dialog arrives rather than appears - it is opened rarely, and on purpose. */
+  #importer { transition: opacity 200ms ease-out; }
+  #importer .box { transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out); }
+  @starting-style {
+    #importer { opacity: 0; }
+    #importer .box { opacity: 0; transform: scale(0.96); }
+  }
+
+  /* Less motion: keep the fades, which carry the change, and drop what moves or scales. */
+  @media (prefers-reduced-motion: reduce) {
+    #up:active:not(:disabled), #panel button:not(.link):active,
+    #importer .foot button:active:not(:disabled), #importer .row button:active:not(:disabled), #crumbs button:active { transform: none; }
+    @starting-style { #importer .box { transform: none; } }
+  }
+
+  #middle { flex: 1; min-height: 0; display: flex; position: relative; }
+
+  /* The legend: what each colour, line and shape means, and a box to turn each one off.
+     It floats over the map's corner and folds away to its title. */
+  #legendCard {
+    position: absolute; left: 12px; bottom: 12px; z-index: 5; width: 212px;
+    max-height: calc(100% - 24px); overflow-y: auto; overscroll-behavior: contain;
+    background: color-mix(in srgb, var(--panel) 92%, transparent); color: var(--fg);
+    border: 1px solid var(--line); border-radius: 12px; font-size: 12.5px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22); backdrop-filter: blur(6px);
+  }
+  #legendCard[hidden] { display: none; }
+  #legendToggle {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 9px 12px; border: none; background: none; color: var(--fg); font: inherit; font-weight: 600;
+    cursor: pointer; border-radius: 12px;
+  }
+  #legendToggle:hover { background: color-mix(in srgb, var(--fg) 5%, transparent); }
+  #legendToggle .icon {
+    width: 14px; height: 14px; fill: none; stroke: var(--muted); stroke-width: 1.6;
+    stroke-linecap: round; stroke-linejoin: round; transition: transform 150ms var(--ease-out, ease-out);
+  }
+  #legendToggle[aria-expanded="false"] .icon { transform: rotate(180deg); }
+  #legendBody { padding: 0 8px 8px; }
+  #legendBody[hidden] { display: none; }
+  #legendBody h4 {
+    margin: 8px 4px 4px; font-size: 11.5px; font-weight: 600; color: var(--muted);
+  }
+  #legendBody h4:first-child { margin-top: 0; }
+  #legendBody label {
+    display: grid; grid-template-columns: 16px 30px minmax(0, 1fr) auto; align-items: center; gap: 8px;
+    padding: 4px; border-radius: 7px; cursor: pointer; user-select: none;
+  }
+  #legendBody label:hover { background: color-mix(in srgb, var(--fg) 6%, transparent); }
+  #legendBody input { margin: 0; width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer; }
+  /* A row that is a key, not a switch: structure cannot be hidden from a tree of structure. */
+  #legendBody label.key { cursor: default; }
+  #legendBody label.key:hover { background: none; }
+  #legendBody svg.swatch { width: 30px; height: 14px; overflow: visible; }
+  #legendBody .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #legendBody .n { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 11.5px; }
+  /* What is switched off stays listed, so it can be switched back on - just quieter. */
+  #legendBody label.off .name, #legendBody label.off svg.swatch { opacity: 0.4; }
+  #stage { flex: 1; min-width: 0; cursor: grab; touch-action: none; }
+  #stage.dragging { cursor: grabbing; }
+  .warn { background: var(--warn-bg); color: var(--warn); border-radius: 6px; padding: 2px 8px; }
+  .label { pointer-events: none; user-select: none; }
+  .node { cursor: pointer; }
+  .born { color: var(--born); }
+  .died { color: var(--died); }
+
+  #panel {
+    width: 370px; flex: none; overflow-y: auto; background: var(--panel);
+    border-left: 1px solid var(--line); padding: 14px 16px; font-size: 13px;
+  }
+  #panel[hidden] { display: none; }
+  #panel h2 { margin: 0; font-size: 16px; font-weight: 600; }
+  #panel h3 {
+    margin: 16px 0 6px; font-size: 12px; font-weight: 600;
+    color: var(--muted); letter-spacing: 0.04em;
+  }
+  #panel code, #panel .sig {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+  #panel .kindline { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 4px 0 2px; }
+  #panel .kindline .swatch { width: 22px; height: 14px; flex: none; }
+  #panel .kindline .kind { font-weight: 600; font-size: 13px; }
+  #panel .chip {
+    font-size: 11px; line-height: 1; padding: 3px 7px; border-radius: 999px; color: var(--fg);
+    background: color-mix(in srgb, var(--fg) 9%, transparent); border: 1px solid var(--line);
+  }
+  #panel .type {
+    color: var(--muted); font-size: 11.5px; overflow-wrap: anywhere;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  #panel .sig {
+    display: block; background: var(--bg); border: 1px solid var(--line);
+    border-radius: 6px; padding: 6px 8px; margin: 8px 0;
+  }
+  #panel .meta { color: var(--muted); margin-top: 2px; }
+
+  /* The doc comment: prose, not code. A hairline on the left sets it apart from the
+     declaration above it; long ones fold at eight lines and open in place. */
+  #panel .doc {
+    margin: 10px 0 4px; padding: 1px 0 1px 10px; border-left: 2px solid var(--line);
+    line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere;
+    color: color-mix(in srgb, var(--fg) 88%, var(--muted));
+  }
+  #panel .doc.folded {
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 8; overflow: hidden;
+  }
+  #panel .doc code, #panel .summary code {
+    font-size: 11.5px; padding: 0 4px; border-radius: 4px;
+    background: color-mix(in srgb, var(--fg) 8%, transparent);
+  }
+  #panel .doc strong { font-weight: 600; color: var(--fg); }
+  #panel .docToggle {
+    font: inherit; font-size: 12px; color: var(--muted); background: none; border: none;
+    padding: 2px 0 2px 12px; cursor: pointer;
+  }
+  #panel .docToggle:hover { color: var(--fg); }
+  #panel li .summary {
+    color: var(--muted); font-size: 12px; margin-top: 1px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #panel ul { list-style: none; margin: 0; padding: 0; }
+  #panel li { padding: 3px 0; border-bottom: 1px solid var(--line); }
+  #panel li:last-child { border-bottom: none; }
+  #panel .link {
+    font: inherit; color: inherit; background: none; border: none; padding: 0; cursor: pointer;
+    border-bottom: 1px dotted var(--muted); text-align: left;
+  }
+  #panel .link:hover { border-bottom-style: solid; }
+  #panel h2 { overflow-wrap: anywhere; text-wrap: balance; }
+
+  /* Keyboard focus is shown; a mouse click does not leave a ring behind. */
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #counts, #panel .meta, #hits .meta { font-variant-numeric: tabular-nums; }
+  #importLog { overscroll-behavior: contain; }
+
+  #panel .none { color: var(--muted); }
+  #panelClose { float: right; }
+  #legend .hint { opacity: 0.6; margin-right: 10px; }
+  .label.anchor { font-weight: 700; letter-spacing: 0.02em; }
+</style>
+</head>
+<body>
+
+<header>
+  <strong class="brand"><svg class="mark" aria-hidden="true" viewBox="0 0 32 32"><mask id="mark-crack"><rect width="32" height="32" fill="#fff"/><path d="M17.3 13.34L26.39 3.18L28.93 5.75Z" fill="#000"/></mask><g mask="url(#mark-crack)"><path d="M16.81 16.8C16.82 17.14 16.69 17.51 16.55 17.83C16.41 18.15 16.21 18.46 15.97 18.7C15.72 18.93 15.4 19.14 15.08 19.24C14.77 19.33 14.4 19.3 14.07 19.27C13.75 19.24 13.44 19.17 13.14 19.06C12.83 18.96 12.5 18.83 12.25 18.62C12.01 18.41 11.81 18.1 11.67 17.8C11.53 17.49 11.44 17.15 11.41 16.8C11.38 16.46 11.38 16.06 11.51 15.74C11.64 15.42 11.91 15.12 12.18 14.91C12.44 14.69 12.79 14.57 13.1 14.46C13.42 14.35 13.75 14.26 14.07 14.27C14.39 14.28 14.74 14.37 15.03 14.5C15.32 14.63 15.57 14.84 15.82 15.06C16.06 15.27 16.34 15.51 16.5 15.8C16.67 16.09 16.81 16.46 16.81 16.8Z"/><path d="M19.04 16.67C19.05 17.24 18.83 17.87 18.59 18.4C18.35 18.94 18.02 19.47 17.6 19.87C17.19 20.27 16.64 20.62 16.11 20.79C15.57 20.95 14.95 20.88 14.4 20.84C13.85 20.79 13.33 20.68 12.81 20.49C12.3 20.31 11.74 20.1 11.32 19.74C10.91 19.39 10.58 18.86 10.34 18.35C10.1 17.84 9.94 17.25 9.89 16.67C9.85 16.09 9.84 15.4 10.06 14.87C10.28 14.33 10.74 13.82 11.19 13.46C11.64 13.09 12.22 12.88 12.76 12.7C13.29 12.52 13.86 12.37 14.4 12.38C14.94 12.39 15.52 12.55 16.01 12.77C16.51 12.99 16.94 13.35 17.35 13.71C17.77 14.08 18.23 14.47 18.52 14.96C18.8 15.45 19.02 16.09 19.04 16.67Z"/><path d="M22.25 16.47C22.27 17.38 21.92 18.38 21.54 19.23C21.16 20.08 20.63 20.94 19.97 21.57C19.31 22.2 18.44 22.77 17.59 23.02C16.74 23.28 15.75 23.18 14.87 23.1C14 23.03 13.17 22.85 12.35 22.56C11.53 22.27 10.63 21.93 9.98 21.36C9.32 20.8 8.79 19.96 8.41 19.15C8.03 18.33 7.78 17.39 7.7 16.47C7.63 15.55 7.62 14.46 7.97 13.61C8.31 12.76 9.05 11.94 9.76 11.36C10.48 10.79 11.41 10.45 12.26 10.16C13.11 9.88 14.01 9.63 14.87 9.65C15.74 9.67 16.66 9.91 17.44 10.27C18.22 10.62 18.91 11.19 19.57 11.77C20.23 12.35 20.97 12.98 21.42 13.76C21.87 14.54 22.23 15.56 22.25 16.47Z"/><path d="M24.23 16.35C24.25 17.47 23.83 18.7 23.36 19.74C22.89 20.79 22.24 21.84 21.43 22.61C20.62 23.39 19.54 24.08 18.5 24.4C17.45 24.71 16.24 24.59 15.16 24.5C14.09 24.4 13.07 24.19 12.06 23.83C11.06 23.47 9.96 23.06 9.15 22.36C8.34 21.66 7.69 20.64 7.23 19.64C6.76 18.63 6.45 17.48 6.36 16.35C6.26 15.21 6.26 13.88 6.68 12.83C7.1 11.79 8.01 10.78 8.89 10.07C9.77 9.37 10.91 8.95 11.95 8.6C13 8.25 14.1 7.95 15.16 7.97C16.22 7.99 17.36 8.29 18.32 8.73C19.28 9.16 20.12 9.86 20.93 10.58C21.75 11.29 22.66 12.06 23.21 13.02C23.76 13.98 24.2 15.23 24.23 16.35Z"/><path d="M27.19 16.17C27.23 17.6 26.68 19.17 26.08 20.51C25.49 21.84 24.65 23.19 23.61 24.18C22.57 25.17 21.2 26.06 19.86 26.46C18.53 26.86 16.97 26.71 15.6 26.59C14.23 26.47 12.92 26.19 11.64 25.74C10.35 25.28 8.94 24.75 7.91 23.86C6.88 22.96 6.04 21.65 5.45 20.37C4.85 19.09 4.45 17.62 4.33 16.17C4.22 14.72 4.21 13.01 4.75 11.67C5.29 10.33 6.45 9.04 7.57 8.14C8.7 7.23 10.16 6.7 11.49 6.25C12.83 5.81 14.24 5.42 15.6 5.45C16.96 5.48 18.41 5.86 19.64 6.42C20.87 6.98 21.94 7.87 22.98 8.79C24.02 9.7 25.19 10.68 25.89 11.91C26.59 13.14 27.16 14.73 27.19 16.17Z"/><path class="bark" d="M29.91 16C29.95 17.72 29.3 19.61 28.58 21.21C27.86 22.81 26.86 24.42 25.61 25.61C24.37 26.8 22.72 27.87 21.12 28.36C19.52 28.84 17.65 28.65 16 28.51C14.35 28.36 12.78 28.03 11.24 27.48C9.7 26.94 8.01 26.3 6.77 25.23C5.53 24.16 4.53 22.59 3.82 21.05C3.1 19.51 2.62 17.74 2.48 16C2.34 14.26 2.33 12.21 2.98 10.61C3.63 9 5.02 7.45 6.37 6.37C7.71 5.28 9.47 4.64 11.07 4.1C12.68 3.57 14.37 3.11 16 3.14C17.63 3.17 19.37 3.64 20.84 4.3C22.32 4.97 23.61 6.05 24.86 7.14C26.11 8.24 27.5 9.41 28.35 10.89C29.19 12.36 29.87 14.28 29.91 16Z"/></g><circle class="pith" cx="13.6" cy="17" r="1.1"/></svg><span class="brand-name">Treering</span></strong>
+  <label id="projectBox" hidden><span class="sr" data-t="project"></span><select id="project"></select></label>
+  <div class="where needs-map">
+    <button id="up" class="icon-btn" type="button" disabled data-t-label="upLabel"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 13V3.5M3.5 8 8 3.5 12.5 8"/></svg></button>
+    <nav id="crumbs"></nav>
+  </div>
+  <span class="spacer"></span>
+  <div id="search" class="needs-map">
+    <input id="q" type="search" autocomplete="off" spellcheck="false" aria-label="Search">
+    <ul id="hits" hidden></ul>
+  </div>
+  <span class="spacer"></span>
+  <div class="tools needs-map">
+    <div id="shapes" class="segmented" role="radiogroup" data-t-label="style">
+      <button type="button" role="radio" aria-checked="false" data-shape="constellation" data-t-label="styleConstellation"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="3.5" cy="5" r="1.2"/><circle cx="8.5" cy="3" r="1.2"/><circle cx="12.5" cy="7" r="1.2"/><circle cx="5" cy="12" r="1.2"/><circle cx="11" cy="12.5" r="1.2"/><path d="M4.6 4.6 7.4 3.4M9.4 3.8l2.2 2.4M5.5 10.9 3.9 6.1M6.2 12.1l3.6.3"/></svg></button>
+      <button type="button" role="radio" aria-checked="false" data-shape="orbit" data-t-label="styleOrbit"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="1.8"/><ellipse cx="8" cy="8" rx="6.2" ry="3.2" transform="rotate(-20 8 8)"/></svg></button>
+      <button type="button" role="radio" aria-checked="false" data-shape="rings" data-t-label="styleRings"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="1.4"/><circle cx="8" cy="8" r="3.8"/><circle cx="8" cy="8" r="6.2"/></svg></button>
+      <button type="button" role="radio" aria-checked="false" data-shape="layers" data-t-label="styleLayers"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="2.6" rx="1"/><rect x="2.5" y="6.7" width="11" height="2.6" rx="1"/><rect x="2.5" y="10.9" width="11" height="2.6" rx="1"/></svg></button>
+      <button type="button" role="radio" aria-checked="false" data-shape="tree" data-t-label="styleTree"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="3.5" cy="8" r="1.3"/><circle cx="12" cy="3.5" r="1.3"/><circle cx="12" cy="8" r="1.3"/><circle cx="12" cy="12.5" r="1.3"/><path d="M4.8 8h5.9M6.5 8V3.5h4.2M6.5 8v4.5h4.2"/></svg></button>
+    </div>
+    <button id="ownToggle" class="toggle" type="button" aria-pressed="false"><span data-t="scopeOwn"></span></button>
+    <div class="pop" id="timeTool">
+      <button class="tool" type="button" aria-expanded="false" aria-controls="timeMenu" data-t-label="timeMenu"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 4.75V8l2.25 1.5"/></svg><span id="timeLabel"></span><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="m4.5 6.5 3.5 3.5 3.5-3.5"/></svg></button>
+      <div class="menu" id="timeMenu" hidden>
+        <label><span data-t="snapshot"></span><select id="at"></select></label>
+        <label id="compareRow"><span data-t="compare"></span><select id="from"></select></label>
+      </div>
+    </div>
+    <div class="pop">
+      <button class="tool icon-only" type="button" aria-expanded="false" aria-controls="viewMenu" data-t-label="viewMenu"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4.5h6M11.5 4.5h2M2.5 11.5h2M7.5 11.5h6"/><circle cx="10" cy="4.5" r="1.5"/><circle cx="6" cy="11.5" r="1.5"/></svg></button>
+      <div class="menu" id="viewMenu" hidden>
+        <label><span data-t="level"></span><select id="granularity"></select></label>
+        <label><span data-t="labels"></span><select id="labels"></select></label>
+        <label class="narrow-only"><span data-t="style"></span><select id="style"></select></label>
+        <label class="narrow-only"><span data-t="scope"></span><select id="scope"></select></label>
+      </div>
+    </div>
+  </div>
+  <div class="pop">
+    <button class="tool icon-only" type="button" aria-expanded="false" aria-controls="settingsMenu" data-t-label="settingsMenu"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="2.1"/><path d="M8 1.75v1.6M8 12.65v1.6M1.75 8h1.6M12.65 8h1.6M3.6 3.6l1.13 1.13M11.27 11.27l1.13 1.13M3.6 12.4l1.13-1.13M11.27 4.73l1.13-1.13"/></svg></button>
+    <div class="menu" id="settingsMenu" hidden>
+      <label><span data-t="theme"></span><select id="theme"></select></label>
+      <label><span data-t="language"></span>
+        <select id="lang">
+          <option value="en">English</option>
+          <option value="ko">한국어</option>
+        </select>
+      </label>
+      <label class="check" id="autoUpdateRow" hidden>
+        <input type="checkbox" id="autoUpdate">
+        <span><b data-t="autoUpdate"></b><small id="autoUpdateNote"></small></span>
+      </label>
+    </div>
+  </div>
+</header>
+
+<div id="importer" hidden role="dialog" aria-modal="true" aria-labelledby="importTitle" data-state="idle">
+  <div class="box">
+    <svg id="rings" aria-hidden="true" viewBox="-125 -135 270 270"></svg>
+    <div class="form">
+      <div class="head">
+        <h2 id="importTitle" data-t="importTitle"></h2>
+        <button id="importClose" class="close" type="button" data-t-label="importClose"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+      </div>
+      <p class="lead" data-t="importLead"></p>
+
+      <div class="choose">
+        <button id="importPick" class="pick" type="button">
+          <span class="badge"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4.5a1 1 0 0 1 1-1h3l1.5 1.5h4.5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1z"/></svg></span>
+          <span class="words"><b id="importPickLabel" data-t="importPick"></b><small data-t="importPickNote"></small></span>
+        </button>
+        <details id="byPath">
+          <summary><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4"/></svg><span data-t="importByPath"></span></summary>
+          <label class="field" for="importPath" data-t="importFolder"></label>
+          <div class="row">
+            <input id="importPath" name="repository" type="text" spellcheck="false" autocomplete="off"
+                   placeholder="D:\Projects\MyApp">
+            <button id="importGo" type="button" data-t="importGo"></button>
+          </div>
+        </details>
+      </div>
+
+      <div class="progress">
+        <div class="where">
+          <span class="badge"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4.5a1 1 0 0 1 1-1h3l1.5 1.5h4.5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1z"/></svg></span>
+          <span class="words"><b id="importName"></b><code id="importRepo"></code></span>
+        </div>
+        <ol id="importSteps" aria-live="polite"></ol>
+        <div id="importProblem" role="alert" hidden></div>
+        <details id="importDetails">
+          <summary><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4"/></svg><span data-t="importDetails"></span></summary>
+          <pre id="importLog"></pre>
+        </details>
+        <p class="note" data-t="importKeepsGoing"></p>
+        <div class="foot">
+          <button id="importAgain" class="primary" type="button" data-t="importAgain"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="middle" class="needs-map">
+  <svg id="stage"></svg>
+  <aside id="panel" hidden></aside>
+  <section id="legendCard" class="needs-map" aria-labelledby="legendTitle">
+    <button id="legendToggle" type="button" aria-expanded="true" aria-controls="legendBody">
+      <span id="legendTitle" data-t="legendTitle"></span>
+      <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="m4.5 10 3.5-3.5 3.5 3.5"/></svg>
+    </button>
+    <div id="legendBody"></div>
+  </section>
+</div>
+
+<footer class="needs-map">
+  <span id="counts" aria-live="polite"></span>
+  <button id="work" type="button" hidden aria-live="polite"></button>
+  <span class="spacer"></span>
+  <span id="truncated"></span>
+  <span id="legend"></span>
+</footer>
+
+<script>
+const SVG = "http://www.w3.org/2000/svg";
+const stage = document.getElementById("stage");
+const crumbs = document.getElementById("crumbs");
+const counts = document.getElementById("counts");
+const truncatedOut = document.getElementById("truncated");
+const legend = document.getElementById("legend");
+const granularitySelect = document.getElementById("granularity");
+const labelSelect = document.getElementById("labels");
+const styleSelect = document.getElementById("style");
+const scopeSelect = document.getElementById("scope");
+const themeSelect = document.getElementById("theme");
+const langSelect = document.getElementById("lang");
+const atSelect = document.getElementById("at");
+const fromSelect = document.getElementById("from");
+const upButton = document.getElementById("up");
+const panel = document.getElementById("panel");
+const searchBox = document.getElementById("q");
+const projectBox = document.getElementById("projectBox");
+const projectSelect = document.getElementById("project");
+const importer = document.getElementById("importer");
+const importPath = document.getElementById("importPath");
+const importGo = document.getElementById("importGo");
+const importPick = document.getElementById("importPick");
+const byPath = document.getElementById("byPath");
+const importLog = document.getElementById("importLog");
+const importPickLabel = document.getElementById("importPickLabel");
+const importSteps = document.getElementById("importSteps");
+const importProblem = document.getElementById("importProblem");
+
+// Which imported project this page is looking at. Every question to the server says so.
+let currentProject = new URLSearchParams(location.search).get("project");
+const api = url => currentProject
+  ? url + (url.includes("?") ? "&" : "?") + "project=" + encodeURIComponent(currentProject)
+  : url;
+const hitList = document.getElementById("hits");
+
+// English is the default. Korean is offered because the project is built by a Korean team,
+// but a public tool should open in English for whoever finds it.
+const STRINGS = {
+  en: {
+    up: "↑ Up", snapshot: "At", compare: "Compare", level: "Level",
+    labels: "Names", theme: "Theme", language: "Language",
+    all: "All", module: "Module", namespace: "Namespace", type: "Type",
+    labelAuto: "Hide on overlap", labelAll: "All", labelNone: "Off",
+    scope: "Scope", scopeAll: "Everything", scopeOwn: "Our code",
+    hintMouse: "click a node to go inside · click empty space to go up",
+    legendOurs: "colour: our code", legendTheirs: "grey: libraries",
+    project: "Project", importOption: "Import…", importTitle: "Import a repository",
+    importLead: "Treering reads a repository's code and history, and draws how its parts connect and how that has changed.",
+    importClose: "Close", importFolder: "Folder on this computer",
+    importPick: "Choose a folder…", importPicking: "Pick the repository in the folder window…",
+    importPickNote: "C#, TypeScript and Python are found and indexed. Nothing is written inside the folder.",
+    importByPath: "Or type its path", importGo: "Import",
+    importDetails: "Details", importKeepsGoing: "You can close this - the import keeps going, and the project appears in the menu when it is done.",
+    importAgain: "Choose another folder…",
+    stepWaiting: "Waiting", stepRunning: "Indexing…", stepSkipped: "Skipped", stepFailed: "Failed",
+    stepElapsed: (elapsed, last) => last ? `${elapsed} of about ${last}` : elapsed,
+    workImport: (name, elapsed) => `Importing ${name} · ${elapsed}`,
+    workImportDone: name => `Imported ${name} · Open`,
+    workImportFailed: "Import stopped · See why",
+    workWatch: (name, elapsed) => `Updating ${name}${elapsed ? " · " + elapsed : ""}`,
+    stepDone: (seconds, symbols) => `${seconds} s · ${symbols} symbols`,
+    whyNotInstalled: indexer => `${indexer} is not installed. Install it, then import again:`,
+    whyIndexerFailed: indexer => `${indexer} stopped with an error:`,
+    problemTitle: "Nothing was imported",
+    problemNothing: "There is no C#, TypeScript, JavaScript or Python source in this folder. Choose the repository's top folder.",
+    problemNoFolder: "That folder does not exist. Check the path, or choose the folder instead.",
+    problemBusy: "Another import is still running. Wait for it to finish.",
+    problemOther: "The server did not answer. Is `treering serve` still running?",
+    searchPlaceholder: "Search…  /", noHits: "Nothing by that name",
+    kindModule: "module", kindNamespace: "namespace", kindType: "type",
+    kindMethod: "method", kindMember: "member", notDrawn: "not drawn here - cut by the budget",
+    globalNamespace: "(global)",
+    style: "Shape",
+    styleConstellation: "Constellation", styleOrbit: "Orbit",
+    styleRings: "Ring", styleLayers: "Layers", styleTree: "Tree",
+    treeRows: "rows", treeMore: "more",
+    hintTree: "click to open or close · point at one to see what it calls · Ctrl+wheel zooms",
+    themeAuto: "System", themeLight: "Light", themeDark: "Dark", themeSkyfall: "Skyfall",
+    themeObsidian: "Obsidian", themeSlate: "Slate",
+    compareNone: "Off",
+    upLabel: "Up one level", timeMenu: "Time", viewMenu: "View options", settingsMenu: "Settings",
+    autoUpdate: "Keep projects current",
+    autoUpdateEvery: minutes => `Re-indexes what changed every ${minutes} min`,
+    autoUpdateLast: time => ` · last looked ${time}`,
+    autoUpdateNow: " · looking now",
+    autoUpdateOff: "Off: snapshots are added only by hand",
+    loading: "Loading…", queryFailed: "Query failed.", loadFailed: "Could not load.",
+    docMore: "Show more", docLess: "Show less",
+    nodes: "nodes", edges: "edges", budgetSpent: "budget spent",
+    newDeps: "new", brokenDeps: "broken", folded: "folded",
+    legendRef: "reference · thick end calls", legendInherit: "inherits",
+    legendShapes: "class · interface · enum · record · struct",
+    legendBorn: "new dependency", legendDied: "broken dependency",
+    legendTitle: "Legend", legendCode: "Code", legendLinks: "Links", legendKinds: "Kinds", legendChanges: "Changes",
+    legendOursItem: "Our code", legendTheirsItem: "Libraries",
+    legendReference: "References", legendInherits: "Inherits", legendContains: "Contains",
+    legendAdded: "Added", legendRemoved: "Removed",
+    legendModule: "Modules, namespaces", legendClass: "Class", legendInterface: "Interface",
+    legendEnum: "Enum", legendRecord: "Record", legendStruct: "Struct", legendDelegate: "Delegate",
+    legendStructure: "Structure", legendTypes: "Types", legendMembers: "Members",
+    legendModuleOnly: "Module", legendNamespace: "Namespace",
+    legendMethod: "Method, function", legendProperty: "Property", legendField: "Field, variable", legendEvent: "Event",
+    mod_abstract: "abstract", mod_static: "static", mod_async: "async", mod_virtual: "virtual",
+    mod_override: "override", mod_sealed: "sealed", mod_readonly: "read-only", mod_const: "constant",
+    close: "Close", none: "None",
+    property: "Properties", method: "Methods", field: "Fields", event: "Events",
+    nestedType: "Nested types", namespaces: "Namespaces", modules: "Modules", member: "Members",
+    injects: "Takes (injected)", injectedInto: "Injected into",
+    implementsLabel: "Implements · inherits", implementedBy: "Implemented by",
+    callers: "Called by", calls: "Calls",
+  },
+  ko: {
+    up: "↑ 상위로", snapshot: "시점", compare: "비교", level: "층",
+    labels: "이름", theme: "테마", language: "언어",
+    all: "전체", module: "모듈", namespace: "네임스페이스", type: "타입",
+    labelAuto: "겹치면 숨김", labelAll: "전부", labelNone: "끄기",
+    scope: "범위", scopeAll: "전부", scopeOwn: "우리 코드",
+    hintMouse: "노드 클릭: 들어가기 · 빈 곳 클릭: 올라가기",
+    legendOurs: "색: 우리 코드", legendTheirs: "회색: 라이브러리",
+    project: "프로젝트", importOption: "가져오기…", importTitle: "저장소 가져오기",
+    importLead: "저장소의 코드와 기록을 읽어, 부분들이 어떻게 이어지고 어떻게 변해 왔는지 그립니다.",
+    importClose: "닫기", importFolder: "이 컴퓨터의 폴더",
+    importPick: "폴더 고르기…", importPicking: "폴더 창에서 저장소를 고르세요…",
+    importPickNote: "C#, TypeScript, Python 을 찾아 색인합니다. 폴더 안에는 아무것도 쓰지 않습니다.",
+    importByPath: "경로를 직접 입력", importGo: "가져오기",
+    importDetails: "자세한 기록", importKeepsGoing: "닫아도 됩니다 - 가져오기는 계속되고, 끝나면 프로젝트 메뉴에 나타납니다.",
+    importAgain: "다른 폴더 고르기…",
+    stepWaiting: "대기", stepRunning: "색인 중…", stepSkipped: "건너뜀", stepFailed: "실패",
+    stepElapsed: (elapsed, last) => last ? `${elapsed} / 지난번 약 ${last}` : elapsed,
+    workImport: (name, elapsed) => `${name} 가져오는 중 · ${elapsed}`,
+    workImportDone: name => `${name} 가져옴 · 열기`,
+    workImportFailed: "가져오기 멈춤 · 이유 보기",
+    workWatch: (name, elapsed) => `${name} 갱신 중${elapsed ? " · " + elapsed : ""}`,
+    stepDone: (seconds, symbols) => `${seconds}초 · 심볼 ${symbols}개`,
+    whyNotInstalled: indexer => `${indexer} 가 설치돼 있지 않습니다. 설치한 뒤 다시 가져오세요:`,
+    whyIndexerFailed: indexer => `${indexer} 가 오류로 멈췄습니다:`,
+    problemTitle: "가져온 것이 없습니다",
+    problemNothing: "이 폴더에는 C#, TypeScript, JavaScript, Python 소스가 없습니다. 저장소의 맨 위 폴더를 고르세요.",
+    problemNoFolder: "그 폴더가 없습니다. 경로를 확인하거나, 폴더를 골라 주세요.",
+    problemBusy: "다른 가져오기가 아직 돌고 있습니다. 끝날 때까지 기다려 주세요.",
+    problemOther: "서버가 답하지 않습니다. `treering serve` 가 아직 떠 있나요?",
+    searchPlaceholder: "검색…  /", noHits: "그 이름은 없습니다",
+    kindModule: "모듈", kindNamespace: "네임스페이스", kindType: "타입",
+    kindMethod: "메서드", kindMember: "멤버", notDrawn: "화면에는 없음 - 예산에서 잘림",
+    globalNamespace: "(전역)",
+    style: "모양",
+    styleConstellation: "성운", styleOrbit: "궤도",
+    styleRings: "고리", styleLayers: "층계", styleTree: "계층도",
+    treeRows: "줄", treeMore: "개 더",
+    hintTree: "클릭: 펼치기·접기 · 마우스를 올리면 호출선 · Ctrl+휠: 확대",
+    themeAuto: "시스템", themeLight: "밝게", themeDark: "어둡게", themeSkyfall: "스카이폴",
+    themeObsidian: "옵시디언", themeSlate: "슬레이트",
+    compareNone: "안 함",
+    upLabel: "한 단계 위로", timeMenu: "시점", viewMenu: "보기 설정", settingsMenu: "설정",
+    autoUpdate: "자동으로 최신 유지",
+    autoUpdateEvery: minutes => `${minutes}분마다 바뀐 것을 다시 색인합니다`,
+    autoUpdateLast: time => ` · 마지막 확인 ${time}`,
+    autoUpdateNow: " · 지금 확인 중",
+    autoUpdateOff: "꺼짐: 스냅샷은 직접 추가할 때만 쌓입니다",
+    loading: "불러오는 중…", queryFailed: "질의에 실패했습니다.", loadFailed: "불러오지 못했습니다.",
+    docMore: "더 보기", docLess: "접기",
+    nodes: "노드", edges: "간선", budgetSpent: "예산 소진",
+    newDeps: "새 의존", brokenDeps: "끊긴 의존", folded: "접힌 곳",
+    legendRef: "참조 · 굵은 쪽이 부르는 쪽", legendInherit: "상속",
+    legendShapes: "클래스 · 인터페이스 · 열거형 · 레코드 · 구조체",
+    legendBorn: "새 의존", legendDied: "끊긴 의존",
+    legendTitle: "범례", legendCode: "코드", legendLinks: "선", legendKinds: "모양", legendChanges: "변화",
+    legendOursItem: "우리 코드", legendTheirsItem: "라이브러리",
+    legendReference: "참조", legendInherits: "상속", legendContains: "포함",
+    legendAdded: "새로 생김", legendRemoved: "없어짐",
+    legendModule: "모듈·네임스페이스", legendClass: "클래스", legendInterface: "인터페이스",
+    legendEnum: "열거형", legendRecord: "레코드", legendStruct: "구조체", legendDelegate: "델리게이트",
+    legendStructure: "구조", legendTypes: "타입", legendMembers: "멤버",
+    legendModuleOnly: "모듈", legendNamespace: "네임스페이스",
+    legendMethod: "메서드·함수", legendProperty: "속성", legendField: "필드·변수", legendEvent: "이벤트",
+    mod_abstract: "추상", mod_static: "정적", mod_async: "비동기", mod_virtual: "가상",
+    mod_override: "재정의", mod_sealed: "봉인", mod_readonly: "읽기 전용", mod_const: "상수",
+    close: "닫기", none: "없음",
+    property: "프로퍼티", method: "메서드", field: "필드", event: "이벤트",
+    nestedType: "중첩 타입", namespaces: "네임스페이스", modules: "모듈", member: "멤버",
+    injects: "주입받는 것", injectedInto: "주입되는 곳",
+    implementsLabel: "구현 · 상속", implementedBy: "이것을 구현하는 것",
+    callers: "부르는 곳", calls: "부르는 대상",
+  },
+};
+
+let lang = "en";
+const t = key => (STRINGS[lang] || STRINGS.en)[key] ?? key;
+
+// Fixed seed and iteration count: same code, same picture.
+const SEED = 0x7265656e;
+const ITERATIONS = 320;
+const GRAVITY = 5;
+
+// Matches EdgeKind: Contains=1, Inherit=2, Reference=3.
+const KIND_INHERIT = 2;
+const KIND_CONTAINS = 1;
+
+// SymbolKind values as the API sends them.
+const SYMBOL_NAMESPACE = 2;
+const SYMBOL_PACKAGE = 10;
+// Going inside happens on every click now, tens of times a sitting - under 300ms, and a strong
+// ease-out (quint, close to cubic-bezier(0.23, 1, 0.32, 1)) so it lands quickly and settles.
+const FLIGHT_MS = 280;
+
+// Someone who has asked their system for less motion gets none of the decorative kind: no
+// drift, no slow turn, no particles along the links, no breathing ring, and no fly-in.
+// Hover, highlight and colour still change - those are information, not decoration.
+const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
+const reducedMotion = () => motionQuery.matches;
+
+// Alive, not animated. The layout stays deterministic; only a slow orbit rides on top.
+const DRIFT = 0.032;
+const DRIFT_SPEED = 0.00011;
+const SPIN_SPEED = 0.0000065;
+const ALIVE_NODES = 260;
+const ALIVE_EDGES = 900;
+const LABEL_PASS_MS = 420;
+const GLOW_NODES = 26;      // glow is expensive; only the heaviest get it
+const FLOW_EDGES = 30;      // likewise for the particles that run along links
+
+let trail = [{ label: null, seed: null, granularity: "module" }];
+let graph = null;
+let nodeById = new Map();
+let dom = null;
+let highlight = null;
+// What a search took you to. Unlike the hover highlight it stays until you move on.
+let focus = null;
+let flight = null;
+let drift = 0;
+let dragging = null;
+let depthKey = "";
+let lastLabelPass = 0;
+let visibleLabels = new Set();
+let stars = [];
+let rotX = -0.35, rotY = 0.6, zoom = 1, fit = 1;
+
+const isSkyfall = () => document.documentElement.dataset.theme === "skyfall";
+
+// Obsidian is flat: no depth, no turning. Dragging empty space moves the page, dragging a
+// node moves the node and pulls what it is tied to, and the wheel zooms where you point.
+const isObsidian = () => document.documentElement.dataset.theme === "obsidian";
+let panX = 0, panY = 0;
+
+// Names come out as you zoom in, like Obsidian's text fade: the loudest first.
+const LABEL_ZOOM = [0, 1.25, 1.9];
+
+function applyLanguage(name) {
+  lang = STRINGS[name] ? name : "en";
+  document.documentElement.lang = lang;
+  langSelect.value = lang;
+  try { localStorage.setItem("treering-lang", lang); } catch { /* fine without it */ }
+
+  for (const node of document.querySelectorAll("[data-t]")) node.textContent = t(node.dataset.t);
+  for (const node of document.querySelectorAll("[data-t-label]")) {
+    node.setAttribute("aria-label", t(node.dataset.tLabel));
+    // An icon says nothing to someone who has not learned it yet - the name shows on hover.
+    if (node.tagName === "BUTTON" && !node.textContent.trim()) node.title = t(node.dataset.tLabel);
+  }
+  syncTools();
+  const importOption = document.querySelector('#project option[value="__import"]');
+  if (importOption) importOption.textContent = t("importOption");
+  searchBox.placeholder = t("searchPlaceholder");
+  searchBox.setAttribute("aria-label", t("searchPlaceholder").replace(/[…/\s]+$/, ""));
+
+  fill(granularitySelect, [["module", t("module")], ["namespace", t("namespace")], ["type", t("type")]]);
+  fill(labelSelect, [["auto", t("labelAuto")], ["all", t("labelAll")], ["none", t("labelNone")]]);
+  fill(styleSelect, STYLES.map(name => [name, t("style" + name[0].toUpperCase() + name.slice(1))]));
+  fill(scopeSelect, [["all", t("scopeAll")], ["own", t("scopeOwn")]]);
+  fill(themeSelect, [
+    ["auto", t("themeAuto")], ["light", t("themeLight")],
+    ["dark", t("themeDark")], ["slate", t("themeSlate")], ["skyfall", t("themeSkyfall")],
+    ["obsidian", t("themeObsidian")],
+  ]);
+
+  if (fromSelect.options.length) fromSelect.options[0].textContent = t("compareNone");
+  if (trail[0].label === null || STRINGS.en.all === trail[0].label || STRINGS.ko.all === trail[0].label) {
+    trail[0].label = t("all");
+  }
+
+  drawCrumbs();
+  drawLegend();
+  if (graph) describeCounts();
+  // The panel was built in the old language and stays on screen. Build it again.
+  if (openDetail !== null && !panel.hidden) showDetail(openDetail);
+}
+
+function fill(select, options) {
+  const keep = select.value;
+  select.innerHTML = options.map(([value, label]) => `<option value="${value}">${label}</option>`).join("");
+  if (keep) select.value = keep;
+}
+
+function drawLegend() {
+  // What the marks mean lives in the legend card now; the footer keeps the one line on how to move.
+  legend.innerHTML = `<span class="hint">${t(isTree() ? "hintTree" : "hintMouse")}</span>`;
+  document.body.classList.toggle("tree-view", isTree());
+  renderLegendCard();
+}
+
+// ---- the legend card ----------------------------------------------------------------
+// Every colour, line and shape on the map, each with a box. A box turned off hides that kind of
+// node - and the lines that touch it - or that kind of line, where it stands: nothing is laid
+// out again, so what stays on screen does not move. "Libraries" is the Scope setting itself,
+// the same one as the switch on the bar; it asks the server again rather than hide.
+let legendOff = new Set();
+try { legendOff = new Set(JSON.parse(localStorage.getItem("treering-legend-off") || "[]")); } catch { /* fine */ }
+
+const EDGE_KIND = { 1: "contains", 2: "inherits", 3: "reference" };
+const nodeKind = node =>
+  node.container || node.kind === SYMBOL_NAMESPACE || node.kind === SYMBOL_PACKAGE ? "module"
+    : ["interface", "enum", "record", "struct", "delegate"].includes(node.flavor) ? node.flavor
+    : "class";
+
+function legendHides(node) {
+  if (!node) return false;
+  if (!node.container && node.own && legendOff.has("ours")) return true;
+  return legendOff.has(nodeKind(node));
+}
+
+function legendHidesEdge(edge) {
+  if (legendOff.has(EDGE_KIND[edge.kind] ?? "reference")) return true;
+  if (edge.state === "born" && legendOff.has("added")) return true;
+  if (edge.state === "died" && legendOff.has("removed")) return true;
+  return legendHides(nodeById.get(edge.from)) || legendHides(nodeById.get(edge.to));
+}
+
+function swatch(body) {
+  return `<svg class="swatch" viewBox="0 0 30 14" aria-hidden="true">${body}</svg>`;
+}
+
+const TREE_KIND_NAME = () => ({
+  module: t("legendModuleOnly"), namespace: t("legendNamespace"),
+  class: t("legendClass"), interface: t("legendInterface"), enum: t("legendEnum"), record: t("legendRecord"),
+  struct: t("legendStruct"), delegate: t("legendDelegate"),
+  method: t("legendMethod"), property: t("legendProperty"), field: t("legendField"), event: t("legendEvent"),
+});
+
+function legendRows(body, groups, { keyOnly = [] } = {}) {
+  const on = key => key === "theirs" ? scopeSelect.value !== "own" : !legendOff.has(key);
+  const number = n => new Intl.NumberFormat(lang === "ko" ? "ko-KR" : "en-US").format(n);
+  body.innerHTML = groups.map(([title, rows]) => {
+    // A kind with nothing on screen says nothing - unless it was switched off, so it can come back.
+    const shown = rows.filter(([key, , , n, always]) => always || n > 0 || legendOff.has(key));
+    if (!shown.length) return "";
+    return `<h4>${title}</h4>` + shown.map(([key, name, art, n]) => keyOnly.includes(key)
+      ? `<label class="key"><span></span>${art}<span class="name">${escapeHtml(name)}</span><span class="n">${number(n)}</span></label>`
+      : `<label class="${on(key) ? "" : "off"}"><input type="checkbox" data-legend="${key}"${on(key) ? " checked" : ""}>` +
+        `${art}<span class="name">${escapeHtml(name)}</span><span class="n">${key === "theirs" && !on(key) ? "" : number(n)}</span></label>`).join("");
+  }).join("");
+}
+
+// The tree's legend: what each mark means, counted over the rows on screen. Types and members
+// can be switched off; modules and namespaces are the tree itself, so they are a key only.
+function renderTreeLegend(body) {
+  const rows = (treeDom?.rows ?? []).filter(row => row.node).map(row => row.node);
+  const count = kind => rows.filter(node => treeKind(node) === kind).length;
+  const names = TREE_KIND_NAME();
+  const row = kind => [kind, names[kind], treeMarkSvg(kind, kindColour(kind)), count(kind)];
+  legendRows(body, [
+    [t("legendCode"), [
+      ["ours", t("legendOursItem"), treeMarkSvg("class", kindColour("class")), rows.filter(node => node.own).length, true],
+      ["theirs", t("legendTheirsItem"), treeMarkSvg("class", kindColour("class")).replace("<g ", '<g opacity="0.45" '),
+        rows.filter(node => !node.own).length, true],
+    ]],
+    [t("legendStructure"), [row("module"), row("namespace")]],
+    [t("legendTypes"), ["class", "interface", "enum", "record", "struct", "delegate"].map(row)],
+    [t("legendMembers"), ["method", "property", "field", "event"].map(row)],
+  ], { keyOnly: ["ours", "module", "namespace"] });
+}
+
+function renderLegendCard() {
+  const body = document.getElementById("legendBody");
+  if (!body) return;
+  if (isTree()) { renderTreeLegend(body); return; }
+  const nodes = graph?.nodes ?? [];
+  const edges = graph?.edges ?? [];
+  const count = (list, test) => list.filter(test).length;
+  const hues = palette().hues;
+  const shape = inner => swatch(`<g transform="translate(15 7) scale(5)" fill="currentColor" fill-opacity="0.75">${inner}</g>`);
+
+  const groups = [
+    [t("legendCode"), [
+      ["ours", t("legendOursItem"), swatch(`<circle cx="9" cy="7" r="4.5" fill="${hues[0]}"/><circle cx="20" cy="7" r="4.5" fill="${hues[1]}"/>`),
+        count(nodes, n => n.own && !n.container)],
+      ["theirs", t("legendTheirsItem"), swatch(`<circle cx="15" cy="7" r="4.5" fill="${palette().grey}"/>`),
+        count(nodes, n => !n.own && !n.container)],
+    ]],
+    [t("legendLinks"), [
+      ["reference", t("legendReference"), swatch('<polygon points="2,4 28,6.3 28,7.7 2,10" fill="currentColor" fill-opacity="0.6"/>'),
+        count(edges, e => e.kind === 3)],
+      ["inherits", t("legendInherits"), swatch('<line x1="2" y1="7" x2="28" y2="7" stroke="currentColor" stroke-width="1.3" stroke-dasharray="1 4" stroke-linecap="round"/>'),
+        count(edges, e => e.kind === KIND_INHERIT)],
+      ["contains", t("legendContains"), swatch('<line x1="2" y1="7" x2="28" y2="7" stroke="currentColor" stroke-width="1" stroke-opacity="0.45"/>'),
+        count(edges, e => e.kind === KIND_CONTAINS)],
+    ]],
+    [t("legendKinds"), [
+      ["module", t("legendModule"), swatch('<circle cx="15" cy="7" r="6" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-opacity="0.5"/>'),
+        count(nodes, n => nodeKind(n) === "module")],
+      ["class", t("legendClass"), shape('<circle r="1"/>'), count(nodes, n => nodeKind(n) === "class")],
+      ["interface", t("legendInterface"), shape('<circle r="0.8" fill="none" stroke="currentColor" stroke-width="0.42"/>'),
+        count(nodes, n => nodeKind(n) === "interface")],
+      ["enum", t("legendEnum"), shape('<polygon points="0,-1 1,0 0,1 -1,0"/>'), count(nodes, n => nodeKind(n) === "enum")],
+      ["record", t("legendRecord"), shape('<rect x="-0.85" y="-0.85" width="1.7" height="1.7" rx="0.55"/>'),
+        count(nodes, n => nodeKind(n) === "record")],
+      ["struct", t("legendStruct"), shape('<rect x="-0.85" y="-0.85" width="1.7" height="1.7"/>'),
+        count(nodes, n => nodeKind(n) === "struct")],
+      ["delegate", t("legendDelegate"), shape('<polygon points="0,-1 0.95,0.7 -0.95,0.7"/>'),
+        count(nodes, n => nodeKind(n) === "delegate")],
+    ]],
+  ];
+  if (fromSelect.value) {
+    groups.push([t("legendChanges"), [
+      ["added", t("legendAdded"), swatch('<polygon points="2,4 28,6.3 28,7.7 2,10" fill="var(--born)"/>'), count(edges, e => e.state === "born")],
+      ["removed", t("legendRemoved"), swatch('<line x1="2" y1="7" x2="28" y2="7" stroke="var(--died)" stroke-width="1.5" stroke-dasharray="4 3"/>'),
+        count(edges, e => e.state === "died")],
+    ]]);
+  }
+
+  // A kind that is not on the map says nothing; the code and line rows always stay.
+  const always = ["ours", "theirs", "reference", "inherits", "contains", "added", "removed"];
+  legendRows(body, groups.map(([title, rows]) => [title, rows.map(r => [...r, always.includes(r[0])])]));
+}
+
+document.getElementById("legendBody").addEventListener("change", event => {
+  const key = event.target.dataset?.legend;
+  if (!key) return;
+  if (key === "theirs") {
+    scopeSelect.value = event.target.checked ? "all" : "own";
+    scopeSelect.dispatchEvent(new Event("change"));
+    return;   // the reload redraws the card
+  }
+  if (event.target.checked) legendOff.delete(key); else legendOff.add(key);
+  try { localStorage.setItem("treering-legend-off", JSON.stringify([...legendOff])); } catch { /* fine */ }
+  event.target.closest("label").classList.toggle("off", !event.target.checked);
+  if (isTree()) { buildTree(); paintTree(); return; }
+  lastLabelPass = 0;
+  paint();
+});
+
+const legendToggle = document.getElementById("legendToggle");
+function setLegendOpen(open) {
+  legendToggle.setAttribute("aria-expanded", String(open));
+  document.getElementById("legendBody").hidden = !open;
+  try { localStorage.setItem("treering-legend-open", open ? "1" : "0"); } catch { /* fine */ }
+}
+legendToggle.addEventListener("click", () => setLegendOpen(legendToggle.getAttribute("aria-expanded") !== "true"));
+try { if (localStorage.getItem("treering-legend-open") === "0") setLegendOpen(false); } catch { /* fine */ }
+
+function applyTheme(name) {
+  const wasFlat = isObsidian();
+  if (name === "auto") delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = name;
+  // Flat and 3D are different layouts, not just different paint.
+  if (graph && wasFlat !== isObsidian()) layout(graph.nodes, graph.edges);
+  try { localStorage.setItem("treering-theme", name); } catch { /* fine without it */ }
+  themeSelect.value = name;
+  drawLegend();   // its colour swatches are the theme's
+  document.querySelector('meta[name="theme-color"]')
+    ?.setAttribute("content", getComputedStyle(document.documentElement).getPropertyValue("--bg").trim());
+  if (graph || isTree()) { build(); paint(); }
+}
+
+function rng(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a += 0x6d2b79f5;
+    let x = a;
+    x = Math.imul(x ^ (x >>> 15), x | 1);
+    x ^= x + Math.imul(x ^ (x >>> 7), x | 61);
+    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// A style only decides WHERE things sit. Colour, shape and line stay the same -
+// it is the same graph seen from another angle, not another graph.
+const STYLES = ["constellation", "orbit", "rings", "layers", "tree"];
+const isTree = () => style === "tree";
+let style = "constellation";
+
+// Each shape is worth looking at from somewhere in particular: the ring wants to be
+// seen face on, the tiers from the side. Set the camera once, then leave it to the reader.
+const CAMERA = { constellation: -0.35, orbit: -0.35, rings: -1.3, layers: -0.08 };
+const CAMERA_TURN = { layers: 0.14 };
+
+// Shapes meant to be read from one angle. They hold still and are framed to the screen's
+// own width and height; the free-floating ones spin slowly and are framed as a ball.
+const FIXED_ANGLE = new Set(["rings", "layers"]);
+let framing = null;
+
+// The opened first screen is laid out on a plane facing the camera, so it holds still and
+// is framed to the screen too. It can still be turned by dragging.
+const opened = () => Boolean(graph && graph.opened);
+const holdsStill = () => FIXED_ANGLE.has(style) || opened() || isObsidian() || isTree();
+
+function applyStyle(name) {
+  const moved = style !== name;
+  const wasTree = isTree();
+  style = STYLES.includes(name) ? name : "constellation";
+  styleSelect.value = style;
+  syncTools();
+  try { localStorage.setItem("treering-style", style); } catch { /* fine without it */ }
+  if (moved) {
+    rotX = CAMERA[style] ?? -0.35;
+    if (CAMERA_TURN[style] !== undefined) rotY = CAMERA_TURN[style];
+  }
+
+  if (wasTree !== isTree()) {
+    drawLegend();
+    zoom = 1; panX = 0; panY = 0;
+    if (graph || treeDom) load();
+    return;
+  }
+
+  if (graph) {
+    layout(graph.nodes, graph.edges);
+    build();
+    flight = null;
+    paint();
+  }
+}
+
+// Points spread evenly over a sphere. Deterministic, and it never clumps at the poles
+// the way latitude/longitude does.
+function onSphere(i, count, radius) {
+  if (count <= 1) return { x: 0, y: 0, z: radius };
+  const y = 1 - (2 * i + 1) / count;
+  const r = Math.sqrt(Math.max(0, 1 - y * y));
+  const angle = i * 2.39996;
+  return { x: Math.cos(angle) * r * radius, y: y * radius, z: Math.sin(angle) * r * radius };
+}
+
+// How much traffic each node carries. Several styles rank by it, so it is worked out once.
+function weightsOf(nodes, links) {
+  const weight = new Float64Array(nodes.length);
+  for (const link of links) { weight[link.a] += link.w; weight[link.b] += link.w; }
+  return weight;
+}
+
+function layout(nodes, edges) {
+  framing = null;
+  panX = 0;
+  panY = 0;
+  const random = rng(SEED);
+  const index = new Map(nodes.map((node, i) => [node.id, i]));
+  const n = Math.max(1, nodes.length);
+  const k = 240 / Math.cbrt(n);
+
+  nodes.forEach((node, i) => {
+    node.x = (random() - 0.5) * k * n;
+    node.y = (random() - 0.5) * k * n;
+    // Starting everything on one plane keeps the force layout on it - flat for Obsidian.
+    node.z = isObsidian() ? 0 : (random() - 0.5) * k * n;
+    node.phase = i * 2.39996;
+    node.amp = k * DRIFT;
+  });
+
+  // The node you went inside is not one of the things being laid out - it is what they
+  // sit in. Lay out the rest, then put it above them.
+  const anchor = nodes.find(node => node.anchor);
+
+  // Module bubbles. In the force layout they take part as hubs, pulling their namespaces
+  // together; in the shapes with a fixed geometry they sit at the middle of what they hold.
+  const floating = style === "constellation";
+  const containers = nodes.filter(node => node.container);
+  const placed = nodes.filter(node => node !== anchor && (floating || !node.container));
+  const placedIndex = new Map(placed.map((node, i) => [node.id, i]));
+
+  const heaviest = Math.max(1, ...edges.map(edge => edge.weight));
+  const links = edges
+    .map(edge => ({
+      a: placedIndex.get(edge.from), b: placedIndex.get(edge.to),
+      w: edge.kind === KIND_CONTAINS ? heaviest * 0.6 : edge.weight,
+    }))
+    .filter(link => link.a !== undefined && link.b !== undefined && link.a !== link.b);
+
+  if (containers.length && (style === "constellation" || style === "orbit")) {
+    // Modules first, then what is in them - so that one module's bubble never swallows
+    // another's. Laid out together, heavy wiring between modules pulled their namespaces
+    // into one heap and Core's bubble sat inside 상점앱's, reading as if it were part of it.
+    clustered(nodes, edges, k, random);
+  } else if (style === "orbit") orbit(placed, links, k);
+  else if (style === "rings") rings(placed, links, k);
+  else if (style === "layers") layers(placed, links, k);
+  else constellation(placed, links, k, random);
+
+  if (!floating && !(containers.length && style === "orbit")) {
+    for (const container of containers) {
+      const held = edges.filter(edge => edge.from === container.id).map(edge => nodeById.get(edge.to)).filter(Boolean);
+      const n = Math.max(1, held.length);
+      container.x = held.reduce((sum, node) => sum + node.x, 0) / n;
+      container.y = held.reduce((sum, node) => sum + node.y, 0) / n;
+      container.z = held.reduce((sum, node) => sum + node.z, 0) / n;
+    }
+  }
+
+  if (anchor) placeAnchor(anchor, placed, edges, k);
+
+  // Flat means looking straight at x-y. The ring lies in x-z, so it is turned to face us;
+  // everything else just loses its depth.
+  if (isObsidian()) {
+    for (const node of nodes) {
+      if (style === "rings") { node.y = node.z; }
+      node.z = 0;
+    }
+  }
+
+  settle(nodes, k);
+
+  // The view is scaled to what is laid out, not to the anchor. Keep the anchor inside
+  // that reach so it is on screen without dictating how small everything else is drawn.
+  if (anchor) {
+    const reach = Math.max(1, ...placed.map(node => Math.hypot(node.x, node.y, node.z)));
+    const distance = Math.hypot(anchor.x, anchor.y, anchor.z);
+    // Short of the edge: the ring is drawn large and its name sits above it.
+    if (distance > reach * 0.88) {
+      const pull = (reach * 0.88) / distance;
+      anchor.x *= pull; anchor.y *= pull; anchor.z *= pull;
+    }
+  }
+}
+
+// Group by module, lay the groups out as if each were one node, lay each group out on its
+// own, then push the groups apart until no two overlap.
+function clustered(nodes, edges, k, random) {
+  const containers = nodes.filter(node => node.container);
+  const groupOf = new Map();
+  const groups = [];
+
+  for (const container of containers) {
+    const members = edges
+      .filter(edge => edge.from === container.id && edge.kind === KIND_CONTAINS)
+      .map(edge => nodeById.get(edge.to))
+      .filter(Boolean);
+    const group = { container, members };
+    groups.push(group);
+    for (const member of members) groupOf.set(member.id, group);
+  }
+
+  // Everything not in a bubble - the libraries - is a group of one.
+  for (const node of nodes) {
+    if (node.container || node.anchor || groupOf.has(node.id)) continue;
+    const group = { container: null, members: [node] };
+    groups.push(group);
+    groupOf.set(node.id, group);
+  }
+
+  // 1. The groups, as single nodes, wired by the sum of what runs between them.
+  const kGroup = 240 / Math.cbrt(Math.max(1, groups.length));
+  const index = new Map(groups.map((group, i) => [group, i]));
+  const between = new Map();
+  for (const edge of edges) {
+    if (edge.kind === KIND_CONTAINS) continue;
+    const a = groupOf.get(edge.from), b = groupOf.get(edge.to);
+    if (!a || !b || a === b) continue;
+    const key = index.get(a) + ">" + index.get(b);
+    between.set(key, (between.get(key) || 0) + edge.weight);
+  }
+  const groupLinks = [...between].map(([key, w]) => {
+    const [a, b] = key.split(">").map(Number);
+    return { a, b, w };
+  });
+  const spots = groups.map(() => ({ x: 0, y: 0, z: 0 }));
+  spots.forEach((spot, i) => {
+    spot.x = (random() - 0.5) * kGroup * groups.length;
+    spot.y = (random() - 0.5) * kGroup * groups.length;
+    spot.z = (random() - 0.5) * kGroup * groups.length;
+  });
+  if (style === "orbit") orbit(spots, groupLinks, kGroup);
+  else constellation(spots, groupLinks, kGroup, random);
+
+  // Bubbles are drawn flat on the screen, so groups must be apart on the screen, not just
+  // in space - two groups a long way apart in depth still sit on top of each other once
+  // projected. The groups go on a plane facing the camera, keeping a little depth.
+  for (const spot of spots) spot.z *= 0.2;
+
+  // 2. Each group on its own, scaled to a radius that grows with what it holds.
+  groups.forEach((group, i) => {
+    const count = group.members.length;
+    group.radius = count > 1 ? kGroup * 0.42 * Math.sqrt(count) : kGroup * 0.12;
+    group.spot = spots[i];
+    if (count < 2) {
+      for (const member of group.members) { member.lx = 0; member.ly = 0; member.lz = 0; }
+      return;
+    }
+
+    const local = group.members.map(() => ({ x: 0, y: 0, z: 0 }));
+    const at = new Map(group.members.map((member, j) => [member.id, j]));
+    const inner = edges
+      .filter(edge => edge.kind !== KIND_CONTAINS && at.has(edge.from) && at.has(edge.to) && edge.from !== edge.to)
+      .map(edge => ({ a: at.get(edge.from), b: at.get(edge.to), w: edge.weight }));
+    local.forEach(point => {
+      point.x = (random() - 0.5) * 100; point.y = (random() - 0.5) * 100; point.z = (random() - 0.5) * 100;
+    });
+    constellation(local, inner, 240 / Math.cbrt(count), random);
+
+    const cx = local.reduce((s, p) => s + p.x, 0) / count;
+    const cy = local.reduce((s, p) => s + p.y, 0) / count;
+    const cz = local.reduce((s, p) => s + p.z, 0) / count;
+    const far = Math.max(1, ...local.map(p => Math.hypot(p.x - cx, p.y - cy, p.z - cz)));
+    group.members.forEach((member, j) => {
+      member.lx = ((local[j].x - cx) / far) * group.radius;
+      member.ly = ((local[j].y - cy) / far) * group.radius;
+      member.lz = ((local[j].z - cz) / far) * group.radius * 0.35;
+    });
+  });
+
+  // 3. No two groups overlap - on screen, which is where it counts. A bubble is drawn a fixed
+  //    number of pixels outside its members, and members are dots a fixed number of pixels
+  //    wide, whatever the scale. So the margin needed in layout units depends on how far the
+  //    picture will be scaled down to fit. Guess that scale from the arrangement as it
+  //    stands, space the groups for it, and guess again - it settles in a few rounds.
+  //    Margins kept in layout units alone let busy maps overlap by twenty pixels.
+  const BUBBLE_PX = 22 + 14, LONE_PX = 10;
+  const separate = () => {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (const group of groups) {
+      minX = Math.min(minX, group.spot.x - group.radius); maxX = Math.max(maxX, group.spot.x + group.radius);
+      minY = Math.min(minY, group.spot.y - group.radius); maxY = Math.max(maxY, group.spot.y + group.radius);
+    }
+    const width = Math.max(320, stage.clientWidth), height = Math.max(240, stage.clientHeight);
+    const scale = Math.max(0.05, Math.min(
+      (width * 0.72) / Math.max(1, maxX - minX), (height * 0.66) / Math.max(1, maxY - minY)));
+    const pad = group => (group.container ? BUBBLE_PX : LONE_PX) / scale;
+
+    for (let pass = 0; pass < 120; pass++) {
+      let moved = false;
+      for (let i = 0; i < groups.length; i++) {
+        for (let j = i + 1; j < groups.length; j++) {
+          const a = groups[i], b = groups[j];
+          const need = a.radius + pad(a) + b.radius + pad(b);
+          let dx = b.spot.x - a.spot.x, dy = b.spot.y - a.spot.y;
+          let d = Math.hypot(dx, dy);
+          if (d >= need) continue;
+          if (d < 0.001) { dx = random() - 0.5; dy = random() - 0.5; d = Math.hypot(dx, dy); }
+          const push = (need - d) / 2 / d;
+          a.spot.x -= dx * push; a.spot.y -= dy * push;
+          b.spot.x += dx * push; b.spot.y += dy * push;
+          moved = true;
+        }
+      }
+      if (!moved) break;
+    }
+  };
+  for (let round = 0; round < 4; round++) separate();
+
+  // Screens are wide. Turn the arrangement so its long side runs across rather than down -
+  // the groups often string out along one line, and standing up it wastes most of the width.
+  {
+    let sx = 0, sy = 0, total = 0;
+    for (const group of groups) { const w = 1 + group.radius; sx += group.spot.x * w; sy += group.spot.y * w; total += w; }
+    const mx = sx / total, my = sy / total;
+    let xx = 0, yy = 0, xy = 0;
+    for (const group of groups) {
+      const w = 1 + group.radius, dx = group.spot.x - mx, dy = group.spot.y - my;
+      xx += w * dx * dx; yy += w * dy * dy; xy += w * dx * dy;
+    }
+    const angle = 0.5 * Math.atan2(2 * xy, xx - yy);
+    const cos = Math.cos(-angle), sin = Math.sin(-angle);
+    for (const group of groups) {
+      const dx = group.spot.x - mx, dy = group.spot.y - my;
+      group.spot.x = dx * cos - dy * sin;
+      group.spot.y = dx * sin + dy * cos;
+    }
+  }
+
+  // Turned, the picture fits the screen differently. Space it once more for that scale.
+  separate();
+
+  for (const group of groups) {
+    for (const member of group.members) {
+      member.x = group.spot.x + member.lx;
+      member.y = group.spot.y + member.ly;
+      member.z = group.spot.z + member.lz;
+    }
+    if (group.container) {
+      group.container.x = group.spot.x;
+      group.container.y = group.spot.y;
+      group.container.z = group.spot.z;
+    }
+  }
+}
+
+// Above what it holds, centred on it. Above reads as "contains" in every shape, and in the
+// ring - seen from above - it lands in the empty middle.
+function placeAnchor(anchor, placed, edges, k) {
+  const held = new Set(edges.filter(edge => edge.from === anchor.id).map(edge => edge.to));
+  const inside = placed.filter(node => held.has(node.id));
+  const around = inside.length ? inside : placed;
+  const n = Math.max(1, around.length);
+
+  anchor.x = around.reduce((sum, node) => sum + node.x, 0) / n;
+  anchor.z = around.reduce((sum, node) => sum + node.z, 0) / n;
+  anchor.y = Math.min(0, ...placed.map(node => node.y)) - k * (style === "layers" ? 1.6 : 0.8);
+}
+
+// The heaviest node in the middle, everything else on shells around it. Reads as
+// "what is this built around" - the force layout answers that only by accident.
+function orbit(nodes, links, k) {
+  const weight = weightsOf(nodes, links);
+  const order = nodes
+    .map((_, i) => i)
+    .sort((a, b) => (weight[b] - weight[a]) || (a - b));
+
+  let placed = 0;
+  for (let shell = 0; placed < order.length; shell++) {
+    const size = shell === 0 ? 1 : Math.min(order.length - placed, 5 + shell * 7);
+    const radius = shell === 0 ? 0 : k * (1.5 + (shell - 1) * 1.45);
+
+    for (let i = 0; i < size; i++) {
+      const node = nodes[order[placed + i]];
+      const point = onSphere(i, size, radius);
+      node.x = point.x; node.y = point.y; node.z = point.z;
+    }
+
+    placed += size;
+  }
+}
+
+// Everything on one circle, grouped by colour, so every edge becomes a chord across it.
+// This is the view for "who reaches into whom" - crossings are the point, not noise.
+function rings(nodes, links, k) {
+  const weight = weightsOf(nodes, links);
+  const peak = Math.max(1, ...weight);
+
+  const groups = new Map();
+  nodes.forEach((node, i) => {
+    const key = node.group ?? "\u0001outside";
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(i);
+  });
+
+  const ordered = [...groups.entries()].sort(
+    (a, b) => (b[1].length - a[1].length) || (a[0] < b[0] ? -1 : 1));
+
+  // A gap between groups, so the arcs read as groups rather than one long band.
+  const gap = ordered.length > 1 ? 1.6 : 0;
+  const slots = nodes.length + gap * ordered.length;
+  const radius = k * Math.max(2.4, slots * 0.42);
+
+  let slot = 0;
+  for (const [, members] of ordered) {
+    members.sort((a, b) => (weight[b] - weight[a]) || (a - b));
+
+    for (const i of members) {
+      const angle = (slot / slots) * Math.PI * 2;
+      nodes[i].x = Math.cos(angle) * radius;
+      nodes[i].z = Math.sin(angle) * radius;
+      // Busy nodes lift out of the plane, so the ring is a shallow bowl rather than a disc.
+      nodes[i].y = -(weight[i] / peak) * k * 2.2;
+      slot++;
+    }
+
+    slot += gap;
+  }
+}
+
+// Tiers by how deep a thing sits in the dependency chain. What calls sits above
+// what is called. Cycles are broken by the pass limit - this is a picture, not a proof.
+function layers(nodes, links, k) {
+  // Code that calls itself round in a circle has no "above". Pushing depth along the loop
+  // just keeps going until a pass limit, and everything on the loop ends up at the bottom
+  // with empty tiers in between. So a loop becomes one tier, and depth is measured between
+  // loops - the longest path through what is left, which has no cycles.
+  const component = stronglyConnected(nodes.length, links);
+  const depthOf = new Map();
+  const into = new Map();
+  for (const link of links) {
+    const from = component[link.a], to = component[link.b];
+    if (from === to) continue;
+    if (!into.has(to)) into.set(to, new Set());
+    into.get(to).add(from);
+  }
+
+  const measure = c => {
+    if (depthOf.has(c)) return depthOf.get(c);
+    depthOf.set(c, 0);   // guards against a cycle we missed; there should be none left
+    let deepest = 0;
+    for (const from of into.get(c) || []) deepest = Math.max(deepest, measure(from) + 1);
+    depthOf.set(c, deepest);
+    return deepest;
+  };
+
+  // Only the depths that occur. A tier with nothing on it is just a gap.
+  const raw = nodes.map((_, i) => measure(component[i]));
+  const levels = [...new Set(raw)].sort((a, b) => a - b);
+  const rank = new Map(levels.map((level, i) => [level, i]));
+  const depth = Int32Array.from(raw, value => rank.get(value));
+
+  const weight = weightsOf(nodes, links);
+  const tiers = new Map();
+  nodes.forEach((_, i) => {
+    if (!tiers.has(depth[i])) tiers.set(depth[i], []);
+    tiers.get(depth[i]).push(i);
+  });
+
+  // Each tier is a row across the screen, not a little disc. Discs stacked up are a thin
+  // column - a bean sprout on a wide screen. The picture is made wider than tall, since
+  // that is the shape of the screen it lands on.
+  const deepest = Math.max(...depth);
+  const widest = Math.max(...[...tiers.values()].map(members => members.length));
+  const pitch = k * 2.4;
+  const width = pitch * Math.max(3, widest);
+  const height = Math.max(k * 3, width * 0.6);
+  const step = deepest > 0 ? height / deepest : 0;
+
+  // Order each row under the things above it that it is tied to, so lines run down rather
+  // than across. One sweep from the top is enough to take most crossings out.
+  const neighbours = Array.from({ length: nodes.length }, () => []);
+  for (const link of links) { neighbours[link.a].push(link.b); neighbours[link.b].push(link.a); }
+
+  for (let level = 0; level <= deepest; level++) {
+    const members = tiers.get(level) || [];
+    const pull = i => {
+      const above = neighbours[i].filter(j => depth[j] < level);
+      return above.length ? above.reduce((sum, j) => sum + nodes[j].x, 0) / above.length : 0;
+    };
+    members.sort((a, b) => (pull(a) - pull(b)) || (weight[b] - weight[a]) || (a - b));
+
+    members.forEach((i, at) => {
+      nodes[i].x = (at - (members.length - 1) / 2) * pitch;
+      // A shallow zig-zag in depth, so a row reads as sitting in space rather than on a wire.
+      nodes[i].z = (at % 2 ? 1 : -1) * k * 0.45;
+      nodes[i].y = (level - deepest / 2) * step;
+    });
+  }
+}
+
+// Tarjan's algorithm, without recursion - a long dependency chain would blow the stack.
+function stronglyConnected(count, links) {
+  const out = Array.from({ length: count }, () => []);
+  for (const link of links) out[link.a].push(link.b);
+
+  const index = new Int32Array(count).fill(-1);
+  const low = new Int32Array(count);
+  const onStack = new Uint8Array(count);
+  const component = new Int32Array(count).fill(-1);
+  const stack = [];
+  let next = 0, found = 0;
+
+  for (let root = 0; root < count; root++) {
+    if (index[root] !== -1) continue;
+    const work = [[root, 0]];
+    index[root] = low[root] = next++;
+    stack.push(root); onStack[root] = 1;
+
+    while (work.length) {
+      const top = work[work.length - 1];
+      const [v, i] = top;
+      if (i < out[v].length) {
+        top[1]++;
+        const w = out[v][i];
+        if (index[w] === -1) {
+          index[w] = low[w] = next++;
+          stack.push(w); onStack[w] = 1;
+          work.push([w, 0]);
+        } else if (onStack[w]) {
+          low[v] = Math.min(low[v], index[w]);
+        }
+        continue;
+      }
+
+      work.pop();
+      if (work.length) {
+        const parent = work[work.length - 1][0];
+        low[parent] = Math.min(low[parent], low[v]);
+      }
+
+      if (low[v] === index[v]) {
+        let w;
+        do { w = stack.pop(); onStack[w] = 0; component[w] = found; } while (w !== v);
+        found++;
+      }
+    }
+  }
+
+  return component;
+}
+
+// 3D Fruchterman-Reingold. The overview is a few hundred nodes by design, so O(n^2) is fine.
+function constellation(nodes, links, k, random) {
+  const maxWeight = Math.max(1, ...links.map(link => link.w));
+  let temperature = k * 6;
+
+  for (let step = 0; step < ITERATIONS; step++) {
+    const fx = new Float64Array(nodes.length);
+    const fy = new Float64Array(nodes.length);
+    const fz = new Float64Array(nodes.length);
+
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        let dx = nodes[i].x - nodes[j].x;
+        let dy = nodes[i].y - nodes[j].y;
+        let dz = nodes[i].z - nodes[j].z;
+        let d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (d < 0.01) { dx = random() - 0.5; dy = random() - 0.5; dz = random() - 0.5; d = 0.01; }
+        const push = (k * k) / d;
+        fx[i] += (dx / d) * push; fy[i] += (dy / d) * push; fz[i] += (dz / d) * push;
+        fx[j] -= (dx / d) * push; fy[j] -= (dy / d) * push; fz[j] -= (dz / d) * push;
+      }
+    }
+
+    for (const link of links) {
+      const a = nodes[link.a], b = nodes[link.b];
+      const dx = b.x - a.x, dy = b.y - a.y, dz = b.z - a.z;
+      const d = Math.max(0.01, Math.sqrt(dx * dx + dy * dy + dz * dz));
+      const weight = 0.4 + 0.6 * (Math.log1p(link.w) / Math.log1p(maxWeight));
+      const pull = ((d * d) / k) * weight;
+      fx[link.a] += (dx / d) * pull; fy[link.a] += (dy / d) * pull; fz[link.a] += (dz / d) * pull;
+      fx[link.b] -= (dx / d) * pull; fy[link.b] -= (dy / d) * pull; fz[link.b] -= (dz / d) * pull;
+    }
+
+    // A little gravity. Without it a node on one or two thin edges drifts out past its
+    // neighbours, and since the view is scaled to fit the farthest node, one straggler
+    // shrinks everything else into a clump in the middle of an empty screen.
+    for (let i = 0; i < nodes.length; i++) {
+      fx[i] -= nodes[i].x * GRAVITY;
+      fy[i] -= nodes[i].y * GRAVITY;
+      fz[i] -= nodes[i].z * GRAVITY;
+    }
+
+    for (let i = 0; i < nodes.length; i++) {
+      const d = Math.max(0.01, Math.hypot(fx[i], fy[i], fz[i]));
+      const move = Math.min(d, temperature) / d;
+      nodes[i].x += fx[i] * move;
+      nodes[i].y += fy[i] * move;
+      nodes[i].z += fz[i] * move;
+    }
+
+    temperature *= 0.965;
+  }
+}
+
+// Whatever put the nodes where they are, the camera expects them centred, and the
+// star field is sized from how far they spread.
+function settle(nodes, k) {
+  // Centre on what was laid out. The anchor rides along but does not pull the middle up.
+  const laid = nodes.filter(node => !node.anchor);
+  const n = Math.max(1, laid.length);
+  const mean = laid.reduce((sum, node) => {
+    sum.x += node.x / n; sum.y += node.y / n; sum.z += node.z / n; return sum;
+  }, { x: 0, y: 0, z: 0 });
+
+  for (const node of nodes) { node.x -= mean.x; node.y -= mean.y; node.z -= mean.z; }
+
+  // A field of far dots. They turn with the camera, so the map reads as sitting in space
+  // rather than being painted on glass.
+  const spread = Math.max(1, ...nodes.map(node => Math.hypot(node.x, node.y, node.z)));
+  const starRandom = rng(SEED ^ 0x5eed);
+  stars = Array.from({ length: 150 }, () => ({
+    x: (starRandom() - 0.5) * spread * 4.2,
+    y: (starRandom() - 0.5) * spread * 4.2,
+    z: (starRandom() - 0.5) * spread * 4.2,
+    r: 0.4 + starRandom() * 0.9,
+  }));
+}
+
+// What colour means depends on what actually differs on screen. Inside a single module
+// everything shares one colour, so the key falls back to the node itself.
+// The first screen, opened. The API answers at namespace level; here our modules become
+// bubbles holding their namespaces, and every library is folded back into one grey ball -
+// a library is context, and a hundred of its namespaces would bury ours.
+function openModules(g) {
+  const nodes = [];
+  const folded = new Map();
+  const into = new Map();
+
+  for (const node of g.nodes) {
+    if (node.own) { nodes.push(node); continue; }
+    const key = node.moduleId ?? node.id;
+    if (!folded.has(key)) {
+      folded.set(key, {
+        id: key, display: node.module || node.display, kind: SYMBOL_PACKAGE,
+        module: node.module, flavor: null, own: false, moduleId: key,
+      });
+    }
+    into.set(node.id, key);
+  }
+  nodes.push(...folded.values());
+
+  const merged = new Map();
+  for (const edge of g.edges) {
+    const from = into.get(edge.from) ?? edge.from;
+    const to = into.get(edge.to) ?? edge.to;
+    if (from === to) continue;
+    const key = `${from}>${to}>${edge.kind}>${edge.state}`;
+    const same = merged.get(key);
+    if (same) same.weight += edge.weight;
+    else merged.set(key, { ...edge, from, to });
+  }
+  const edges = [...merged.values()];
+
+  const containers = new Map();
+  const hold = (containerId, memberId) => edges.push({
+    from: containerId, to: memberId, kind: KIND_CONTAINS, weight: 0, inferred: false, state: "same",
+  });
+
+  if (g.groups && g.groups.length) {
+    // One package of ours: the server has split it into the branches worth seeing, so the
+    // first screen is not a single bubble. A branch can itself be a node (a file that holds
+    // code), so its bubble gets an id of its own and remembers the namespace it stands for.
+    const module = g.nodes.find(node => node.own)?.module;
+    for (const group of g.groups) {
+      const id = -group.id;
+      containers.set(id, {
+        id, target: group.id, display: group.display, kind: SYMBOL_NAMESPACE, module,
+        flavor: null, own: true, moduleId: null, container: true,
+      });
+      for (const member of group.members) hold(id, member);
+    }
+  } else {
+    for (const node of g.nodes) {
+      if (!node.own || node.moduleId == null) continue;
+      if (!containers.has(node.moduleId)) {
+        containers.set(node.moduleId, {
+          id: node.moduleId, target: node.moduleId, display: node.module, kind: SYMBOL_PACKAGE,
+          module: node.module, flavor: null, own: true, moduleId: node.moduleId, container: true,
+        });
+      }
+      hold(node.moduleId, node.id);
+    }
+  }
+  nodes.push(...containers.values());
+
+  g.nodes = nodes;
+  g.edges = edges;
+}
+
+// Colour says where a thing belongs; size and type say how much it matters. Before, every
+// module got its own hue - 38 modules, 38 colours, and nothing stood out - and the biggest
+// labels were whichever libraries happened to sit nearest the camera.
+//
+//  - What you went inside, and everything it holds, takes the first colour.
+//  - Our own code takes the next colours, one per module, heaviest first.
+//  - Code we did not write is grey. It is context, not the subject.
+//  - Importance is a rank by how much traffic a node carries, with other people's code
+//    counted at half - the top few are drawn and named the loudest.
+// A module keeps its colour wherever you are. Colours used to be dealt afresh on every
+// screen, so the same module was blue on the way in and green once inside - the one thing
+// colour is for, telling you what belongs together, broke on the first click.
+const moduleHues = new Map();
+const hueForModule = name => {
+  if (!moduleHues.has(name)) moduleHues.set(name, moduleHues.size);
+  return moduleHues.get(name);
+};
+
+function classify(g) {
+  const mass = new Map();
+  for (const edge of g.edges) {
+    mass.set(edge.from, (mass.get(edge.from) || 0) + edge.weight);
+    mass.set(edge.to, (mass.get(edge.to) || 0) + edge.weight);
+  }
+
+  const inside = new Set(g.children || []);
+  const drilled = g.nodes.some(node => node.anchor);
+  for (const node of g.nodes) {
+    node.mass = mass.get(node.id) || 0;
+    node.group = node.own ? (node.module || node.display || "") : null;
+    // Inside something, our code from elsewhere keeps its colour but steps back a little,
+    // so what you went into reads first.
+    node.outside = drilled && node.own && !node.anchor && !inside.has(node.id);
+  }
+
+  // New modules are dealt a colour heaviest first, so the first screen sets the order.
+  const totals = new Map();
+  for (const node of g.nodes) {
+    if (node.group !== null) totals.set(node.group, (totals.get(node.group) || 0) + node.mass);
+  }
+  [...totals.keys()]
+    .sort((a, b) => (totals.get(b) - totals.get(a)) || (a < b ? -1 : 1))
+    .forEach(hueForModule);
+  for (const node of g.nodes) node.hue = node.group === null ? -1 : hueForModule(node.group);
+
+  const score = node => node.mass * (node.hue >= 0 ? 1 : 0.5);
+  [...g.nodes]
+    .filter(node => !node.anchor && !node.container)
+    .sort((a, b) => (score(b) - score(a)) || (a.id - b.id))
+    .forEach((node, i) => { node.rank = i; });
+}
+
+// A handful of hues that stay apart from each other, per theme. More groups than hues is
+// rare - the grey takes everything that is not ours - and then they repeat.
+function palette() {
+  if (isSkyfall()) {
+    return {
+      hues: ["#46d7ff", "#58e0a8", "#ffb454", "#ff7a6b", "#a58bff", "#e8e36a", "#5fb3ff", "#ff8fd0"],
+      grey: "#2d4b62",
+    };
+  }
+  // Slate's accent is green, so no module is: a green node would read as "the one you are on".
+  if (document.documentElement.dataset.theme === "slate") {
+    return {
+      hues: ["#60a5fa", "#f59e0b", "#f472b6", "#a78bfa", "#fb923c", "#38bdf8", "#facc15", "#f87171"],
+      grey: "#475569",
+    };
+  }
+  // No violet among them: violet is the hover accent, and it has to mean only that.
+  if (isObsidian()) {
+    return {
+      hues: ["#6fa8dc", "#e5a86b", "#7ec699", "#e08a8a", "#d4c56b", "#6cc5c5", "#c49a6c", "#9fb3c8"],
+      grey: "#5c5c5c",
+    };
+  }
+  const dark = document.documentElement.dataset.theme === "dark"
+    || (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
+  return dark
+    ? { hues: ["#6f9cf2", "#f0a05c", "#5cc79a", "#ee7a8d", "#b08ef0", "#e0c050", "#5cc8d8", "#d98bb0"],
+        grey: "#5f5d57" }
+    : { hues: ["#3a6fd8", "#d9772b", "#2f9e6e", "#c8455d", "#8a5cc9", "#b8941f", "#2a9fb0", "#a8567a"],
+        grey: "#b9b6ae" };
+}
+
+// Label tiers: the few that matter most are read first, the rest are there if you look.
+const LABEL_SIZE = [17, 13.5, 11];
+const LABEL_WEIGHT = [700, 600, 400];
+const tierOf = node =>
+  node.anchor || node.container ? 0 : node.hue < 0 ? 2
+    : node.rank < 3 ? (node.outside ? 1 : 0) : node.rank < 10 ? 1 : 2;
+
+// Cut long names in the middle. The end of a dotted name is what tells two packages apart -
+// "Microsoft.EntityFrameworkCo…" said nothing about which of four it was.
+const shorten = name => name.length > 30 ? name.slice(0, 12) + "…" + name.slice(-16) : name;
+
+function colorOf(node) {
+  const { hues, grey } = palette();
+  return node && node.hue >= 0 ? hues[node.hue % hues.length] : grey;
+}
+
+function el(name, attrs) {
+  const node = document.createElementNS(SVG, name);
+  for (const key in attrs) node.setAttribute(key, attrs[key]);
+  return node;
+}
+
+// A flat disc reads as a sticker. A lit sphere reads as an object sitting in depth,
+// which is most of what makes the map feel three-dimensional.
+function sphereGradient(defs, color, id) {
+  const gradient = el("radialGradient", { id, cx: "0.34", cy: "0.30", r: "0.78" });
+  gradient.append(
+    el("stop", { offset: "0%", "stop-color": "#fff", "stop-opacity": "0.55" }),
+    el("stop", { offset: "38%", "stop-color": color, "stop-opacity": "1" }),
+    el("stop", { offset: "100%", "stop-color": color, "stop-opacity": "0.72" }));
+  defs.append(gradient);
+  return `url(#${id})`;
+}
+
+function shapeFor(node, fill, stroke) {
+  switch (node.flavor) {
+    case "interface":
+      return el("circle", { r: 0.8, fill: "none", stroke, "stroke-width": 0.42 });
+    case "enum":
+      return el("polygon", { points: "0,-1 1,0 0,1 -1,0", fill });
+    case "struct":
+      return el("rect", { x: -0.85, y: -0.85, width: 1.7, height: 1.7, fill });
+    case "record":
+      return el("rect", { x: -0.85, y: -0.85, width: 1.7, height: 1.7, rx: 0.55, fill });
+    case "delegate":
+      return el("polygon", { points: "0,-1 0.95,0.7 -0.95,0.7", fill });
+    default:
+      return el("circle", { r: 1, fill });
+  }
+}
+
+// Build the DOM once per graph. Rewriting innerHTML every frame re-lays out every label,
+// which is what made the motion look like insects crawling.
+function build() {
+  if (isTree()) { buildTree(); return; }
+  stage.textContent = "";
+
+  const defs = el("defs", {});
+  const glowFilter = el("filter", { id: "glow", x: "-80%", y: "-80%", width: "260%", height: "260%" });
+  glowFilter.append(
+    el("feGaussianBlur", { stdDeviation: isSkyfall() ? 7 : 4, result: "b" }),
+    (() => {
+      const merge = el("feMerge", {});
+      merge.append(
+        el("feMergeNode", { in: "b" }), el("feMergeNode", { in: "b" }), el("feMergeNode", { in: "b" }));
+      return merge;
+    })());
+  defs.append(glowFilter);
+  stage.append(defs);
+
+  const starLayer = el("g", {});
+  const glowLayer = el("g", { filter: "url(#glow)", opacity: isSkyfall() ? 1 : 0.55 });
+  const edgeLayer = el("g", {});
+  const flowLayer = el("g", {});
+  const bubbleLayer = el("g", {});
+  const nodeLayer = el("g", {});
+  const labelLayer = el("g", {});
+  stage.append(starLayer, bubbleLayer, glowLayer, edgeLayer, flowLayer, nodeLayer, labelLayer);
+
+  const starDots = isSkyfall()
+    ? stars.map(star => {
+        const dot = el("circle", { r: star.r, fill: "currentColor" });
+        starLayer.append(dot);
+        return { star, dot };
+      })
+    : [];
+
+  const style = getComputedStyle(document.documentElement);
+  const born = (style.getPropertyValue("--born") || "#2f8f4e").trim();
+  const died = (style.getPropertyValue("--died") || "#b4453f").trim();
+
+  const gradients = new Map();
+  const gradientFor = color => {
+    if (!gradients.has(color)) {
+      gradients.set(color, sphereGradient(defs, color, "grad" + gradients.size));
+    }
+    return gradients.get(color);
+  };
+
+  const heaviest = [...graph.edges].sort((l, r) => r.weight - l.weight);
+  const flowing = new Set(heaviest.slice(0, FLOW_EDGES).map(edge => edge));
+
+  const edges = graph.edges.filter(edge => !nodeById.get(edge.from)?.container).map(edge => {
+    let element;
+    let flow = null;
+
+    if (isObsidian()) {
+      // Hairlines, all of them. Paint decides colour and dash each frame.
+      element = el("path", { fill: "none", "stroke-linecap": "round" });
+    } else if (edge.kind === KIND_CONTAINS) {
+      element = el("path", {
+        fill: "none", stroke: "currentColor", "stroke-dasharray": "2 6", "stroke-linecap": "round",
+      });
+    } else if (edge.state === "died") {
+      element = el("path", { fill: "none", stroke: died, "stroke-dasharray": "4 3", "stroke-linecap": "round" });
+    } else if (edge.kind === KIND_INHERIT) {
+      element = el("path", {
+        fill: "none", stroke: edge.state === "born" ? born : "currentColor",
+        "stroke-dasharray": "1 4", "stroke-linecap": "round",
+      });
+    } else {
+      element = el("path", { fill: edge.state === "born" ? born : colorOf(nodeById.get(edge.from)) });
+
+      // A dotted line crawling from source to target: direction you can watch rather than infer.
+      if (flowing.has(edge)) {
+        flow = el("path", {
+          fill: "none", "stroke-linecap": "round", "stroke-dasharray": "1 13",
+          stroke: edge.state === "born" ? born : colorOf(nodeById.get(edge.from)),
+        });
+        flowLayer.append(flow);
+      }
+    }
+
+    edgeLayer.append(element);
+    return { edge, element, flow };
+  });
+
+  const nodes = graph.nodes.map(node => {
+    const color = colorOf(node);
+    const name = node.display || t("globalNamespace");
+    const group = el("g", { class: node.container ? "node container" : node.anchor ? "node anchor" : "node" });
+    group.append(node.container
+      ? el("circle", { r: 1, fill: color, "fill-opacity": 0.07, stroke: color, "stroke-opacity": 0.45 })
+      : node.anchor
+        ? el("circle", { r: 1, fill: "none", stroke: color, "stroke-width": 0.12 })
+        : isObsidian() ? el("circle", { r: 1, fill: color }) : shapeFor(node, gradientFor(color), color));
+    group.dataset.id = node.id;
+    group.dataset.name = encodeURIComponent(name);
+
+    const title = document.createElementNS(SVG, "title");
+    title.textContent = name
+      + (node.flavor ? " · " + node.flavor : "")
+      + (node.module ? " · " + node.module : "");
+    group.append(title);
+    (node.container ? bubbleLayer : nodeLayer).append(group);
+
+    const halo = el("circle", { r: 1, fill: color });
+    glowLayer.append(halo);
+
+    const text = shorten(name);
+    const tier = tierOf(node);
+    const label = el("text", {
+      class: node.anchor ? "label anchor" : "label", "text-anchor": "middle",
+      fill: node.hue < 0 ? "var(--muted)" : "currentColor",
+      "font-weight": LABEL_WEIGHT[tier],
+    });
+    label.textContent = text;
+    labelLayer.append(label);
+
+    let em = 0;
+    for (const ch of text) em += /[ᄀ-ᇿ　-鿿가-힯]/.test(ch) ? 1 : 0.55;
+
+    const members = node.container
+      ? graph.edges.filter(edge => edge.from === node.id).map(edge => edge.to)
+      : null;
+
+    return { node, group, label, halo, em, color, tier, members };
+  });
+
+  const focusRing = el("circle", {
+    r: 1, fill: "none", stroke: "var(--accent)", "stroke-width": 2.2, "stroke-opacity": 0,
+  });
+  labelLayer.append(focusRing);
+
+  dom = { starDots, glowLayer, edgeLayer, nodeLayer, labelLayer, edges, nodes, focusRing };
+  renderLegendCard();
+  depthKey = "";
+  lastLabelPass = 0;
+  visibleLabels = new Set();
+}
+
+function pickLabels(placed) {
+  const mode = labelSelect.value;
+  if (mode === "none") return new Set();
+  if (mode === "all") return new Set(placed.map(item => item.id));
+
+  const chosen = new Set();
+  const boxes = [];
+
+  for (const item of placed) {
+    const half = item.em * item.size * 0.5;
+    const box = { x1: item.x - half, x2: item.x + half, y1: item.y - item.size, y2: item.y + 3 };
+    if (boxes.some(o => box.x1 < o.x2 && box.x2 > o.x1 && box.y1 < o.y2 && box.y2 > o.y1)) continue;
+    boxes.push(box);
+    chosen.add(item.id);
+  }
+
+  return chosen;
+}
+
+function paint() {
+  if (isTree()) { paintTree(); return; }
+  if (!graph || !dom) return;
+
+  const width = stage.clientWidth, height = stage.clientHeight;
+  stage.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  const cx = width / 2, cy = height / 2;
+
+  const flat = isObsidian();
+  const cosY = flat ? 1 : Math.cos(rotY), sinY = flat ? 0 : Math.sin(rotY);
+  const cosX = flat ? 1 : Math.cos(rotX), sinX = flat ? 0 : Math.sin(rotX);
+
+  let centre = { x: 0, y: 0 };
+  if (holdsStill()) {
+    // Framed once, to the box the picture actually makes from this angle, and kept while
+    // the reader turns it - re-framing every frame would make it breathe.
+    if (!framing || framing.width !== width || framing.height !== height) {
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      for (const node of graph.nodes) {
+        const x1 = node.x * cosY - node.z * sinY;
+        const z1 = node.x * sinY + node.z * cosY;
+        const y2 = node.y * cosX - z1 * sinX;
+        minX = Math.min(minX, x1); maxX = Math.max(maxX, x1);
+        minY = Math.min(minY, y2); maxY = Math.max(maxY, y2);
+      }
+      framing = {
+        width, height,
+        // Bubbles reach past the nodes they hold, and their names sit above them - leave room.
+        fit: Math.min(
+          (width * (opened() ? 0.72 : 0.84)) / Math.max(1, maxX - minX),
+          (height * (opened() ? 0.66 : 0.76)) / Math.max(1, maxY - minY)),
+        centre: { x: (minX + maxX) / 2, y: (minY + maxY) / 2 },
+      };
+    }
+    fit = framing.fit;
+    centre = framing.centre;
+  } else {
+    const spread = Math.max(1, ...graph.nodes
+      .filter(node => !node.anchor)
+      .map(node => Math.hypot(node.x, node.y, node.z)));
+    fit = (Math.min(width, height) * 0.46) / spread;
+  }
+  const t0 = flight ? flight.eased : 1;
+  const alive = !flat && !flight && !reducedMotion()
+    && graph.nodes.length <= ALIVE_NODES && graph.edges.length <= ALIVE_EDGES;
+
+  const project = flat
+    ? (px, py) => ({
+        x: cx + panX + (px - centre.x) * fit * zoom,
+        y: cy + panY + (py - centre.y) * fit * zoom,
+        z: 0, s: 1,
+      })
+    : (px, py, pz) => {
+    const x1 = px * cosY - pz * sinY;
+    const z1 = px * sinY + pz * cosY;
+    const y2 = py * cosX - z1 * sinX;
+    const z2 = py * sinX + z1 * cosX;
+    const X = (x1 - centre.x) * fit, Y = (y2 - centre.y) * fit, Z = z2 * fit;
+    const scale = 700 / (700 + Z);
+    return { x: cx + X * scale * zoom, y: cy + Y * scale * zoom, z: Z, s: scale };
+  };
+
+  for (const { star, dot } of dom.starDots) {
+    const point = project(star.x, star.y, star.z);
+    // On a wide screen the fit grows, and a star can end up behind the camera - its scale goes
+    // negative, and so would its radius. It is not in view; draw nothing.
+    if (point.s <= 0) { dot.setAttribute("r", "0"); continue; }
+    dot.setAttribute("cx", point.x.toFixed(1));
+    dot.setAttribute("cy", point.y.toFixed(1));
+    dot.setAttribute("r", (star.r * point.s).toFixed(2));
+    dot.setAttribute("fill-opacity", (0.05 + 0.16 * point.s).toFixed(3));
+  }
+
+  const screen = new Map();
+  for (const node of graph.nodes) {
+    let px = flight ? node.fx + (node.x - node.fx) * t0 : node.x;
+    let py = flight ? node.fy + (node.y - node.fy) * t0 : node.y;
+    let pz = flight ? node.fz + (node.z - node.fz) * t0 : node.z;
+
+    if (alive) {
+      const angle = drift * DRIFT_SPEED + node.phase;
+      px += Math.cos(angle) * node.amp;
+      py += Math.sin(angle) * node.amp * 0.62;
+      pz += Math.sin(angle) * node.amp * 0.78;
+    }
+
+    screen.set(node.id, project(px, py, pz));
+  }
+
+  const degree = new Map();
+  for (const edge of graph.edges) {
+    degree.set(edge.from, (degree.get(edge.from) || 0) + edge.weight);
+    degree.set(edge.to, (degree.get(edge.to) || 0) + edge.weight);
+  }
+
+  const heaviestNode = Math.max(1, ...degree.values());
+  const heaviestEdge = Math.max(1, ...graph.edges.map(edge => edge.weight), 1);
+
+  const neighbours = new Set();
+  if (highlight !== null) {
+    neighbours.add(highlight);
+    for (const edge of graph.edges) {
+      if (edge.from === highlight) neighbours.add(edge.to);
+      if (edge.to === highlight) neighbours.add(edge.from);
+    }
+  }
+
+  for (const { edge, element, flow } of dom.edges) {
+    const a = screen.get(edge.from), b = screen.get(edge.to);
+    if (!a || !b) continue;
+    if (legendHidesEdge(edge)) {
+      element.setAttribute("display", "none");
+      flow?.setAttribute("display", "none");
+      continue;
+    }
+    element.removeAttribute("display");
+    flow?.removeAttribute("display");
+
+    const touched = highlight === null || edge.from === highlight || edge.to === highlight;
+    const depth = (a.s + b.s) / 2;
+    const share = Math.log1p(edge.weight) / Math.log1p(heaviestEdge);
+    // Wiring among our own code is the story; a line out to a library is a footnote.
+    const theirs = nodeById.get(edge.from)?.hue < 0 || nodeById.get(edge.to)?.hue < 0 ? 0.5 : 1;
+    const base = (isSkyfall() ? 0.30 + 0.55 * share : 0.14 + 0.5 * share) * theirs;
+    const opacity = ((highlight === null ? base : touched ? 0.92 : 0.05) * depth).toFixed(3);
+
+    if (flat) {
+      const lit = highlight !== null && touched;
+      element.setAttribute("d", `M${a.x.toFixed(1)} ${a.y.toFixed(1)} L${b.x.toFixed(1)} ${b.y.toFixed(1)}`);
+      element.setAttribute("stroke",
+        edge.state === "born" ? "var(--born)" : edge.state === "died" ? "var(--died)"
+          : lit ? "var(--accent)" : "var(--edge)");
+      element.setAttribute("stroke-dasharray",
+        edge.kind === KIND_INHERIT || edge.kind === KIND_CONTAINS || edge.state === "died" ? "3 3" : "none");
+      element.setAttribute("stroke-width",
+        ((edge.kind === KIND_CONTAINS ? 0.6 : 0.7 + 1.1 * share) * Math.min(2, Math.sqrt(zoom))).toFixed(2));
+      element.setAttribute("stroke-opacity", (highlight === null
+        ? (edge.kind === KIND_CONTAINS ? 0.25 : (0.32 + 0.4 * share) * theirs)
+        : lit ? 0.95 : 0.05).toFixed(3));
+      continue;
+    }
+
+    // Links bow away from the straight line. Parallel arcs read as separate strands
+    // where parallel straight lines merge into one grey smear.
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const length = Math.max(0.01, Math.hypot(dx, dy));
+    const nx = -dy / length, ny = dx / length;
+    const bow = Math.min(34, length * 0.13);
+    const mx = (a.x + b.x) / 2 + nx * bow;
+    const my = (a.y + b.y) / 2 + ny * bow;
+
+    if (edge.kind === KIND_CONTAINS) {
+      element.setAttribute("d", `M${a.x.toFixed(1)} ${a.y.toFixed(1)} L${b.x.toFixed(1)} ${b.y.toFixed(1)}`);
+      element.setAttribute("stroke-width", (0.9 * depth).toFixed(2));
+      element.setAttribute("stroke-opacity", ((highlight === null ? 0.22 : touched ? 0.6 : 0.04) * depth).toFixed(3));
+      continue;
+    }
+
+    if (edge.kind === KIND_INHERIT || edge.state === "died") {
+      element.setAttribute("d", `M${a.x.toFixed(1)} ${a.y.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`);
+      element.setAttribute("stroke-width", ((edge.state === "died" ? 1.5 : 1.1) * depth).toFixed(2));
+      element.setAttribute("stroke-opacity", edge.state === "same" ? opacity : Math.max(0.55, +opacity).toFixed(3));
+      continue;
+    }
+
+    const wide = (0.9 + 3.4 * share) * depth;
+    const narrow = 0.3 * depth;
+
+    element.setAttribute("d",
+      `M${(a.x + nx * wide).toFixed(1)} ${(a.y + ny * wide).toFixed(1)}` +
+      ` Q${(mx + nx * wide * 0.5).toFixed(1)} ${(my + ny * wide * 0.5).toFixed(1)}` +
+      ` ${(b.x + nx * narrow).toFixed(1)} ${(b.y + ny * narrow).toFixed(1)}` +
+      ` L${(b.x - nx * narrow).toFixed(1)} ${(b.y - ny * narrow).toFixed(1)}` +
+      ` Q${(mx - nx * wide * 0.5).toFixed(1)} ${(my - ny * wide * 0.5).toFixed(1)}` +
+      ` ${(a.x - nx * wide).toFixed(1)} ${(a.y - ny * wide).toFixed(1)} Z`);
+    element.setAttribute("fill-opacity",
+      edge.state === "born" ? Math.max(0.6, +opacity).toFixed(3) : opacity);
+
+    if (flow) {
+      flow.setAttribute("d", `M${a.x.toFixed(1)} ${a.y.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`);
+      flow.setAttribute("stroke-width", (1.6 * depth).toFixed(2));
+      flow.setAttribute("stroke-opacity", ((touched ? 0.85 : 0.1) * depth).toFixed(3));
+      flow.setAttribute("stroke-dashoffset", reducedMotion() ? "0" : (-drift * 0.011).toFixed(1));
+    }
+  }
+
+  const candidates = [];
+
+  for (const item of dom.nodes) {
+    const { node, group, halo } = item;
+
+    // Switched off in the legend: gone from view, but still where it was.
+    item.off = legendHides(node);
+    if (item.off) {
+      group.setAttribute("display", "none");
+      halo?.setAttribute("fill-opacity", "0");
+      item.point = screen.get(node.id);
+      item.radius = 0;
+      item.dim = 0;
+      item.near = false;
+      item.size = LABEL_SIZE[0];
+      continue;
+    }
+    if (!node.container) group.removeAttribute("display");
+
+    // Ring and Layers keep their own geometry, which does not keep a module in one place.
+    // A bubble there would be drawn round half the screen; colour carries membership instead.
+    if (node.container && FIXED_ANGLE.has(style)) {
+      group.setAttribute("display", "none");
+      halo.setAttribute("fill-opacity", "0");
+      item.point = screen.get(node.id);
+      item.radius = 0;
+      item.dim = 0;
+      item.near = false;
+      item.size = LABEL_SIZE[0];
+      continue;
+    }
+    if (node.container) group.removeAttribute("display");
+
+    // A bubble is drawn round what it holds, wherever that ended up on screen.
+    if (node.container) {
+      const points = item.members.map(id => screen.get(id)).filter(Boolean);
+      const own = screen.get(node.id);
+      const cx0 = points.length ? points.reduce((sum, p) => sum + p.x, 0) / points.length : own.x;
+      const cy0 = points.length ? points.reduce((sum, p) => sum + p.y, 0) / points.length : own.y;
+      const reach = Math.max(0, ...points.map(p => Math.hypot(p.x - cx0, p.y - cy0)));
+      const radius = Math.max(24, reach + 22);
+      const lit = highlight === null || neighbours.has(node.id);
+
+      group.setAttribute("transform", `translate(${cx0.toFixed(1)} ${cy0.toFixed(1)}) scale(${radius.toFixed(1)})`);
+      group.firstChild.setAttribute("stroke-width", (1.3 / radius).toFixed(4));
+      group.firstChild.setAttribute("fill-opacity", (highlight === node.id ? 0.14 : lit ? 0.07 : 0.03).toFixed(2));
+      group.firstChild.setAttribute("stroke-opacity", (lit ? 0.5 : 0.18).toFixed(2));
+      halo.setAttribute("fill-opacity", "0");
+
+      item.point = { x: cx0, y: cy0, z: own.z, s: 1 };
+      item.radius = radius;
+      item.dim = lit ? 1 : 0.35;
+      item.near = true;
+      item.size = LABEL_SIZE[0];
+      candidates.push({
+        id: node.id, x: cx0, y: cy0 - radius - 5, size: item.size, em: item.em, weight: Infinity,
+      });
+      continue;
+    }
+
+    const point = screen.get(node.id);
+    const share = node.anchor ? 0 : Math.sqrt((degree.get(node.id) || 1) / heaviestNode);
+    // Other people's code is drawn a size smaller: it is there to show what ours leans on.
+    const own = node.hue >= 0 ? 1 : 0.78;
+    const radius = flat
+      ? (node.anchor ? 22 : (3.5 + 11 * share) * own) * Math.min(2.5, zoom)
+      : (node.anchor ? 26 : (5 + 18 * share) * own) * point.s * Math.min(2, zoom);
+    const near = highlight === null || neighbours.has(node.id);
+    const dim = near ? 1 : 0.18;
+
+    group.setAttribute("transform",
+      `translate(${point.x.toFixed(2)} ${point.y.toFixed(2)}) scale(${radius.toFixed(2)})`);
+
+    const shape = group.firstChild;
+    const solid = ((0.62 + 0.36 * point.s) * dim * (node.hue < 0 ? 0.7 : node.outside ? 0.75 : 1)).toFixed(2);
+
+    if (node.anchor) {
+      shape.setAttribute("stroke-width", (1.6 / radius).toFixed(3));
+      shape.setAttribute("stroke-opacity", (0.75 * dim).toFixed(2));
+    } else if (node.flavor === "interface") {
+      shape.setAttribute("stroke-opacity", solid);
+    } else {
+      shape.setAttribute("fill-opacity", solid);
+      if (node.id === highlight) {
+        shape.setAttribute("stroke", "currentColor");
+        shape.setAttribute("stroke-width", (1.8 / radius).toFixed(3));
+        shape.setAttribute("stroke-opacity", "0.6");
+      } else {
+        shape.removeAttribute("stroke");
+      }
+    }
+
+    // Only the heaviest few get a halo. Glow on everything is both slow and mush.
+    // Obsidian lights what you point at in its accent and leaves the rest as they are.
+    if (flat && !node.anchor) shape.setAttribute("fill", node.id === highlight ? "var(--accent)" : item.color);
+
+    // Only the top few of ours glow. Glow on everything is both slow and mush.
+    const glowing = !flat && !node.anchor && ((node.hue >= 0 && node.rank < 3) || node.id === highlight);
+    halo.setAttribute("cx", point.x.toFixed(1));
+    halo.setAttribute("cy", point.y.toFixed(1));
+    halo.setAttribute("r", (radius * 0.92).toFixed(1));
+    halo.setAttribute("fill-opacity", glowing ? (0.62 * point.s * dim).toFixed(2) : "0");
+
+    item.point = point;
+    item.radius = radius;
+    item.dim = dim;
+    item.near = near;
+    // The tier sets the size; depth only nudges it. Letting depth decide made whatever sat
+    // nearest the camera the loudest thing on screen.
+    item.size = flat ? [13, 11.5, 10.5][item.tier] : LABEL_SIZE[item.tier] * (0.9 + 0.1 * point.s);
+
+    // In Obsidian, quieter names wait until you zoom in. Pointing at something names it
+    // and its neighbours regardless.
+    const zoomedEnough = !flat || labelSelect.value !== "auto" || zoom >= LABEL_ZOOM[item.tier];
+    if (near && zoomedEnough) {
+      candidates.push({
+        id: node.id, x: point.x, y: flat ? point.y + radius + 12 : point.y - radius - 5,
+        size: item.size, em: item.em,
+        // Named in order of importance, so when two would overlap the one that matters wins.
+        // What you went inside is always named - it answers "where am I".
+        weight: node.anchor ? Infinity : -node.rank,
+      });
+    }
+  }
+
+  const now = performance.now();
+  if (now - lastLabelPass > LABEL_PASS_MS || flight || dragging) {
+    lastLabelPass = now;
+    candidates.sort((l, r) => r.weight - l.weight);
+    visibleLabels = pickLabels(candidates);
+  }
+
+  for (const item of dom.nodes) {
+    const { node, label, point, radius, dim, near } = item;
+    const shown = !item.off && ((near && (visibleLabels.has(node.id) || node.id === highlight)) || node.id === focus
+      || (flat && highlight !== null && neighbours.has(node.id)));
+    // Whole pixels. Text on fractional positions re-rasterises as it moves and shimmers.
+    // Obsidian puts the name under the dot; bubbles keep theirs on top.
+    label.setAttribute("x", Math.round(point.x));
+    label.setAttribute("y", Math.round(flat && !node.container ? point.y + radius + 12 : point.y - radius - 5));
+    label.setAttribute("font-size", item.size.toFixed(1));
+    label.setAttribute("fill-opacity", shown ? (point.s * 0.95 * dim).toFixed(2) : "0");
+  }
+
+  // The ring round what a search found. It breathes, so the eye finds it on a busy map.
+  const found = focus === null ? null : dom.nodes.find(item => item.node.id === focus && item.point);
+  if (found) {
+    const pulse = reducedMotion() ? 8 : 7 + 3 * Math.sin(performance.now() / 260);
+    dom.focusRing.setAttribute("cx", found.point.x.toFixed(1));
+    dom.focusRing.setAttribute("cy", found.point.y.toFixed(1));
+    dom.focusRing.setAttribute("r", (found.radius + pulse).toFixed(1));
+    dom.focusRing.setAttribute("stroke-opacity", "0.9");
+  } else {
+    dom.focusRing.setAttribute("stroke-opacity", "0");
+  }
+
+  // Painter's algorithm, but only touch the DOM when the order actually changed.
+  const sorted = dom.nodes.filter(item => !item.node.container).sort((l, r) => r.point.z - l.point.z);
+  const key = sorted.map(item => item.node.id).join(",");
+  if (key !== depthKey) {
+    depthKey = key;
+    for (const item of sorted) dom.nodeLayer.append(item.group);
+  }
+}
+
+// Going inside, what is in there bursts out of the thing you clicked (spread 0.04: from a
+// point). Coming out is the same film backwards: you land beside the thing you left, and the
+// level around it gathers in from wider than it will sit (spread 1.3), the way a view does
+// when you step back from it.
+function flyFrom(origin, spread = 0.04) {
+  for (const node of graph.nodes) {
+    node.fx = origin.x + (node.x - origin.x) * spread;
+    node.fy = origin.y + (node.y - origin.y) * spread;
+    node.fz = origin.z + (node.z - origin.z) * spread;
+  }
+  flight = { start: performance.now(), eased: 0 };
+}
+
+// With less motion asked for, nothing flies: the new level fades in instead, so it still
+// reads as a change rather than a jump cut.
+function fadeIn() {
+  stage.animate?.([{ opacity: 0 }, { opacity: 1 }], { duration: 140, easing: "ease-out" });
+}
+
+function drawCrumbs() {
+  crumbs.innerHTML = trail.map((step, i) =>
+    i === trail.length - 1
+      ? `<b>${step.label ?? t("all")}</b>`
+      : `<button data-step="${i}">${step.label ?? t("all")}</button><span>›</span>`).join("");
+  upButton.disabled = trail.length < 2;
+}
+
+const escapeHtml = text => String(text ?? "").replace(/[&<>"]/g, ch =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]);
+
+// A member's line in the panel. A C# declaration carries the name ("private int App._count"),
+// so it is shown as it is. scip-python writes only the type in that place ("builtins.int"), and
+// showing that alone would list a column of types with no names - so the name leads, and the
+// type follows, quieter. The name is matched as a whole word: a field "i" is not found in "int".
+function memberLine(m) {
+  const name = m.display, signature = m.signature;
+  if (!signature) return `<code>${escapeHtml(name)}</code>`;
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const word = new RegExp(`(^|[^\\w])${escaped}([^\\w]|$)`);
+  if (word.test(signature)) return `<code>${escapeHtml(signature)}</code>`;
+  return `<code>${escapeHtml(name)}</code> <span class="type">${escapeHtml(signature)}</span>`;
+}
+
+// A doc comment as the server hands it: plain text with `code`, **bold** and blank-line
+// paragraphs. It is escaped first, so nothing in a comment can become markup.
+function docHtml(text) {
+  return escapeHtml(text)
+    .replace(/`([^`\n]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
+}
+
+// What the thing is, said the way the tree and the legend say it: the same mark and colour, the
+// kind by name, and the modifiers its declaration carries - so an abstract method reads as one.
+// Modifiers are read only from the words before the name's parameters or body, where C# and
+// Python put them; a word inside a name or a type is not taken for one.
+const KIND_CODE = { Package: 10, Namespace: 2, Type: 3, Method: 4, Term: 5 };
+const MODIFIERS = ["abstract", "static", "async", "virtual", "override", "sealed", "readonly", "const"];
+
+function modifiersOf(signature) {
+  if (!signature) return [];
+  const words = new Set(signature.split(/[({=:]/)[0].split(/\s+/));
+  return MODIFIERS.filter(word => words.has(word));
+}
+
+function kindLine(d) {
+  const kind = treeKind({ kind: KIND_CODE[d.kind] ?? 0, flavor: d.flavor, shape: d.shape });
+  const chips = modifiersOf(d.signature).map(word => `<span class="chip">${t("mod_" + word)}</span>`).join("");
+  return `<div class="kindline">${treeMarkSvg(kind, kindColour(kind))}` +
+    `<span class="kind">${escapeHtml(TREE_KIND_NAME()[kind] ?? d.kind)}</span>${chips}</div>`;
+}
+
+// The graph shows how things are wired. This shows what the thing is.
+let openDetail = null;
+
+async function showDetail(id) {
+  openDetail = id;
+  if (panel.hidden || !panel.firstElementChild) {
+    panel.innerHTML = `<p class="none">${t("loading")}</p>`;
+  } else {
+    panel.classList.add("stale");
+  }
+  panel.hidden = false;
+  panel.setAttribute("aria-busy", "true");
+
+  const response = await fetch(api("/api/symbol?id=" + id)).catch(() => null);
+  // Clicked on to something else, or closed, while this was on its way.
+  if (openDetail !== id) return;
+  panel.classList.remove("stale");
+  panel.removeAttribute("aria-busy");
+  if (!response?.ok) { panel.innerHTML = `<p class="none">${t("loadFailed")}</p>`; return; }
+
+  const d = await response.json();
+  if (openDetail !== id) return;
+  const shapes = {
+    property: t("property"), method: t("method"), field: t("field"), event: t("event"),
+    type: t("nestedType"), namespace: t("namespaces"), module: t("modules"), member: t("member"),
+  };
+
+  const list = (items, render) => items.length
+    ? "<ul>" + items.map(render).join("") + "</ul>"
+    : `<p class="none">${t("none")}</p>`;
+
+  const typeLink = item =>
+    `<li><button type="button" class="link" data-id="${item.id}">${escapeHtml(item.display)}</button>` +
+    (item.module && item.module !== d.module ? ` <span class="meta">${escapeHtml(item.module)}</span>` : "") +
+    (item.weight > 1 ? ` <span class="meta">${item.weight.toLocaleString()}</span>` : "") + "</li>";
+
+  const grouped = {};
+  for (const member of d.members) (grouped[member.shape] ||= []).push(member);
+
+  const section = (title, body) => `<h3>${title}</h3>${body}`;
+
+  panel.innerHTML =
+    `<button id="panelClose">${t("close")}</button>` +
+    `<h2>${escapeHtml(d.display)}</h2>` +
+    kindLine(d) +
+    (d.module || d.namespace
+      ? `<div class="meta">${[d.module, d.namespace].filter(Boolean).map(escapeHtml).join(" · ")}</div>` : "") +
+    (d.signature ? `<code class="sig">${escapeHtml(d.signature)}</code>` : "") +
+    (d.doc ? `<div class="doc folded" id="panelDoc">${docHtml(d.doc)}</div>` +
+      `<button type="button" class="docToggle" id="panelDocToggle" aria-controls="panelDoc" aria-expanded="false" hidden>${t("docMore")}</button>` : "") +
+    (d.file ? `<div class="meta">${escapeHtml(d.file)}${d.line != null ? " : " + (d.line + 1) : ""}</div>` : "") +
+    Object.entries(grouped).map(([shape, items]) =>
+      section(`${shapes[shape] || shape} ${items.length}`,
+        list(items, m => `<li>${memberLine(m)}` +
+          (m.summary ? `<div class="summary" title="${escapeHtml(m.summary)}">${docHtml(m.summary)}</div>` : "") +
+          `</li>`))).join("") +
+    section(t("injects"), list(d.injects, typeLink)) +
+    section(t("injectedInto"), list(d.injectedInto, typeLink)) +
+    (d.implements.length ? section(t("implementsLabel"), list(d.implements, typeLink)) : "") +
+    (d.implementedBy.length ? section(t("implementedBy"), list(d.implementedBy, typeLink)) : "") +
+    section(t("callers"), list(d.callers, typeLink)) +
+    section(t("calls"), list(d.calls, typeLink));
+
+  // Offer "show more" only when the fold actually hides something.
+  const doc = document.getElementById("panelDoc");
+  const toggle = document.getElementById("panelDocToggle");
+  if (doc && toggle) {
+    toggle.hidden = doc.scrollHeight <= doc.clientHeight + 1;
+    toggle.onclick = () => {
+      const open = doc.classList.toggle("folded") === false;
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.textContent = t(open ? "docLess" : "docMore");
+    };
+  }
+
+  document.getElementById("panelClose").onclick = () => {
+    panel.hidden = true;
+    openDetail = null;
+    highlight = null;
+    paint();
+  };
+}
+
+panel.addEventListener("click", event => {
+  const link = event.target.closest("[data-id]");
+  if (!link) return;
+  const id = Number(link.dataset.id);
+  if (nodeById.has(id)) { highlight = id; paint(); }
+  showDetail(id);
+});
+
+async function loadSnapshots() {
+  let snapshots = [];
+  try {
+    const response = await fetch(api("/api/snapshots"));
+    if (response.ok) snapshots = await response.json();
+  } catch { /* without snapshots only the time axis is unavailable */ }
+
+  if (snapshots.length === 0) {
+    document.getElementById("timeTool").hidden = true;
+    knownSnapshots = 0;
+    return;
+  }
+
+  const label = snapshot => `ord ${snapshot.ord} · ${snapshot.indexedAt}`;
+  atSelect.innerHTML = snapshots.map(s => `<option value="${s.ord}">${label(s)}</option>`).join("");
+  atSelect.value = snapshots[snapshots.length - 1].ord;
+
+  fromSelect.innerHTML = `<option value="">${t("compareNone")}</option>`
+    + snapshots.map(s => `<option value="${s.ord}">${label(s)}</option>`).join("");
+
+  document.getElementById("compareRow").hidden = snapshots.length < 2;
+  syncTools();
+}
+
+function describeCounts() {
+  const born = graph.edges.filter(edge => edge.state === "born").length;
+  const died = graph.edges.filter(edge => edge.state === "died").length;
+
+  counts.innerHTML =
+    `${t("nodes")} ${graph.nodes.length.toLocaleString()} / ${graph.nodeBudget.toLocaleString()}` +
+    ` · ${t("edges")} ${graph.edges.length.toLocaleString()}` +
+    (graph.budgetExhausted ? ` · ${t("budgetSpent")}` : "") +
+    (fromSelect.value
+      ? ` · <span class="born">${t("newDeps")} ${born.toLocaleString()}</span>` +
+        ` · <span class="died">${t("brokenDeps")} ${died.toLocaleString()}</span>`
+      : "");
+
+  truncatedOut.innerHTML = graph.truncated.length
+    ? `<span class="warn">${t("folded")} ${graph.truncated.length}: ` +
+      graph.truncated.slice(0, 2).map(item => `${item.display} +${item.hidden}`).join(", ") + "</span>"
+    : "";
+}
+
+async function load(origin = null) {
+  focus = null;
+  syncTools();
+  if (isTree()) return loadTree();
+  const step = trail[trail.length - 1];
+  granularitySelect.value = step.granularity;
+  counts.textContent = t("loading");
+
+  const params = new URLSearchParams({ granularity: step.granularity });
+  if (scopeSelect.value === "own") params.set("own", "1");
+  if (step.seed !== null) params.set("seed", step.seed);
+  if (trail.length === 1 && step.granularity === "module") params.set("open", "1");
+  if (atSelect.value) params.set("at", atSelect.value);
+  if (fromSelect.value) params.set("from", fromSelect.value);
+
+  const response = await fetch(api("/api/map?" + params));
+  if (!response.ok) { counts.textContent = t("queryFailed"); return; }
+
+  graph = await response.json();
+  if (graph.opened) {
+    openModules(graph);
+    // Face the plane the modules are laid out on.
+    rotX = -0.16;
+    rotY = 0;
+  }
+
+  // Going inside something should not make it vanish. Keep it on screen as the thing
+  // everything else sits in, tied to what it holds by faint lines.
+  if (step.anchor && !graph.nodes.some(node => node.id === step.anchor.id)) {
+    graph.nodes.push({ ...step.anchor, anchor: true });
+    const present = new Set(graph.nodes.map(node => node.id));
+    for (const child of graph.children || []) {
+      if (!present.has(child) || child === step.anchor.id) continue;
+      graph.edges.push({
+        from: step.anchor.id, to: child, kind: KIND_CONTAINS, weight: 0, inferred: false, state: "same",
+      });
+    }
+  }
+
+  nodeById = new Map(graph.nodes.map(node => [node.id, node]));
+  classify(graph);
+  highlight = null;
+  layout(graph.nodes, graph.edges);
+  drawCrumbs();
+  drawLegend();
+  build();
+
+  // Coming out of something: find it on this level - itself, or the bubble standing for it.
+  const left = origin?.leaving == null ? null
+    : graph.nodes.find(node => !node.anchor && (node.id === origin.leaving || node.target === origin.leaving));
+  if (left) focus = left.id;   // the ring marks where you just were
+
+  if (!origin || origin.instant) flight = null;
+  else if (reducedMotion()) { flight = null; fadeIn(); }
+  else if ("leaving" in origin) flyFrom(left ?? { x: 0, y: 0, z: 0 }, 1.3);
+  else flyFrom(origin);
+  paint();
+  describeCounts();
+}
+
+// Clicking asks a new question rather than growing what is on screen.
+// A click moves you, so the side panel follows you: it describes what you are inside, and
+// on the top level - inside nothing - it gets out of the way.
+function describeWhereYouAre() {
+  const here = trail[trail.length - 1];
+  if (here.seed !== null) {
+    showDetail(here.seed);
+  } else {
+    panel.hidden = true;
+    openDetail = null;
+  }
+}
+
+// What is one level inside a thing depends on the thing, not on the screen: the opened
+// first screen holds modules and namespaces side by side.
+const FINER = { module: "namespace", namespace: "type" };
+const nextLevelOf = node =>
+  !node ? FINER[trail[trail.length - 1].granularity] ?? null
+    : node.kind === SYMBOL_PACKAGE ? "namespace"
+    : node.kind === SYMBOL_NAMESPACE ? "type"
+    : null;
+const canGoInside = node => Boolean(nextLevelOf(node));
+
+function drillInto(group, label) {
+  const id = typeof group === "string" ? Number(group) : Number(group.dataset.id);
+  const name = label ?? decodeURIComponent(group.dataset.name);
+  const from = nodeById.get(id);
+  const next = nextLevelOf(from);
+  if (!next) return;
+  const origin = from ? { x: from.x, y: from.y, z: from.z } : { x: 0, y: 0, z: 0 };
+
+  // A bubble stands for a symbol it is not itself - go inside that one.
+  const seed = from?.target ?? id;
+  const anchor = from
+    ? { id: seed, display: from.display, kind: from.kind, module: from.module, flavor: from.flavor, own: from.own }
+    : { id, display: name, kind: null, module: null, flavor: null, own: false };
+
+  trail.push({ label: name, seed, granularity: next, anchor });
+  load(origin).then(describeWhereYouAre);
+}
+
+// From the keyboard it is instant - Esc gets pressed in runs, and a flight on each would
+// only make it feel slow.
+function goUp({ instant = false } = {}) {
+  if (trail.length < 2) return;
+  const leaving = trail.pop().seed;
+  load({ leaving, instant }).then(describeWhereYouAre);
+}
+
+upButton.addEventListener("click", () => goUp());
+addEventListener("keydown", event => {
+  const typing = event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement;
+  if ((event.key === "/" && !typing) || (event.key.toLowerCase() === "k" && (event.ctrlKey || event.metaKey))) {
+    event.preventDefault();
+    searchBox.focus();
+    searchBox.select();
+    return;
+  }
+  if (event.key === "Escape" && !importer.hidden) { closeImporter(); return; }
+  if (event.key === "Escape" && closeMenu({ refocus: true })) return;
+  if (event.key === "Escape" && !typing) goUp({ instant: true });
+});
+
+// ---- the tree -----------------------------------------------------------------------
+// What is inside what: modules, namespaces, types, members, opened a branch at a time.
+// The map says who calls whom; this says where things live. Pointing at a node draws its
+// calls over the tree, to wherever the other end is visible right now.
+const TREE_ROW = 24;
+const TREE_COL = 220;
+const TREE_LEFT = 36;
+const TREE_TOP = 28;
+
+const tree = { children: new Map(), more: new Map(), nodes: new Map(), open: new Set(), links: new Map() };
+let treeDom = null;
+let treeHovered = null;
+
+function resetTree() {
+  tree.children.clear(); tree.more.clear(); tree.nodes.clear(); tree.open.clear(); tree.links.clear();
+}
+
+async function treeFetch(parentId) {
+  const key = parentId ?? "root";
+  if (tree.children.has(key)) return tree.children.get(key);
+
+  const params = new URLSearchParams();
+  if (parentId != null) params.set("id", parentId);
+  if (scopeSelect.value === "own") params.set("own", "1");
+
+  let answer = { nodes: [], more: 0 };
+  try {
+    const response = await fetch(api("/api/tree/children?" + params));
+    if (response.ok) answer = await response.json();
+  } catch { /* an empty branch */ }
+
+  for (const node of answer.nodes) { node.parent = parentId ?? null; tree.nodes.set(node.id, node); }
+  tree.children.set(key, answer.nodes);
+  tree.more.set(key, answer.more);
+  return answer.nodes;
+}
+
+async function loadTree() {
+  counts.textContent = t("loading");
+  if (!tree.children.has("root")) {
+    const modules = await treeFetch(null);
+    // Our modules start open, so the first look already shows what is in them.
+    for (const module of modules) {
+      if (!module.own) continue;
+      tree.open.add(module.id);
+      await treeFetch(module.id);
+    }
+  }
+  graph = null;
+  drawCrumbs();
+  drawLegend();
+  buildTree();
+  paintTree();
+}
+
+// Leaves take the next row; a parent sits in the middle of its children. That keeps the
+// shape of a hierarchy chart while every name still gets a line of its own.
+function layoutTree() {
+  let next = 0;
+  const rows = [];
+  const place = (key, depth) => {
+    const ys = [];
+    for (const node of tree.children.get(key) || []) {
+      if (treeHides(node)) continue;   // switched off in the legend, with everything under it
+      const kids = tree.open.has(node.id) ? tree.children.get(node.id) || [] : [];
+      let y;
+      if (kids.length) {
+        const span = place(node.id, depth + 1);
+        y = (span[0] + span[1]) / 2;
+      } else {
+        y = next++ * TREE_ROW;
+      }
+      rows.push({ node, x: depth * TREE_COL, y, depth });
+      ys.push(y);
+    }
+    const more = tree.more.get(key);
+    if (more) {
+      const y = next++ * TREE_ROW;
+      rows.push({ more, x: depth * TREE_COL, y, depth, parentKey: key === "root" ? undefined : key });
+      ys.push(y);
+    }
+    return ys.length ? [ys[0], ys[ys.length - 1]] : [next * TREE_ROW, next * TREE_ROW];
+  };
+  place("root", 0);
+  return rows;
+}
+
+// ---- what a row in the tree is -----------------------------------------------------
+// One table of marks, drawn in the tree and in its legend alike. Types keep the shapes they
+// have on the map; members get a smaller family of their own, so a function and a constant
+// no longer look the same.
+const treeKind = node =>
+  node.kind === 10 ? "module"
+    : node.kind === SYMBOL_NAMESPACE ? "namespace"
+    : node.kind === 3 ? (["interface", "enum", "record", "struct", "delegate"].includes(node.flavor) ? node.flavor : "class")
+    : node.shape === "method" || node.kind === 4 ? "method"
+    : node.shape === "property" ? "property"
+    : node.shape === "event" ? "event"
+    : "field";
+
+const TREE_MARKS = {
+  module: c => [["circle", { r: 6.5, fill: c, "fill-opacity": 0.22, stroke: c, "stroke-width": 1.6 }], ["circle", { r: 2.4, fill: c }]],
+  namespace: c => [["circle", { r: 5.5, fill: c, "fill-opacity": 0.22, stroke: c, "stroke-width": 1.4 }]],
+  class: c => [["circle", { r: 4.8, fill: c }]],
+  interface: c => [["circle", { r: 4, fill: "none", stroke: c, "stroke-width": 2 }]],
+  enum: c => [["polygon", { points: "0,-5.5 5.5,0 0,5.5 -5.5,0", fill: c }]],
+  record: c => [["rect", { x: -4.5, y: -4.5, width: 9, height: 9, rx: 3, fill: c }]],
+  struct: c => [["rect", { x: -4.5, y: -4.5, width: 9, height: 9, rx: 0.8, fill: c }]],
+  delegate: c => [["polygon", { points: "0,-5 4.8,3.8 -4.8,3.8", fill: c }]],
+  method: c => [["polygon", { points: "-2.6,-3.6 3.8,0 -2.6,3.6", fill: c }]],
+  property: c => [["circle", { r: 2.9, fill: "none", stroke: c, "stroke-width": 1.6 }]],
+  field: c => [["rect", { x: -2.8, y: -2.8, width: 5.6, height: 5.6, fill: c }]],
+  event: c => [["path", { d: "M1 -4.2 L-2.4 0.6 L0.2 0.6 L-1 4.2 L2.6 -0.8 L0 -0.8 Z", fill: c }]],
+};
+const TREE_TOGGLES = ["class", "interface", "enum", "record", "struct", "delegate", "method", "property", "field", "event"];
+const treeHides = node => TREE_TOGGLES.includes(treeKind(node)) && legendOff.has(treeKind(node));
+
+function treeMark(node, colour) {
+  const group = el("g", { class: "mark" });
+  for (const [tag, attrs] of TREE_MARKS[treeKind(node)](colour)) group.append(el(tag, attrs));
+  return group;
+}
+
+function treeMarkSvg(kind, colour) {
+  const inner = TREE_MARKS[kind](colour)
+    .map(([tag, attrs]) => `<${tag} ${Object.entries(attrs).map(([k, v]) => `${k}="${v}"`).join(" ")}/>`).join("");
+  return `<svg class="swatch" viewBox="0 0 30 14" aria-hidden="true"><g transform="translate(15 7)">${inner}</g></svg>`;
+}
+
+// In the tree, where a row sits already says which module it is in, so colour is free to say
+// what the row is - and it says it together with the shape. The hues are spread round the wheel
+// so neighbours in the list never look alike, and follow the editor conventions developers
+// know: classes orange, interfaces blue, methods purple. Structure stays neutral. There is one
+// set for dark themes and a deeper one for light themes, where pale hues would wash out.
+const KIND_COLOURS = {
+  dark: {
+    class: "#f0a04b", interface: "#5fa8ff", enum: "#e6c84f", record: "#6ccb5f", struct: "#3fc7b0",
+    delegate: "#f27db0", method: "#b98cf5", property: "#56c8e8", field: "#8fa2ff", event: "#ff7a6b",
+  },
+  light: {
+    class: "#c26a12", interface: "#2a6fd6", enum: "#9a7f00", record: "#2e8b3e", struct: "#0f8f7e",
+    delegate: "#c23a7e", method: "#7e4ccb", property: "#1c86ab", field: "#4f5fd6", event: "#d0453a",
+  },
+};
+function kindColour(kind) {
+  if (kind === "module" || kind === "namespace") return "var(--muted)";
+  const dark = getComputedStyle(document.documentElement).colorScheme.includes("dark");
+  return KIND_COLOURS[dark ? "dark" : "light"][kind];
+}
+
+function buildTree() {
+  stage.textContent = "";
+  const rows = layoutTree();
+  const at = new Map(rows.filter(row => row.node).map(row => [row.node.id, row]));
+
+  const root = el("g", {});
+  const wires = el("g", {});
+  const overlay = el("g", {});
+  const marks = el("g", {});
+  root.append(wires, overlay, marks);
+  stage.append(root);
+
+  const made = [];
+  for (const row of rows) {
+    if (row.more) {
+      const group = el("g", {});
+      const text = el("text", { x: 10, y: 4, fill: "var(--muted)", "font-size": 11.5 });
+      text.textContent = `… +${row.more.toLocaleString()} ${t("treeMore")}`;
+      group.append(text);
+      marks.append(group);
+      made.push({ row, group, label: text });
+      continue;
+    }
+
+    const node = row.node;
+    const open = tree.open.has(node.id);
+    const member = node.kind === 4 || node.kind === 5;
+    const colour = kindColour(treeKind(node));
+    const group = el("g", { class: "tnode", transform: `translate(${row.x} ${row.y})` });
+    group.dataset.id = node.id;
+
+    // What the row is, by its mark - the same shapes as the map and the legend. A branch that is
+    // open fades its mark a little; its children say the rest.
+    const mark = treeMark(node, colour);
+    // Someone else's code keeps its shape and colour, faded: what it is still reads, and that it
+    // is not ours reads too (its name is muted as well).
+    if (!node.own) mark.setAttribute("opacity", "0.45");
+    else if (open && node.childCount) mark.setAttribute("opacity", "0.6");
+    group.append(mark);
+
+    const label = el("text", {
+      x: 10, y: 4, "font-size": member ? 11.5 : node.kind === 10 ? 13.5 : 12.5,
+      "font-weight": node.kind === 10 ? 700 : node.kind === 3 && node.own ? 600 : 400,
+      fill: node.own ? "currentColor" : "var(--muted)",
+    });
+    label.textContent = shorten(node.display || t("globalNamespace"));
+    if (node.childCount && !open) {
+      const count = document.createElementNS(SVG, "tspan");
+      count.setAttribute("fill", "var(--muted)");
+      count.setAttribute("font-weight", "400");
+      count.textContent = "  " + node.childCount.toLocaleString();
+      label.append(count);
+    }
+    group.append(label);
+
+    const title = document.createElementNS(SVG, "title");
+    title.textContent = [node.display, TREE_KIND_NAME()[treeKind(node)], node.module].filter(Boolean).join(" · ");
+    group.append(title);
+    marks.append(group);
+    made.push({ row, group, label });
+  }
+
+  // Columns are as wide as their longest name, measured, so a branch leaves from the end of
+  // its parent's name instead of running through it.
+  const widest = [];
+  for (const item of made) {
+    item.width = item.label.getComputedTextLength ? item.label.getComputedTextLength() : 80;
+    widest[item.row.depth] = Math.max(widest[item.row.depth] || 0, item.width);
+  }
+  const columnX = [0];
+  for (let depth = 1; depth <= widest.length; depth++) {
+    columnX[depth] = columnX[depth - 1] + (widest[depth - 1] || 0) + 64;
+  }
+  for (const item of made) {
+    item.row.x = columnX[item.row.depth];
+    item.row.end = item.row.x + 10 + item.width;
+    item.group.setAttribute("transform", `translate(${item.row.x} ${item.row.y})`);
+  }
+
+  for (const item of made) {
+    const parent = item.row.node ? at.get(item.row.node.parent)
+      : item.row.parentKey !== undefined ? at.get(item.row.parentKey) : null;
+    if (!parent) continue;
+    const x1 = parent.end + 6, y1 = parent.y, x2 = item.row.x - 7, y2 = item.row.y, mid = (x1 + x2) / 2;
+    wires.append(el("path", {
+      d: `M${x1} ${y1} C${mid} ${y1} ${mid} ${y2} ${x2} ${y2}`,
+      fill: "none", stroke: "currentColor", "stroke-opacity": 0.22, "stroke-width": 1,
+    }));
+  }
+
+  const ring = el("circle", { r: 11, fill: "none", stroke: "var(--accent)", "stroke-width": 2, "stroke-opacity": 0 });
+  marks.append(ring);
+
+  treeDom = { root, overlay, at, ring, rows };
+  renderLegendCard();
+  counts.textContent = `${rows.filter(row => row.node).length.toLocaleString()} ${t("treeRows")}`;
+  if (treeHovered !== null) drawTreeLinks(treeHovered);
+}
+
+function paintTree() {
+  if (!treeDom) return;
+  const width = stage.clientWidth, height = stage.clientHeight;
+  stage.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  treeDom.root.setAttribute("transform", `translate(${TREE_LEFT + panX} ${TREE_TOP + panY}) scale(${zoom})`);
+
+  const found = focus !== null ? treeDom.at.get(focus) : null;
+  if (found) {
+    treeDom.ring.setAttribute("cx", found.x);
+    treeDom.ring.setAttribute("cy", found.y);
+    treeDom.ring.setAttribute("r", (reducedMotion() ? 11 : 10 + 2.5 * Math.sin(performance.now() / 260)).toFixed(1));
+    treeDom.ring.setAttribute("stroke-opacity", "0.9");
+  } else {
+    treeDom.ring.setAttribute("stroke-opacity", "0");
+  }
+}
+
+async function treeClick(id) {
+  const node = tree.nodes.get(id);
+  if (!node) return;
+  showDetail(id);
+  if (!node.childCount) return;
+
+  if (tree.open.has(id)) tree.open.delete(id);
+  else { await treeFetch(id); tree.open.add(id); }
+  buildTree();
+  paintTree();
+}
+
+async function treeHover(id) {
+  treeHovered = id;
+  if (!treeDom) return;
+  treeDom.overlay.textContent = "";
+  for (const group of treeDom.root.querySelectorAll(".tnode")) group.removeAttribute("opacity");
+  if (id === null) return;
+
+  if (!tree.links.has(id)) {
+    try {
+      const response = await fetch(api("/api/tree/links?id=" + id));
+      tree.links.set(id, response.ok ? await response.json() : []);
+    } catch { tree.links.set(id, []); }
+  }
+  if (treeHovered === id) drawTreeLinks(id);
+}
+
+// Each link names a type and its chain up to its module. The line goes to the first link
+// in that chain that is on screen - the type itself if its branch is open, otherwise the
+// namespace or module it is folded into. Links that land on the node's own ancestors are
+// containment, not calls, and are dropped.
+function drawTreeLinks(id) {
+  const from = treeDom.at.get(id);
+  if (!from) return;
+
+  const ancestors = new Set();
+  for (let node = tree.nodes.get(id); node; node = tree.nodes.get(node.parent)) ancestors.add(node.id);
+
+  const merged = new Map();
+  for (const link of tree.links.get(id) || []) {
+    const landing = link.chain.map(other => treeDom.at.get(other)).find(Boolean);
+    if (!landing || ancestors.has(landing.node.id)) continue;
+    const key = landing.node.id + (link.outgoing ? ">" : "<");
+    const same = merged.get(key);
+    if (same) same.weight += link.weight;
+    else merged.set(key, { landing, weight: link.weight, outgoing: link.outgoing });
+  }
+
+  const heaviest = Math.max(1, ...[...merged.values()].map(link => link.weight));
+  const lit = new Set([id]);
+  for (const { landing, weight, outgoing } of merged.values()) {
+    // From the end of one name to the end of the other, bowing out to the right of both,
+    // so a call never runs through a name.
+    const x1 = from.end + 4, y1 = from.y, x2 = landing.end + 4, y2 = landing.y;
+    const reach = Math.max(x1, x2) + 50 + Math.min(220, Math.abs(y2 - y1) * 0.25);
+    treeDom.overlay.append(el("path", {
+      d: `M${x1} ${y1} C${reach} ${y1} ${reach} ${y2} ${x2} ${y2}`,
+      fill: "none", stroke: "var(--accent)",
+      "stroke-width": (0.8 + 2.4 * Math.log1p(weight) / Math.log1p(heaviest)).toFixed(2),
+      "stroke-opacity": 0.75, "stroke-dasharray": outgoing ? "none" : "4 3",
+    }));
+    lit.add(landing.node.id);
+  }
+
+  for (const group of treeDom.root.querySelectorAll(".tnode")) {
+    if (!lit.has(Number(group.dataset.id))) group.setAttribute("opacity", "0.35");
+  }
+}
+
+// Open the branches down to a thing and bring it to the middle of the screen.
+async function treeReveal(id) {
+  let path = [];
+  try {
+    const response = await fetch(api("/api/tree/path?id=" + id));
+    if (response.ok) path = await response.json();
+  } catch { /* nowhere to go */ }
+
+  let key = null;
+  await treeFetch(null);
+  for (const step of path) {
+    const kids = await treeFetch(key);
+    const node = kids.find(kid => kid.id === step || (kid.merged || []).includes(step));
+    if (!node) continue;           // folded into the step before it
+    if (node.id === id || (node.merged || []).includes(id)) { key = node.id; break; }
+    tree.open.add(node.id);
+    key = node.id;
+  }
+
+  const target = tree.nodes.has(id) ? id : key;
+  buildTree();
+  const row = target !== null ? treeDom.at.get(target) : null;
+  if (row) {
+    panX = stage.clientWidth / 2 - TREE_LEFT - row.x * zoom - 120;
+    panY = stage.clientHeight / 2 - TREE_TOP - row.y * zoom;
+  }
+  focus = target;
+  paintTree();
+  if (target !== null) showDetail(target);
+}
+
+// ---- search ------------------------------------------------------------------------
+// Type a name, pick a line, and the map takes you to where that thing lives: a type opens
+// inside its namespace, a namespace inside its module, a method or property at its type.
+let hits = [];
+let chosen = -1;
+let searchTimer = null;
+let searchSeq = 0;
+
+const kindLabel = hit =>
+  hit.flavor || ({ 10: t("kindModule"), 2: t("kindNamespace"), 3: t("kindType"), 4: t("kindMethod") }[hit.kind]
+    ?? t("kindMember"));
+
+const whereLabel = hit => [
+  hit.kind === 4 || hit.kind === 5 ? hit.type : null,
+  hit.kind !== 2 && hit.kind !== 10 ? hit.namespace : null,
+  hit.kind !== 10 ? hit.module : null,
+].filter(Boolean).join(" · ");
+
+function drawHits() {
+  const typed = searchBox.value.trim() !== "";
+  if (!hits.length) {
+    hitList.innerHTML = typed ? `<li class="none">${t("noHits")}</li>` : "";
+    hitList.hidden = !typed;
+    return;
+  }
+  hitList.hidden = false;
+  hitList.innerHTML = hits.map((hit, i) => {
+    const where = whereLabel(hit);
+    return `<li data-i="${i}" class="${i === chosen ? "on" : ""}${hit.own ? "" : " theirs"}">` +
+      `<b>${escapeHtml(hit.display)}</b><span class="meta">${escapeHtml(kindLabel(hit))}` +
+      `${where ? " · " + escapeHtml(where) : ""}</span></li>`;
+  }).join("");
+}
+
+async function runSearch() {
+  const query = searchBox.value.trim();
+  const seq = ++searchSeq;
+  if (!query) { hits = []; chosen = -1; drawHits(); return; }
+
+  let found = [];
+  try {
+    const response = await fetch(api("/api/search?limit=12&q=" + encodeURIComponent(query)));
+    if (response.ok) found = await response.json();
+  } catch { /* a failed search is an empty one */ }
+
+  // Answers can come back out of order while typing. Only the latest counts.
+  if (seq !== searchSeq) return;
+  hits = found;
+  chosen = hits.length ? 0 : -1;
+  drawHits();
+}
+
+async function goTo(hit) {
+  hitList.hidden = true;
+  searchBox.blur();
+  if (isTree()) {
+    if (!hit.own && scopeSelect.value === "own") {
+      scopeSelect.value = "all";
+      try { localStorage.setItem("treering-scope", "all"); } catch { /* fine without it */ }
+      resetTree();
+    }
+    await treeReveal(hit.id);
+    return;
+  }
+
+  // Someone else's code is not on an "our code" map. Show everything so it can be seen.
+  if (!hit.own && scopeSelect.value === "own") {
+    scopeSelect.value = "all";
+    try { localStorage.setItem("treering-scope", "all"); } catch { /* fine without it */ }
+  }
+
+  const root = trail[0];
+  const member = hit.kind !== 10 && hit.kind !== 2 && hit.kind !== 3;
+  const target = member ? hit.typeId : hit.id;
+
+  if (hit.kind === 10) {
+    root.granularity = "module";
+    trail = [root];
+  } else if (hit.kind === 2 && hit.moduleId != null) {
+    trail = [root, {
+      label: hit.module, seed: hit.moduleId, granularity: "namespace",
+      anchor: { id: hit.moduleId, display: hit.module, kind: SYMBOL_PACKAGE, module: hit.module, flavor: null, own: hit.own },
+    }];
+  } else if (hit.namespaceId != null) {
+    trail = [root, {
+      label: hit.namespace, seed: hit.namespaceId, granularity: "type",
+      anchor: { id: hit.namespaceId, display: hit.namespace, kind: SYMBOL_NAMESPACE, module: hit.module, flavor: null, own: hit.own },
+    }];
+  } else {
+    // Nowhere to go inside - a type in the global namespace, say. Say what it is.
+    showDetail(target ?? hit.id);
+    return;
+  }
+
+  // The level gathers in around what was found, the way it does round a thing you came out of.
+  await load({ leaving: target });
+  focus = target;
+  highlight = target;
+  paint();
+  showDetail(target);
+  if (!nodeById.has(target)) counts.textContent += " · " + t("notDrawn");
+}
+
+searchBox.addEventListener("input", () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(runSearch, 140);
+});
+
+searchBox.addEventListener("keydown", event => {
+  if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    event.preventDefault();
+    if (!hits.length) return;
+    chosen = (chosen + (event.key === "ArrowDown" ? 1 : hits.length - 1)) % hits.length;
+    drawHits();
+    hitList.children[chosen]?.scrollIntoView({ block: "nearest" });
+  } else if (event.key === "Enter") {
+    event.preventDefault();
+    if (hits[chosen]) goTo(hits[chosen]);
+  } else if (event.key === "Escape") {
+    searchBox.value = "";
+    hits = [];
+    drawHits();
+    searchBox.blur();
+  }
+});
+
+searchBox.addEventListener("focus", () => { if (hits.length) hitList.hidden = false; });
+searchBox.addEventListener("blur", () => setTimeout(() => { hitList.hidden = true; }, 150));
+
+// mousedown, not click: a click lands after the box has blurred and the list has gone.
+hitList.addEventListener("mousedown", event => {
+  const row = event.target.closest("li[data-i]");
+  if (!row) return;
+  event.preventDefault();
+  goTo(hits[Number(row.dataset.i)]);
+});
+
+crumbs.addEventListener("click", event => {
+  const button = event.target.closest("button");
+  if (!button) return;
+  const step = Number(button.dataset.step);
+  // Several levels up at once still lands beside the branch you came down.
+  const leaving = trail[step + 1]?.seed ?? null;
+  trail = trail.slice(0, step + 1);
+  load({ leaving }).then(describeWhereYouAre);
+});
+
+granularitySelect.addEventListener("change", () => {
+  trail[trail.length - 1].granularity = granularitySelect.value;
+  load();
+});
+
+labelSelect.addEventListener("change", () => { lastLabelPass = 0; paint(); });
+themeSelect.addEventListener("change", () => applyTheme(themeSelect.value));
+langSelect.addEventListener("change", () => applyLanguage(langSelect.value));
+styleSelect.addEventListener("change", () => applyStyle(styleSelect.value));
+scopeSelect.addEventListener("change", () => {
+  try { localStorage.setItem("treering-scope", scopeSelect.value); } catch { /* fine without it */ }
+  resetTree();
+  // 범위가 바뀌면 노드 집합이 통째로 달라진다. 들어와 있던 자리는 그대로 두고 다시 묻는다.
+  load();
+});
+atSelect.addEventListener("change", () => load());
+fromSelect.addEventListener("change", () => load());
+
+// ---- the bar's tools ----------------------------------------------------------------
+// The selects are still the source of truth - they are in the menus, and on a narrow screen
+// they are the only way in. The icons and the switch on the bar only drive them.
+const shapeButtons = [...document.querySelectorAll("#shapes [data-shape]")];
+const ownToggle = document.getElementById("ownToggle");
+
+// Called from load() and applyStyle(), which can run before this part of the script has -
+// so it looks its elements up rather than use the constants below.
+function syncTools() {
+  for (const button of document.querySelectorAll("#shapes [data-shape]")) {
+    const on = button.dataset.shape === style;
+    button.setAttribute("aria-checked", String(on));
+    button.tabIndex = on ? 0 : -1;
+  }
+  document.getElementById("ownToggle").setAttribute("aria-pressed", String(scopeSelect.value === "own"));
+
+  // "ord 3 · 2026-09-25 14:46" says more than the bar has room for; the day and time are enough.
+  const short = option => (option?.textContent ?? "").replace(/^ord \d+ · \d{4}-/, "");
+  const at = short(atSelect.selectedOptions[0]);
+  const from = fromSelect.value ? short(fromSelect.selectedOptions[0]) : null;
+  document.getElementById("timeLabel").textContent = from ? `${from} → ${at}` : at;
+}
+
+for (const button of shapeButtons) {
+  button.addEventListener("click", () => applyStyle(button.dataset.shape));
+}
+// A radio group moves with the arrow keys, and Tab lands only on the one that is on.
+document.getElementById("shapes").addEventListener("keydown", event => {
+  const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
+  if (!step) return;
+  event.preventDefault();
+  const at = shapeButtons.findIndex(button => button.dataset.shape === style);
+  const next = shapeButtons[(at + step + shapeButtons.length) % shapeButtons.length];
+  applyStyle(next.dataset.shape);
+  next.focus();
+});
+
+ownToggle.addEventListener("click", () => {
+  scopeSelect.value = scopeSelect.value === "own" ? "all" : "own";
+  scopeSelect.dispatchEvent(new Event("change"));
+  syncTools();
+});
+
+// Menus: one open at a time; a click elsewhere or Esc closes it, and focus goes back.
+const pops = [...document.querySelectorAll(".pop")];
+function setMenu(pop, open) {
+  const button = pop.querySelector("button[aria-controls]");
+  const menu = pop.querySelector(".menu");
+  menu.hidden = !open;
+  button.setAttribute("aria-expanded", String(open));
+  if (open) menu.querySelector("select:not([hidden])")?.focus();
+}
+function openMenu() { return pops.find(pop => !pop.querySelector(".menu").hidden) ?? null; }
+function closeMenu({ refocus = false } = {}) {
+  const pop = openMenu();
+  if (!pop) return false;
+  setMenu(pop, false);
+  if (refocus) pop.querySelector("button[aria-controls]").focus();
+  return true;
+}
+for (const pop of pops) {
+  pop.querySelector("button[aria-controls]").addEventListener("click", () => {
+    const opening = pop.querySelector(".menu").hidden;
+    closeMenu();
+    if (opening) setMenu(pop, true);
+  });
+}
+document.addEventListener("pointerdown", event => { if (!event.target.closest(".pop")) closeMenu(); });
+
+stage.addEventListener("pointerdown", event => {
+  if (isTree()) {
+    dragging = { x: event.clientX, y: event.clientY, startX: event.clientX, startY: event.clientY,
+      row: event.target.closest(".tnode"), right: event.button === 2 };
+    stage.setPointerCapture(event.pointerId);
+    return;
+  }
+  dragging = {
+    x: event.clientX, y: event.clientY,
+    startX: event.clientX, startY: event.clientY,
+    group: event.target.closest(".node"),
+    // The right button only ever means "go inside". It does not turn the camera.
+    right: event.button === 2,
+  };
+
+  // Obsidian: a node you press can be dragged, and it pulls what it is tied to, like rope.
+  // Only when stretched - pushing a node into its neighbours leaves them where they are.
+  if (isObsidian() && dragging.group && !dragging.right) {
+    const node = nodeById.get(Number(dragging.group.dataset.id));
+    if (node && !node.container && !node.anchor) {
+      dragging.node = node;
+      dragging.ropes = graph.edges
+        .filter(edge => edge.kind !== KIND_CONTAINS && (edge.from === node.id || edge.to === node.id))
+        .map(edge => nodeById.get(edge.from === node.id ? edge.to : edge.from))
+        .filter(other => other && other !== node && !other.anchor && !other.container)
+        .map(other => ({ other, rest: Math.hypot(other.x - node.x, other.y - node.y) }));
+    }
+  }
+  stage.classList.add("dragging");
+  stage.setPointerCapture(event.pointerId);
+});
+
+stage.addEventListener("pointermove", event => {
+  if (isTree()) {
+    if (!dragging || dragging.right) return;
+    panX += event.clientX - dragging.x;
+    panY += event.clientY - dragging.y;
+    dragging.x = event.clientX;
+    dragging.y = event.clientY;
+    paintTree();
+    return;
+  }
+  if (!dragging || dragging.right) return;
+
+  if (isObsidian()) {
+    const dx = event.clientX - dragging.x, dy = event.clientY - dragging.y;
+    dragging.x = event.clientX;
+    dragging.y = event.clientY;
+    const far = Math.hypot(event.clientX - dragging.startX, event.clientY - dragging.startY) >= 4;
+
+    if (dragging.node) {
+      if (!far) return;   // still a click, until it moves
+      const scale = fit * zoom;
+      const node = dragging.node;
+      node.x += dx / scale;
+      node.y += dy / scale;
+      for (const rope of dragging.ropes) {
+        const ox = node.x - rope.other.x, oy = node.y - rope.other.y;
+        const d = Math.max(0.01, Math.hypot(ox, oy));
+        const stretch = d - rope.rest;
+        if (stretch > 0) {
+          rope.other.x += (ox / d) * stretch * 0.12;
+          rope.other.y += (oy / d) * stretch * 0.12;
+        }
+      }
+    } else {
+      panX += dx;
+      panY += dy;
+    }
+    paint();
+    return;
+  }
+
+  rotY += (event.clientX - dragging.x) * 0.006;
+  rotX += (event.clientY - dragging.y) * 0.006;
+  rotX = Math.max(-1.4, Math.min(1.4, rotX));
+  dragging.x = event.clientX;
+  dragging.y = event.clientY;
+  paint();
+});
+
+stage.addEventListener("pointerup", event => {
+  if (isTree()) {
+    if (!dragging) return;
+    const moved = Math.hypot(event.clientX - dragging.startX, event.clientY - dragging.startY);
+    const { row, right } = dragging;
+    dragging = null;
+    if (moved < 4 && row && !right) treeClick(Number(row.dataset.id));
+    return;
+  }
+  if (!dragging) return;
+  const moved = Math.hypot(event.clientX - dragging.startX, event.clientY - dragging.startY);
+  const { group, right } = dragging;
+  dragging = null;
+  stage.classList.remove("dragging");
+  // Capturing the pointer for rotation redirects the click to the canvas, so the node is
+  // remembered on pointerdown and treated as a click only if the pointer barely moved.
+  // A drag is a turn of the camera, never a click - so letting go after turning the map
+  // on empty space does not throw you up a level.
+  if (moved >= 4) return;
+
+  // The right button is the one that moves you. On a node it goes in; on empty space, or
+  // on the ring of what you are already inside, it comes back out.
+  const id = group ? Number(group.dataset.id) : null;
+  const here = trail[trail.length - 1];
+
+  // Empty space takes you out. So does the right button on the ring of where you are.
+  if (id === null || (right && id === here.seed)) {
+    goUp();
+    return;
+  }
+
+  // A click on a node takes you inside it. Where there is no further in - the type level,
+  // or the ring of what you are already inside - it says what the thing is instead.
+  if (id !== here.seed && canGoInside(nodeById.get(id))) {
+    drillInto(group);
+  } else {
+    highlight = id;
+    paint();
+    showDetail(id);
+  }
+});
+
+// The browser menu would cover the node you just asked to open.
+stage.addEventListener("contextmenu", event => event.preventDefault());
+
+stage.addEventListener("pointerover", event => {
+  if (isTree()) {
+    if (dragging) return;
+    const row = event.target.closest(".tnode");
+    treeHover(row ? Number(row.dataset.id) : null);
+    return;
+  }
+  if (dragging) return;
+  const group = event.target.closest(".node");
+  const id = group ? Number(group.dataset.id) : null;
+  if (id === highlight) return;
+  highlight = id;
+  paint();
+});
+
+stage.addEventListener("pointerleave", () => {
+  if (isTree()) { treeHover(null); return; }
+  if (highlight === null) return;
+  highlight = null;
+  paint();
+});
+
+stage.addEventListener("wheel", event => {
+  event.preventDefault();
+
+  // A tree is read like a page: the wheel scrolls it, Ctrl+wheel zooms about the pointer.
+  if (isTree()) {
+    if (event.ctrlKey || event.metaKey) {
+      const before = zoom;
+      zoom = Math.max(0.3, Math.min(3, zoom * (event.deltaY < 0 ? 1.12 : 0.89)));
+      const box = stage.getBoundingClientRect();
+      const sx = event.clientX - box.left - TREE_LEFT, sy = event.clientY - box.top - TREE_TOP;
+      panX = sx - (sx - panX) * (zoom / before);
+      panY = sy - (sy - panY) * (zoom / before);
+    } else {
+      panX -= event.deltaX;
+      panY -= event.deltaY;
+    }
+    paintTree();
+    return;
+  }
+
+  const before = zoom;
+  zoom = Math.max(0.25, Math.min(isObsidian() ? 8 : 4, zoom * (event.deltaY < 0 ? 1.12 : 0.89)));
+
+  // Flat views zoom about the pointer, so what you are looking at stays under it.
+  if (isObsidian()) {
+    const box = stage.getBoundingClientRect();
+    const sx = event.clientX - box.left - stage.clientWidth / 2;
+    const sy = event.clientY - box.top - stage.clientHeight / 2;
+    panX = sx - (sx - panX) * (zoom / before);
+    panY = sy - (sy - panY) * (zoom / before);
+  }
+  paint();
+}, { passive: false });
+
+addEventListener("resize", paint);
+
+function beat(now) {
+  if (!graph) return;
+
+  if (flight) {
+    const progress = Math.min(1, (now - flight.start) / FLIGHT_MS);
+    flight.eased = 1 - Math.pow(1 - progress, 5);
+    paint();
+    if (progress >= 1) flight = null;
+    return;
+  }
+
+  drift = now;
+  if (!dragging && graph.nodes.length <= ALIVE_NODES && !holdsStill() && !reducedMotion()) rotY += SPIN_SPEED * 16;
+  paint();
+}
+
+// requestAnimationFrame is the right driver - it pauses with the tab. But it never fires on
+// surfaces that do not composite, where the map would silently freeze, so fall back to a timer.
+let sawFrame = false;
+
+function heartbeat(now) {
+  sawFrame = true;
+  requestAnimationFrame(heartbeat);
+  beat(now);
+}
+
+requestAnimationFrame(heartbeat);
+setTimeout(() => {
+  if (sawFrame) return;
+  setInterval(() => { if (!document.hidden) beat(performance.now()); }, 32);
+}, 1200);
+
+let savedLang = null;
+let savedTheme = "auto";
+let savedStyle = "constellation";
+let savedScope = "all";
+try {
+  savedLang = localStorage.getItem("treering-lang");
+  savedTheme = localStorage.getItem("treering-theme") || "auto";
+  savedStyle = localStorage.getItem("treering-style") || "constellation";
+  savedScope = localStorage.getItem("treering-scope") || "all";
+} catch { /* fine without it */ }
+
+// English is the default, deliberately. The browser's language is not consulted -
+// a public tool should open the same way for everyone, and Korean is one click away.
+applyLanguage(savedLang || "en");
+applyTheme(savedTheme);
+// No graph yet, so this only settles the control; the first load lays out with it.
+applyStyle(savedStyle);
+scopeSelect.value = savedScope;
+
+// ---- projects and import ------------------------------------------------------------
+// Started as `treering serve` with no DB, the server holds every imported project. The page
+// picks one, and can import another from its folder - the indexers run on the server and the
+// page watches the log.
+async function loadProjects() {
+  let answer = { single: true, projects: [] };
+  try {
+    const response = await fetch("/api/projects");
+    if (response.ok) answer = await response.json();
+  } catch { /* an old server: one DB */ }
+
+  if (answer.single) return true;
+
+  // No folder window on this machine: the path field is the form.
+  if (!answer.canPick) {
+    importer.classList.add("no-pick");
+    byPath.open = true;
+  }
+
+  projectBox.hidden = false;
+  if (!currentProject && answer.projects.length) currentProject = answer.projects[0].id;
+  projectSelect.innerHTML = answer.projects.map(project =>
+    `<option value="${escapeHtml(project.id)}" title="${escapeHtml(project.repo)}">` +
+    `${escapeHtml(project.name)}${project.languages.length ? " · " + escapeHtml(project.languages.join("+")) : ""}</option>`)
+    .join("") + `<option value="__import">${t("importOption")}</option>`;
+  projectSelect.value = currentProject ?? "__import";
+
+  if (!answer.projects.length) {
+    // The first screen is the import itself - not a dialog over an empty map.
+    document.body.classList.add("empty");
+    importer.removeAttribute("aria-modal");
+    importer.setAttribute("role", "region");
+    importer.setAttribute("aria-labelledby", "importTitle");
+    drawRings();
+    openImporter();
+    return false;
+  }
+  return true;
+}
+
+// A cross-section of a trunk: the rings are uneven, the way a year's growth is, and the pith
+// sits a little off centre. The outermost ring - now - is the accent. Seeded, so it is the
+// same drawing every time.
+function drawRings() {
+  const svg = document.getElementById("rings");
+  let seed = 7;
+  const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const widths = [7, 10, 15, 6, 11, 18, 8, 5, 13, 9, 14];
+  const phaseA = random() * Math.PI * 2, phaseB = random() * Math.PI * 2;
+  let radius = 6, markup = "";
+  widths.forEach((width, i) => {
+    radius += width;
+    // Every ring follows the one inside it, with a little of its own year in it.
+    const wobble = 0.028 + random() * 0.012;
+    const points = [];
+    for (let k = 0; k < 96; k++) {
+      const a = (k / 96) * Math.PI * 2;
+      const r = radius * (1 + wobble * Math.sin(2 * a + phaseA + i * 0.08) + 0.012 * Math.sin(5 * a + phaseB + i * 0.2));
+      // The pith is off centre: the rings are wider on one side.
+      points.push([(r * Math.cos(a) + radius * 0.13).toFixed(1), (r * Math.sin(a) - radius * 0.05).toFixed(1)]);
+    }
+    const d = "M" + points.map(p => p.join(",")).join("L") + "Z";
+    const last = i === widths.length - 1;
+    markup += `<path d="${d}" style="--i:${i}"${last ? ' class="bark"' : ""}/>`;
+  });
+  svg.innerHTML = `<circle r="2.5" cx="0" cy="0"/>` + markup;
+}
+
+// The log, with the line it is on now standing out from what it has already done.
+// ---- the import form ------------------------------------------------------------------
+// One form, four states - idle, picking, running, failed - kept on the element as data-state,
+// so the styles decide what shows. The server reports each indexer as a step with a state
+// and, when it stops, a reason code; the words for that reason are chosen here, in the
+// page's language, and always say what to do next.
+const STEP_ICON = {
+  waiting: '<circle cx="8" cy="8" r="2.5"/>',
+  running: '<circle cx="8" cy="8" r="5.5" stroke-opacity="0.25"/><path d="M8 2.5a5.5 5.5 0 0 1 5.5 5.5"/>',
+  done: '<path d="M3.5 8.5l3 3 6-7"/>',
+  skipped: '<path d="M4.5 8h7"/>',
+  failed: '<path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/>',
+};
+const icon = body => `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true">${body}</svg>`;
+const count = n => new Intl.NumberFormat(lang === "ko" ? "ko-KR" : "en-US").format(n);
+const seconds = s => new Intl.NumberFormat(lang === "ko" ? "ko-KR" : "en-US", { maximumFractionDigits: 1 }).format(s);
+
+function setImportState(state) {
+  importer.dataset.state = state;
+  importPick.disabled = state === "picking";
+  importPickLabel.textContent = t(state === "picking" ? "importPicking" : "importPick");
+}
+
+// 1:05, 12:40 - elapsed time as a clock reads it.
+const clock = secondsIn => {
+  const s = Math.max(0, Math.round(secondsIn));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+};
+
+function stepRow(step) {
+  const elapsed = step.startedAt ? (Date.now() - step.startedAt) / 1000 : 0;
+  const state = {
+    waiting: t("stepWaiting"), skipped: t("stepSkipped"), failed: t("stepFailed"),
+    running: t("stepElapsed")(clock(elapsed), step.expectedSeconds ? clock(step.expectedSeconds) : null),
+    done: t("stepDone")(seconds(step.seconds), count(step.symbols)),
+  }[step.state] ?? step.state;
+  const why = step.reason === "not-installed" ? t("whyNotInstalled")(step.indexer)
+    : step.reason === "indexer-failed" ? t("whyIndexerFailed")(step.indexer)
+    : null;
+  const row = document.createElement("li");
+  row.className = step.state;
+  row.innerHTML =
+    icon(STEP_ICON[step.state] ?? STEP_ICON.waiting) +
+    `<span class="lang">${escapeHtml(step.language)}</span>` +
+    `<span class="name" title="${escapeHtml(step.name)}">${escapeHtml(step.name)}</span>` +
+    `<span class="state">${escapeHtml(state)}</span>` +
+    (why ? `<p class="why">${escapeHtml(why)}${step.detail ? `<code>${escapeHtml(step.detail)}</code>` : ""}</p>` : "") +
+    (step.state === "running" ? liveBar(step, elapsed) : "");
+  return row;
+}
+
+// Filled against the last time this step took, never quite to the end - it is an estimate, and
+// a bar at 100% that keeps going reads as stuck. Without a last time, a travelling band.
+function liveBar(step, elapsed) {
+  const known = step.expectedSeconds > 0;
+  const share = known ? Math.min(95, (elapsed / step.expectedSeconds) * 100) : 0;
+  return `<div class="live"><div class="bar${known ? "" : " unknown"}"><span${known ? ` style="width:${share.toFixed(1)}%"` : ""}></span></div>` +
+    `<span class="phase" title="${escapeHtml(step.phase || "")}">${escapeHtml(step.phase || t("stepRunning"))}</span></div>`;
+}
+
+function showProblem(text) {
+  importProblem.hidden = text === null;
+  if (text !== null) {
+    importProblem.innerHTML = icon(STEP_ICON.failed) +
+      `<div><b>${t("problemTitle")}</b>${text ? `<span>${escapeHtml(text)}</span>` : ""}</div>`;
+  }
+}
+
+function showImport(status, error = null) {
+  const repo = status.repo ?? importPath.value.trim();
+  document.getElementById("importName").textContent = repo.split(/[\\/]/).filter(Boolean).pop() ?? repo;
+  document.getElementById("importRepo").textContent = repo;
+  document.getElementById("importRepo").title = repo;
+  importSteps.replaceChildren(...(status.steps ?? []).map(stepRow));
+  importLog.textContent = (status.log ?? []).join("\n");
+  importLog.scrollTop = importLog.scrollHeight;
+  document.getElementById("importDetails").hidden = !(status.log ?? []).length;
+
+  const failed = error !== null || (!status.running && !status.ok);
+  setImportState(failed ? "failed" : "running");
+  showProblem(!failed ? null
+    // With steps listed, each one already says why it stopped - the headline is enough.
+    : error ?? ((status.steps ?? []).length ? "" : t("problemNothing")));
+  if (failed) document.getElementById("importAgain").focus();
+}
+
+// The folder window is the server's: a browser never tells a page the full path of a folder
+// picked in it. Choosing is the decision, so the import starts as soon as a folder comes back.
+async function pickFolder() {
+  setImportState("picking");
+  let path = null, failed = false;
+  try {
+    const response = await fetch("/api/pick-folder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: t("importTitle") }),
+    });
+    if (response.ok) path = (await response.json()).path;
+    else failed = true;
+  } catch { failed = true; }
+
+  setImportState("idle");
+  // No window could be opened: the path field is the way in, so open it.
+  if (failed) { byPath.open = true; importPath.focus(); return; }
+  if (!path) { importPick.focus(); return; }
+
+  importPath.value = path;
+  startImport();
+}
+
+let focusBeforeImporter = null;
+
+function openImporter() {
+  focusBeforeImporter = document.activeElement;
+  importer.hidden = false;
+  setImportState("idle");
+  (importer.classList.contains("no-pick") ? importPath : importPick).focus();
+  // An import started earlier may still be running - pick it up rather than start another.
+  pollImport(true);
+}
+
+function closeImporter() {
+  if (!document.body.classList.contains("empty")) importer.hidden = true;
+  if (currentProject) projectSelect.value = currentProject;
+  if (importer.hidden) focusBeforeImporter?.focus?.();
+}
+
+async function startImport() {
+  const path = importPath.value.trim();
+  if (!path) { byPath.open = true; importPath.focus(); return; }
+
+  showImport({ repo: path, running: true, steps: [], log: [] });
+  let response;
+  try {
+    response = await fetch("/api/import", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path }),
+    });
+  } catch { response = null; }
+
+  if (!response || !response.ok) {
+    const problem = !response ? t("problemOther")
+      : response.status === 409 ? t("problemBusy")
+      : response.status === 400 ? t("problemNoFolder")
+      : t("problemOther");
+    showImport({ repo: path, running: false, steps: [], log: [] }, problem);
+    return;
+  }
+  pollImport(false);
+}
+
+async function pollImport(quiet) {
+  let status;
+  try { status = await (await fetch("/api/import")).json(); } catch { return; }
+  if (quiet && !status.running) return;
+  if (importer.hidden) return;
+
+  showImport(status);
+  if (status.running) { setTimeout(() => pollImport(false), 600); return; }
+  if (status.ok && status.project) location.search = "?project=" + encodeURIComponent(status.project);
+}
+
+projectSelect.addEventListener("change", () => {
+  if (projectSelect.value === "__import") { openImporter(); return; }
+  location.search = "?project=" + encodeURIComponent(projectSelect.value);
+});
+importGo.addEventListener("click", startImport);
+importPick.addEventListener("click", pickFolder);
+document.getElementById("importAgain").addEventListener("click", pickFolder);
+document.getElementById("importClose").addEventListener("click", closeImporter);
+importPath.addEventListener("keydown", event => { if (event.key === "Enter") startImport(); });
+
+// A dialog keeps the keyboard inside it: Tab from the last control comes back to the first.
+importer.addEventListener("keydown", event => {
+  if (event.key !== "Tab" || document.body.classList.contains("empty")) return;
+  const stops = [...importer.querySelectorAll("button, input, summary")]
+    .filter(el => !el.disabled && el.getClientRects().length > 0);
+  if (!stops.length) return;
+  const first = stops[0], last = stops[stops.length - 1];
+  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+});
+
+// Deal module colours once, biggest of ours first, before any view is drawn - so a module is
+// the same colour whichever view happens to open first.
+async function seedModuleColours() {
+  try {
+    const response = await fetch(api("/api/tree/children"));
+    if (!response.ok) return;
+    for (const module of (await response.json()).nodes) if (module.own) hueForModule(module.display);
+  } catch { /* colours are then dealt as modules are met */ }
+}
+
+loadProjects().then(ready => ready && loadSnapshots().then(seedModuleColours).then(() => load()));
+
+// ---- work behind the page -------------------------------------------------------------
+// An import keeps going when its dialog is closed, and the server re-indexes on its own. The
+// footer says so, with the time it has taken: a click opens the import, and once it is done,
+// the imported project.
+const work = document.getElementById("work");
+let lastImport = null;
+
+async function showWork() {
+  let job = null, watch = null;
+  try {
+    const [a, b] = await Promise.all([fetch("/api/import"), fetch("/api/watch")]);
+    job = a.ok ? await a.json() : null;
+    watch = b.ok ? await b.json() : null;
+  } catch { return; }
+
+  const name = repo => (repo || "").split(/[\\/]/).filter(Boolean).pop() || repo;
+  const running = job?.running ? job.steps?.find(step => step.state === "running") : null;
+  let text = null, kind = "busy";
+
+  if (job?.running) {
+    const since = running?.startedAt ?? Date.now();
+    text = t("workImport")(name(job.repo), clock((Date.now() - since) / 1000));
+  } else if (job && lastImport?.running && job.ok !== null) {
+    // It just finished while we were watching.
+    kind = job.ok ? "done" : "failed";
+    text = job.ok ? t("workImportDone")(name(job.repo)) : t("workImportFailed");
+    if (job.ok) loadProjects();
+  } else if (work.dataset.kind === "done" || work.dataset.kind === "failed") {
+    return;   // keep the result up until it is clicked
+  } else if (watch?.busy && watch.currentSince) {
+    kind = "idle";
+    text = t("workWatch")(watch.current, clock((Date.now() - watch.currentSince) / 1000));
+  }
+
+  lastImport = job;
+  work.hidden = !text;
+  if (!text) return;
+  work.className = kind;
+  work.dataset.kind = kind;
+  work.dataset.project = job?.project || "";
+  work.innerHTML = `<span class="dot" aria-hidden="true"></span>${escapeHtml(text)}`;
+}
+
+work.addEventListener("click", () => {
+  const kind = work.dataset.kind;
+  if (kind === "idle") return;
+  if (kind === "done" && work.dataset.project) {
+    location.search = "?project=" + encodeURIComponent(work.dataset.project);
+    return;
+  }
+  work.dataset.kind = "";
+  work.hidden = true;
+  openImporter();
+});
+
+showWork();
+setInterval(() => { if (!document.hidden) showWork(); }, 2000);
+
+// ---- keeping current ----------------------------------------------------------------
+// The server re-indexes imported projects on its own (every 10 minutes by default). The page
+// notices the snapshots that brings: if you are looking at the latest, it moves to the new
+// one; if you went back in time, you stay there and only the list grows.
+let knownSnapshots = null;
+
+async function followSnapshots() {
+  let snapshots;
+  try {
+    const response = await fetch(api("/api/snapshots"));
+    if (!response.ok) return;
+    snapshots = await response.json();
+  } catch { return; }
+
+  const count = snapshots.length;
+  if (knownSnapshots === null) { knownSnapshots = count; return; }
+  if (count <= knownSnapshots) return;
+  knownSnapshots = count;
+
+  const onLatest = atSelect.options.length === 0 || atSelect.selectedIndex === atSelect.options.length - 1;
+  const at = atSelect.value, from = fromSelect.value;
+  document.getElementById("timeTool").hidden = false;
+  await loadSnapshots();
+  if (!onLatest) atSelect.value = at;
+  fromSelect.value = from;
+  syncTools();
+  if (onLatest) {
+    if (isTree()) resetTree();
+    load();
+  }
+}
+
+const autoUpdate = document.getElementById("autoUpdate");
+async function showWatch(status) {
+  if (!status) {
+    try {
+      const response = await fetch("/api/watch");
+      if (!response.ok) return;
+      status = await response.json();
+    } catch { return; }
+  }
+  document.getElementById("autoUpdateRow").hidden = false;
+  autoUpdate.checked = status.on;
+  document.getElementById("autoUpdateNote").textContent = status.on
+    ? t("autoUpdateEvery")(status.minutes) + (status.busy ? t("autoUpdateNow") : status.lastRound ? t("autoUpdateLast")(status.lastRound) : "")
+    : t("autoUpdateOff");
+}
+
+autoUpdate.addEventListener("change", async () => {
+  try {
+    const response = await fetch("/api/watch", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ on: autoUpdate.checked }),
+    });
+    showWatch(response.ok ? await response.json() : null);
+  } catch { showWatch(); }
+});
+
+showWatch();
+followSnapshots();
+// A tab in the background does not ask; the moment it is looked at again, it catches up
+// rather than wait out the rest of the half-minute.
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) return;
+  followSnapshots();
+  showWatch();
+});
+setInterval(() => {
+  if (document.hidden) return;
+  followSnapshots();
+  showWatch();
+}, 30_000);
+</script>
+</body>
+</html>

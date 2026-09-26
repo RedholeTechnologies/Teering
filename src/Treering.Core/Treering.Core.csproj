@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.36.2" />
+    <PackageReference Include="Grpc.Tools" Version="2.84.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
+  </ItemGroup>
+
+  <!--
+    scip.proto 는 sourcegraph/scip 에서 그대로 가져온 것이다. 우리가 고치지 않는다.
+    생성 코드에는 TreatWarningsAsErrors 를 적용할 수 없으므로 경고를 끈다.
+  -->
+  <ItemGroup>
+    <Protobuf Include="Scip\scip.proto" ProtoRoot="Scip" GrpcServices="None" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CS8981</NoWarn>
+  </PropertyGroup>
+
+</Project>
