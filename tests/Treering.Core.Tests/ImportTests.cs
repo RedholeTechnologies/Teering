@@ -6,6 +6,7 @@ namespace Treering.Core.Tests;
 /// 리포를 보고 무엇을 어떤 색인기로 돌릴지 정하는 것. 실행은 하지 않는다 — 여기서 틀리면
 /// 몇 분을 쓰고 엉뚱한 것을 색인하거나, 아예 빠뜨린다.
 /// </summary>
+[Collection("TREERING_HOME")]
 public sealed class ImportTests : IDisposable
 {
     private readonly string _root = Path.Combine(Path.GetTempPath(), $"tr-{Guid.NewGuid():N}");

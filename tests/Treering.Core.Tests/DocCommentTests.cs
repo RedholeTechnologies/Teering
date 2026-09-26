@@ -118,6 +118,93 @@ public sealed class DocCommentTests : IDisposable
         Assert.EndsWith("…", doc);
     }
 
+    // --- The rest of the XML doc tags: each one either reads as prose or is dropped, never shown raw. ---
+
+    private static string? Xml(string summary) => DocComment.Of(["```cs\nclass Order\n```", $"<member name=\"T:Acme.Shop.Order\"><summary>{summary}</summary></member>"]);
+
+    [Fact]
+    public void A_code_block_stands_as_its_own_paragraph()
+    {
+        Assert.Equal("Use it like this:\n\n`var total = order.Total();`\n\nThen save.", Xml("Use it like this:<code>var total = order.Total();</code>Then save."));
+    }
+
+    [Fact]
+    public void A_para_starts_a_new_paragraph()
+    {
+        Assert.Equal("One order.\n\nMany lines.", Xml("One order.<para>Many lines.</para>"));
+    }
+
+    [Fact]
+    public void A_line_break_the_author_wrote_is_kept()
+    {
+        // The editor's own wrapping is joined; a <br/> is a break the author asked for.
+        Assert.Equal("Paid\nShipped", Xml("Paid<br/>Shipped"));
+    }
+
+    [Fact]
+    public void A_line_break_leaves_no_spaces_around_it()
+    {
+        Assert.Equal("Paid\nShipped", Xml("Paid <br/> Shipped"));
+    }
+
+    [Fact]
+    public void A_line_break_at_the_end_of_a_paragraph_leaves_no_blank_line()
+    {
+        Assert.Equal("Paid\n\nShipped", Xml("<br/>Paid<br/><para>Shipped<br/></para>"));
+    }
+
+    [Fact]
+    public void A_list_reads_as_items()
+    {
+        Assert.Equal("States:\n\n- Paid\n- Shipped", Xml("States:<list type=\"bullet\"><item>Paid</item><item>Shipped</item></list>"));
+    }
+
+    [Fact]
+    public void An_unknown_tag_keeps_its_words()
+    {
+        Assert.Equal("Totals are final once paid.", Xml("Totals are <em>final</em> once <i>paid</i>."));
+    }
+
+    [Fact]
+    public void A_link_reads_as_its_text_or_its_address()
+    {
+        Assert.Equal("See the guide.", Xml("See <see href=\"https://example.com/guide\">the guide</see>."));
+        Assert.Equal("See https://example.com/guide.", Xml("See <see href=\"https://example.com/guide\"/>."));
+    }
+
+    [Fact]
+    public void Reference_names_are_short_whatever_kind_they_are()
+    {
+        Assert.Equal("`Order.Total` builds a `Order`, a `Box` and a `Order`.",
+            Xml("<see cref=\"M:Acme.Shop.Order.Total(System.Decimal)\"/> builds a <see cref=\"M:Acme.Shop.Order.#ctor\"/>, " +
+                "a <see cref=\"T:Acme.Shop.Box`1\"/> and a <see cref=\"Acme.Shop.Order\"/>."));
+    }
+
+    [Fact]
+    public void An_empty_code_tag_leaves_no_ticks()
+    {
+        Assert.Equal("Nothing here.", Xml("Nothing<c></c> here."));
+    }
+
+    [Fact]
+    public void A_summary_without_its_member_wrapper_is_read_too()
+    {
+        Assert.Equal("An order.", DocComment.Of(["```cs\nclass Order\n```", "<summary>An order.</summary>"]));
+    }
+
+    [Fact]
+    public void A_docstring_that_opens_on_a_new_line_loses_the_blank_lines_around_it()
+    {
+        // The most common Python style: """ on its own line, text below, """ on its own line.
+        Assert.Equal("Sum of the lines.\n\nRounds once.", DocComment.Of(["```python\ndef total():\n```", "\n    Sum of the lines.\n\n    Rounds once.\n    "]));
+    }
+
+    [Fact]
+    public void A_blank_comment_has_no_summary()
+    {
+        Assert.Null(DocComment.Summary("   \n  "));
+    }
+
     [Fact]
     public void The_summary_is_the_first_paragraph_on_one_line()
     {

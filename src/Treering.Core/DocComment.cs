@@ -86,6 +86,17 @@ public static partial class DocComment
     /// C# 의 XML 주석. 요약 → 비고 → 매개변수 → 반환 순으로 문단을 잇는다.
     /// 소스의 줄바꿈은 편집기 폭에 맞춘 것이라 문단 안에서는 이어 붙이고, 빈 줄만 문단으로 본다.
     /// </summary>
+    /// <summary>
+    /// 쓴 사람이 넣은 줄바꿈(<c>&lt;br/&gt;</c>)의 자리표시. 소스의 줄바꿈은 문단 안에서 이어 붙이는데,
+    /// 그 전에 <c>\n</c> 으로 바꿔 두면 편집기 폭에 맞춘 줄바꿈과 구별되지 않아 함께 이어져 버린다.
+    /// 공백이 아닌 글자라 문단을 만드는 동안 살아남고, 다 만든 뒤에 <see cref="Breaks"/> 가 줄바꿈으로 바꾼다.
+    /// </summary>
+    private const char LineBreak = '';
+
+    /// <summary>자리표시를 줄바꿈으로. 문단 끝에 걸린 것은 빈 줄을 남기지 않게 지우고, 둘레의 공백도 걷는다.</summary>
+    private static string Breaks(string text) =>
+        InnerBreak().Replace(EdgeBreak().Replace(text, string.Empty), "\n");
+
     private static string FromXml(string block)
     {
         XElement root;
@@ -125,7 +136,7 @@ public static partial class DocComment
         }
 
         if (lines.Count > 0) paragraphs.Add(string.Join('\n', lines));
-        return string.Join("\n\n", paragraphs);
+        return Breaks(string.Join("\n\n", paragraphs));
     }
 
     /// <summary>요소 안의 글. 안에 든 태그는 가벼운 표기로 바꾼다.</summary>
@@ -146,7 +157,7 @@ public static partial class DocComment
                         "code" => "\n\n" + Code(child.Value) + "\n\n",
                         "b" or "strong" => $"**{Inline(child).Trim()}**",
                         "para" => "\n\n" + Inline(child) + "\n\n",
-                        "br" => "\n",
+                        "br" => LineBreak.ToString(),
                         "list" => "\n\n" + string.Join('\n', child.Elements("item").Select(item => "- " + Collapse(Inline(item)))) + "\n\n",
                         "paramref" or "typeparamref" => Code(child.Attribute("name")?.Value ?? string.Empty),
                         "see" or "seealso" => See(child),
@@ -236,4 +247,10 @@ public static partial class DocComment
 
     [GeneratedRegex(@"`+\d+")]
     private static partial Regex Arity();
+
+    [GeneratedRegex(@"[ \t]*[ \t]*(?=\n|$)|(?<=\n|^)[ \t]*[ \t]*")]
+    private static partial Regex EdgeBreak();
+
+    [GeneratedRegex(@"[ \t]*[ \t]*")]
+    private static partial Regex InnerBreak();
 }

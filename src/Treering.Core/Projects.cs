@@ -82,7 +82,15 @@ public static class Projects
         return found.OrderByDescending(info => info.ImportedAt).ToList();
     }
 
-    public static ProjectInfo? Find(string id) => List().FirstOrDefault(info => info.Id == id);
+    /// <summary>
+    /// id 는 폴더 이름이라 폴더처럼 비교한다. Windows 에서는 대소문자가 달라도 같은 폴더이고,
+    /// <see cref="IdFor"/> 의 앞부분은 적힌 대로의 이름이라 <c>D:\Shop</c> 과 <c>d:\shop</c> 이
+    /// <c>Shop-…</c> · <c>shop-…</c> 로 갈린다 — 그대로 비교하면 들여온 프로젝트를 못 찾는다.
+    /// </summary>
+    public static ProjectInfo? Find(string id) => List().FirstOrDefault(info => string.Equals(info.Id, id, IdComparison));
+
+    private static StringComparison IdComparison =>
+        OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
     /// <summary>이 리포를 들여온 적이 있으면 그 기록.</summary>
     public static ProjectInfo? ForRepo(string repo) => Find(IdFor(repo));
