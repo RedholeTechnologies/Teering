@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Treering.Core\Treering.Core.csproj" />
+  </ItemGroup>
+
+  <!--
+    로컬 웹 UI 를 서빙한다. 정적 페이지는 실행 파일 안에 넣는다 —
+    런타임에 Node 도, 옆에 놓인 파일도 필요하지 않아야 한다.
+  -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <EmbeddedResource Include="wwwroot\index.html" LogicalName="index.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ModelContextProtocol" Version="2.2.0" />
+  </ItemGroup>
+
+</Project>
