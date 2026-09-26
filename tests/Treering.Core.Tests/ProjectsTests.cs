@@ -85,6 +85,16 @@ public sealed partial class ProjectsTests : IDisposable
     }
 
     [Fact]
+    public void On_windows_a_repository_written_in_another_case_is_found_as_the_same_project()
+    {
+        if (!OperatingSystem.IsWindows()) return;   // elsewhere "Shop" and "shop" are two folders
+        var info = Imported("Shop");
+
+        Assert.Equal(info.Id, Projects.ForRepo(Path.Combine(_repos, "shop"))?.Id);
+        Assert.Equal(info.Id, Projects.Find(info.Id.ToUpperInvariant())?.Id);
+    }
+
+    [Fact]
     public void A_trailing_separator_does_not_make_another_project()
     {
         var repo = Repo("Shop");
