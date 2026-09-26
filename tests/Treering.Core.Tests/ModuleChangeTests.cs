@@ -76,6 +76,30 @@ public sealed class ModuleChangeTests : IDisposable
         changes.Select(change => (change.From, change.To)).OrderBy(pair => pair).ToList();
 
     [Fact]
+    public void A_namespace_starts_using_another_when_its_first_link_to_it_appears()
+    {
+        // "Shop.Sales/Cart" is the type Cart in the namespace Sales of our package Shop.
+        Snapshot(0, new() { ["Shop.Sales/Cart"] = ["Shop.Sales/Order"], ["Shop.Sales/Order"] = [], ["Shop.Billing/Invoice"] = [] });
+        Snapshot(1, new() { ["Shop.Sales/Cart"] = ["Shop.Sales/Order", "Shop.Billing/Invoice"], ["Shop.Sales/Order"] = [], ["Shop.Billing/Invoice"] = [] });
+
+        using var db = GraphDb.Open(_dbPath);
+
+        Assert.Equal([("Sales", "Billing")], Pairs(TimeAxis.Appeared(db, 0, 1, Granularity.Namespace)));
+    }
+
+    [Fact]
+    public void A_new_link_inside_one_namespace_is_not_a_namespace_dependency()
+    {
+        Snapshot(0, new() { ["Shop.Sales/Cart"] = [], ["Shop.Sales/Order"] = [] });
+        Snapshot(1, new() { ["Shop.Sales/Cart"] = ["Shop.Sales/Order"], ["Shop.Sales/Order"] = [] });
+
+        using var db = GraphDb.Open(_dbPath);
+
+        Assert.Empty(TimeAxis.Appeared(db, 0, 1, Granularity.Namespace));
+        Assert.Equal([("Cart", "Order")], Pairs(TimeAxis.Appeared(db, 0, 1, Granularity.Type)));
+    }
+
+    [Fact]
     public void A_module_still_uses_another_while_any_one_of_its_links_remains()
     {
         Snapshot(0, new() { ["Web.Page"] = ["Core.Repo", "Core.Money"], ["Core.Repo"] = [], ["Core.Money"] = [] });
