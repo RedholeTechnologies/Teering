@@ -1,0 +1,22 @@
+bin/
+obj/
+*.user
+.vs/
+artifacts/
+*.scip
+*.db
+*.db-wal
+*.db-shm
+
+# 손으로 MCP 를 두드려 볼 때 쓰는 임시 파일
+mcp*.txt
+serve.log
+
+# 자격증명 — 한 번 들어가면 이력에서 못 지운다. 들어갔다면 회전이 먼저다.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+secrets.*
