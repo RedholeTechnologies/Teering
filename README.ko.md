@@ -4,6 +4,10 @@
 
 Treering 은 코드베이스의 구조를 지도로 그리고, 커밋마다 그 지도를 남겨 둡니다. 그래서 지난주 이후 어떤 타입들이 새로 엮였는지, 어떤 클래스를 부르는 곳이 언제부터 늘었는지를 볼 수 있습니다. 모든 작업은 내 컴퓨터에서 이루어지고 네트워크로 나가는 데이터는 없습니다. LLM 을 쓰지 않기 때문에 같은 코드에서는 언제나 같은 그래프가 나옵니다.
 
+![회로도에서 모듈과 그 안의 네임스페이스로 들어갔다가 나오고, 같은 장을 칩 평면도로 바꿔 보는 장면](docs/screenshots/demo.gif)
+
+*상자를 누르면 안으로 들어가고, 들어간 부품이 테두리가 되어 그 안을 감쌉니다. 다시 나와서 같은 장을 칩으로 바꿔 봅니다.*
+
 ![설계도를 회로도로 보고 한 달 전과 비교한 화면: Billing 모듈이 새로 생겼고, 웹 화면이 더 이상 DB 를 직접 부르지 않는다](docs/screenshots/schematic-compare.png)
 
 *예제 프로젝트의 모듈을 회로도로 그려 한 달 전과 비교한 화면입니다. 초록은 새로 생긴 것으로, Billing 모듈이 결제 인터페이스를 구현합니다. 빨간 점선은 사라진 것으로, 예전에는 웹 화면이 DB 를 직접 불렀습니다.*
@@ -26,16 +30,16 @@ Treering 은 코드베이스의 구조를 지도로 그리고, 커밋마다 그 
 Windows (PowerShell):
 
 ```powershell
-irm https://raw.githubusercontent.com/RedholeTechnologies/Teering/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/RedholeTechnologies/Treering/main/install.ps1 | iex
 ```
 
 Linux (x86-64):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/RedholeTechnologies/Teering/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/RedholeTechnologies/Treering/main/install.sh | sh
 ```
 
-스크립트는 [Releases](https://github.com/RedholeTechnologies/Teering/releases) 에서 최신 빌드를 내려받아 함께 올라온 체크섬과 맞춰 본 뒤, `treering` 을 PATH 에 넣습니다. Windows 에서는 시작 메뉴에도 추가합니다. 관리자 권한은 필요 없고, 다시 실행하면 새 버전으로 바뀝니다. 스크립트를 쓰고 싶지 않다면 Releases 에서 zip 이나 tar.gz 를 받아 아무 곳에나 풀어도 됩니다.
+스크립트는 [Releases](https://github.com/RedholeTechnologies/Treering/releases) 에서 최신 빌드를 내려받아 함께 올라온 체크섬과 맞춰 본 뒤, `treering` 을 PATH 에 넣습니다. Windows 에서는 시작 메뉴에도 추가합니다. 관리자 권한은 필요 없고, 다시 실행하면 새 버전으로 바뀝니다. 스크립트를 쓰고 싶지 않다면 Releases 에서 zip 이나 tar.gz 를 받아 아무 곳에나 풀어도 됩니다.
 
 설치한 뒤 `treering` 을 실행하거나 시작 메뉴에서 여세요. 서버가 켜지고 브라우저에 http://127.0.0.1:7377 이 열립니다. 이미 켜져 있으면 브라우저만 엽니다.
 
@@ -121,10 +125,18 @@ treering growth graph.db InvoiceModel
 ## 에이전트에서 쓰기
 
 ```bash
-treering mcp graph.db
+treering mcp
 ```
 
-stdio 로 MCP(Model Context Protocol) 서버를 띄웁니다. 도구는 `find_symbol`, `callers_of`, `subgraph`, `changed_since`, `snapshots` 다섯 가지입니다. 화면과 같은 질의를 같은 크기 제한으로 실행하고, 결과가 너무 크면 무엇이 빠졌는지 알려 주어 에이전트가 범위를 좁혀 다시 물을 수 있게 합니다.
+가져온 프로젝트들을 대상으로 stdio MCP(Model Context Protocol) 서버를 띄웁니다. 도구는 `list_projects`, `find_symbol`, `callers_of`, `subgraph`, `changed_since`, `snapshots` 여섯 가지입니다. 도구마다 `project`(`list_projects` 가 알려 주는 이름이나 id)를 받고, 비우면 가장 최근에 가져온 프로젝트에 묻습니다. 화면과 같은 질의를 같은 크기 제한으로 실행하고, 결과가 너무 크면 무엇이 빠졌는지 알려 주어 에이전트가 범위를 좁혀 다시 물을 수 있게 합니다. `treering mcp graph.db` 처럼 DB 를 주면 그 하나만 답합니다.
+
+Claude Code 에 추가하려면:
+
+```bash
+claude mcp add treering -- treering mcp
+```
+
+다른 호스트에서는 명령 `treering`, 인자 `mcp` 로 등록합니다. 릴리스마다 MCP 번들(`treering-win-x64.mcpb`, `treering-linux-x64.mcpb`)도 함께 올라가 MCPB 를 한 번에 설치하는 호스트에서 쓸 수 있고, [MCP Registry](https://registry.modelcontextprotocol.io) 에 `io.github.RedholeTechnologies/treering` 으로 게시됩니다.
 
 ## 성능
 
@@ -185,6 +197,12 @@ dotnet publish src/Treering.Cli -c Release -r win-x64 --self-contained true -p:P
 약 52 MB 짜리 실행 파일 하나가 만들어집니다. 웹 화면이 실행 파일 안에 들어 있어서 Node 를 포함해 따로 설치할 것이 없습니다. `IncludeNativeLibrariesForSelfExtract` 를 빼면 `e_sqlite3.dll` 이 실행 파일 옆에 따로 놓입니다.
 
 NativeAOT 는 아직 동작하지 않습니다. JSON 직렬화가 리플렉션을 쓰고 MCP SDK 가 어셈블리를 스캔하기 때문입니다.
+
+## 왜 「Treering」인가
+
+Treering 은 나이테(tree ring)입니다. 나이테는 한 해에 한 겹씩 앞선 해들을 둘러싸며 쌓이기 때문에, 나무를 자르면 그 나무의 역사가 한눈에 보입니다. Treering 도 코드에 같은 일을 합니다. 갱신할 때마다 구조를 한 겹씩 남겨 두고, 모듈과 타입과 그 사이의 의존이 어떻게 자라 왔는지 되짚어 보게 합니다. 다른 코드 지도와 다른 점, 곧 시간을 이름 한 단어가 말해 줍니다. 코드가 이미 나무(구문 트리, 모듈·네임스페이스·타입으로 이어지는 나무)로 이루어져 있다는 점도 함께 담았습니다.
+
+로고는 톱으로 자른 통나무 단면입니다. 한쪽으로 치우친 심을 고르지 않은 나이테가 둘러싸고, 껍질에서 안쪽으로 마른 틈이 나 있으며, 가장 바깥 고리(지금)만 강조색입니다.
 
 ## 라이선스
 

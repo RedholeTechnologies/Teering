@@ -4,6 +4,10 @@ English | [한국어](README.ko.md)
 
 Treering draws a map of your codebase and keeps a copy of it for every commit, so you can see how the structure changed: which types started depending on each other last week, or when a class began to collect callers. It runs entirely on your machine and sends nothing over the network. It doesn't use an LLM, so the same code always produces the same graph.
 
+![Opening a module and one of its namespaces in the schematic, coming back out, and the same sheet as a chip floor plan](docs/screenshots/demo.gif)
+
+*Click a box to go inside it; the part you opened frames what it holds. Then back out, and the same sheet as a chip.*
+
 ![The blueprint as a schematic, compared with a month earlier: the Billing module is new and the web pages no longer call the database](docs/screenshots/schematic-compare.png)
 
 *The sample project's modules as a schematic, compared with a month earlier. Green is new: a Billing module now implements the payment interface. Red dashed is gone: the web pages used to call the database directly.*
@@ -26,16 +30,16 @@ Treering is still in development, and the database format may change between rel
 Windows (PowerShell):
 
 ```powershell
-irm https://raw.githubusercontent.com/RedholeTechnologies/Teering/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/RedholeTechnologies/Treering/main/install.ps1 | iex
 ```
 
 Linux (x86-64):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/RedholeTechnologies/Teering/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/RedholeTechnologies/Treering/main/install.sh | sh
 ```
 
-Each script downloads the latest build from [Releases](https://github.com/RedholeTechnologies/Teering/releases), checks it against the published checksum, and puts `treering` on your PATH. On Windows it also adds Treering to the Start menu. Neither needs administrator rights, and running a script again updates Treering. If you'd rather not run a script, download the zip or tarball from Releases and unpack it anywhere.
+Each script downloads the latest build from [Releases](https://github.com/RedholeTechnologies/Treering/releases), checks it against the published checksum, and puts `treering` on your PATH. On Windows it also adds Treering to the Start menu. Neither needs administrator rights, and running a script again updates Treering. If you'd rather not run a script, download the zip or tarball from Releases and unpack it anywhere.
 
 Then run `treering`, or open it from the Start menu. It starts the server and opens http://127.0.0.1:7377 in your browser. If Treering is already running, it only opens the browser.
 
@@ -121,10 +125,18 @@ treering growth graph.db InvoiceModel
 ## Use it from an agent
 
 ```bash
-treering mcp graph.db
+treering mcp
 ```
 
-This runs a Model Context Protocol (MCP) server over stdio with five tools: `find_symbol`, `callers_of`, `subgraph`, `changed_since` and `snapshots`. They run the same queries as the page, with the same size limits. When a result would be too large, the response says what was left out so the agent can narrow the question and ask again.
+This runs a Model Context Protocol (MCP) server over stdio for the projects you've imported. It has six tools: `list_projects`, `find_symbol`, `callers_of`, `subgraph`, `changed_since` and `snapshots`. Each tool takes a `project` (a name or id from `list_projects`); left empty, it asks the most recently imported one. They run the same queries as the page, with the same size limits. When a result would be too large, the response says what was left out so the agent can narrow the question and ask again. `treering mcp graph.db` answers about that one database only.
+
+To add it to Claude Code:
+
+```bash
+claude mcp add treering -- treering mcp
+```
+
+In other hosts, the command is `treering` with the argument `mcp`. Each release also carries MCP bundles (`treering-win-x64.mcpb`, `treering-linux-x64.mcpb`) for hosts that install MCPB in one step, and is published to the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.RedholeTechnologies/treering`.
 
 ## Performance
 
@@ -185,6 +197,12 @@ dotnet publish src/Treering.Cli -c Release -r win-x64 --self-contained true -p:P
 This produces a single executable of about 52 MB. The web page is embedded in it, so nothing else needs to be installed to run it, not even Node. Without `IncludeNativeLibrariesForSelfExtract`, `e_sqlite3.dll` is placed next to the executable.
 
 NativeAOT doesn't work yet, because JSON serialization uses reflection and the MCP SDK scans assemblies.
+
+## Why "Treering"
+
+A tree ring is one year of growth laid down around the years before it, so cutting a trunk shows its whole history at once. Treering does the same for code. It keeps a snapshot of the structure for every update, and lets you read back how the modules, types and their dependencies grew. The name says in one word what sets it apart from other code maps: time. It also nods to the trees code is already made of, from syntax trees to the tree of modules, namespaces and types.
+
+The logo is the end of a sawn log: uneven rings around an off-centre pith, a drying crack running in from the bark, and the outermost ring, which is now, in the accent colour.
 
 ## License
 

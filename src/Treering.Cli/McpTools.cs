@@ -14,11 +14,53 @@ namespace Treering.Cli;
 [McpServerToolType]
 public static class McpTools
 {
-    private static string _dbPath = string.Empty;
+    // Started on one DB, every tool reads that one. Started without, the tools read the imported
+    // projects - each call names one, or gets the most recently imported.
+    private static string? _dbPath;
 
-    public static void Use(string dbPath) => _dbPath = dbPath;
+    public static void Use(string? dbPath) => _dbPath = dbPath;
 
-    private static Microsoft.Data.Sqlite.SqliteConnection Open() => GraphDb.Open(_dbPath);
+    private const string ProjectHelp =
+        "Which imported project to ask: its name or id, as list_projects gives them. Empty means the most recently imported one.";
+
+    private sealed class NoProject(string message) : Exception(message);
+
+    private static Microsoft.Data.Sqlite.SqliteConnection Open(string? project)
+    {
+        if (_dbPath is not null) return GraphDb.Open(_dbPath);
+        var all = Projects.List();
+        if (all.Count == 0) throw new NoProject("No project has been imported. Run `treering` and import a repository, or `treering sample`.");
+        var chosen = string.IsNullOrWhiteSpace(project)
+            ? all[0]
+            : all.FirstOrDefault(info => string.Equals(info.Id, project, StringComparison.OrdinalIgnoreCase))
+              ?? all.FirstOrDefault(info => string.Equals(info.Name, project, StringComparison.OrdinalIgnoreCase));
+        return chosen is null
+            ? throw new NoProject($"No imported project is called '{project}'. list_projects shows what there is.")
+            : GraphDb.Open(chosen.Db);
+    }
+
+    // A tool answers with what went wrong rather than failing the call - the agent can act on it.
+    private static string Answer(Func<string> ask)
+    {
+        try { return ask(); }
+        catch (NoProject problem) { return Json(new { error = problem.Message }); }
+    }
+
+    [McpServerTool(Name = "list_projects")]
+    [Description("The repositories imported into Treering: name, id, languages, where they are and when they were imported. "
+        + "Every other tool takes one of these as project.")]
+    public static string ListProjects()
+    {
+        if (_dbPath is not null) return Json(new[] { new { name = Path.GetFileNameWithoutExtension(_dbPath), id = (string?)null, db = _dbPath } });
+        return Json(Projects.List().Select(info => new
+        {
+            name = info.Name,
+            id = info.Id,
+            languages = info.Languages,
+            repository = info.Repo,
+            importedAt = info.ImportedAt.ToString("u"),
+        }));
+    }
 
     private static string Json(object value) =>
         JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented = false });
@@ -27,9 +69,10 @@ public static class McpTools
     [Description("Find a symbol by name. Looks at types, methods, namespaces and packages alike.")]
     public static string FindSymbol(
         [Description("The name to look for. Substring match.")] string name,
-        [Description("Maximum results. Default 20.")] int limit = 20)
+        [Description("Maximum results. Default 20.")] int limit = 20,
+        [Description(ProjectHelp)] string? project = null) => Answer(() =>
     {
-        using var db = Open();
+        using var db = Open(project);
         using var command = db.CreateCommand();
         command.CommandText = """
             SELECT s.id, s.display, s.kind, s.flavor, p.name, f.path, d.line
@@ -61,15 +104,16 @@ public static class McpTools
         }
 
         return Json(new { count = found.Count, symbols = found });
-    }
+    });
 
     [McpServerTool(Name = "callers_of")]
     [Description("The types that call this one, rolled up to type level. "
         + "The «who» of a reference is inferred from position, so method level is unreliable.")]
     public static string CallersOf(
-        [Description("Type name. Exact match.")] string type)
+        [Description("Type name. Exact match.")] string type,
+        [Description(ProjectHelp)] string? project = null) => Answer(() =>
     {
-        using var db = Open();
+        using var db = Open(project);
         using var command = db.CreateCommand();
         command.CommandText = """
             WITH RECURSIVE
@@ -115,7 +159,7 @@ public static class McpTools
         }
 
         return Json(new { type, count = callers.Count, confidence = "inferred", callers });
-    }
+    });
 
     [McpServerTool(Name = "subgraph")]
     [Description("The subgraph around one point. Budgets apply (2,000 nodes, degree 50) and "
@@ -125,14 +169,15 @@ public static class McpTools
         [Description("One of module, namespace, type. Default type.")] string granularity = "type",
         [Description("How many hops. Default 1.")] int depth = 1,
         [Description("Leave out what this repo did not write - system and package types. Default false.")]
-        bool ownOnly = false)
+        bool ownOnly = false,
+        [Description(ProjectHelp)] string? project = null) => Answer(() =>
     {
         if (!Enum.TryParse<Granularity>(granularity, ignoreCase: true, out var level))
         {
             return Json(new { error = $"unknown level: {granularity}" });
         }
 
-        using var db = Open();
+        using var db = Open(project);
 
         List<long> seeds;
         var wholeLevel = string.IsNullOrWhiteSpace(seed);
@@ -177,7 +222,7 @@ public static class McpTools
             truncated = result.Truncated.Select(item => new { item.Display, item.Hidden }),
             result.BudgetExhausted,
         });
-    }
+    });
 
     [McpServerTool(Name = "changed_since")]
     [Description("Dependencies that appeared or went away between two snapshots. "
@@ -185,14 +230,15 @@ public static class McpTools
     public static string ChangedSince(
         [Description("The snapshot ord to measure from.")] int fromOrd,
         [Description("The snapshot ord to compare against. Empty means the latest.")] int? toOrd = null,
-        [Description("One of module, namespace, type. Default module.")] string granularity = "module")
+        [Description("One of module, namespace, type. Default module.")] string granularity = "module",
+        [Description(ProjectHelp)] string? project = null) => Answer(() =>
     {
         if (!Enum.TryParse<Granularity>(granularity, ignoreCase: true, out var level))
         {
             return Json(new { error = $"unknown level: {granularity}" });
         }
 
-        using var db = Open();
+        using var db = Open(project);
         var snapshots = TimeAxis.Snapshots(db);
         if (snapshots.Count == 0) return Json(new { error = "no snapshots" });
 
@@ -208,20 +254,21 @@ public static class McpTools
             disappeared = gone.Take(50).Select(Describe),
             crossingBoundary = appeared.Where(change => change.CrossesBoundary).Take(20).Select(Describe),
         });
-    }
+    });
 
     [McpServerTool(Name = "snapshots")]
     [Description("The snapshots on file. Pick the ord to hand to changed_since from here.")]
-    public static string Snapshots()
+    public static string Snapshots(
+        [Description(ProjectHelp)] string? project = null) => Answer(() =>
     {
-        using var db = Open();
+        using var db = Open(project);
         return Json(TimeAxis.Snapshots(db).Select(snapshot => new
         {
             snapshot.Ord,
             commit = snapshot.CommitSha,
             indexedAt = snapshot.IndexedAt.ToString("u"),
         }));
-    }
+    });
 
     private static object Describe(DependencyChange change) => new
     {
