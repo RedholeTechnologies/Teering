@@ -30,16 +30,16 @@ Treering 은 코드베이스의 구조를 지도로 그리고, 커밋마다 그 
 Windows (PowerShell):
 
 ```powershell
-irm https://raw.githubusercontent.com/RedholeTechnologies/Teering/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/RedholeTechnologies/Treering/main/install.ps1 | iex
 ```
 
 Linux (x86-64):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/RedholeTechnologies/Teering/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/RedholeTechnologies/Treering/main/install.sh | sh
 ```
 
-스크립트는 [Releases](https://github.com/RedholeTechnologies/Teering/releases) 에서 최신 빌드를 내려받아 함께 올라온 체크섬과 맞춰 본 뒤, `treering` 을 PATH 에 넣습니다. Windows 에서는 시작 메뉴에도 추가합니다. 관리자 권한은 필요 없고, 다시 실행하면 새 버전으로 바뀝니다. 스크립트를 쓰고 싶지 않다면 Releases 에서 zip 이나 tar.gz 를 받아 아무 곳에나 풀어도 됩니다.
+스크립트는 [Releases](https://github.com/RedholeTechnologies/Treering/releases) 에서 최신 빌드를 내려받아 함께 올라온 체크섬과 맞춰 본 뒤, `treering` 을 PATH 에 넣습니다. Windows 에서는 시작 메뉴에도 추가합니다. 관리자 권한은 필요 없고, 다시 실행하면 새 버전으로 바뀝니다. 스크립트를 쓰고 싶지 않다면 Releases 에서 zip 이나 tar.gz 를 받아 아무 곳에나 풀어도 됩니다.
 
 설치한 뒤 `treering` 을 실행하거나 시작 메뉴에서 여세요. 서버가 켜지고 브라우저에 http://127.0.0.1:7377 이 열립니다. 이미 켜져 있으면 브라우저만 엽니다.
 

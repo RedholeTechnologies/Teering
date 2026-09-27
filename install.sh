@@ -1,12 +1,12 @@
 #!/bin/sh
 # Installs the latest Treering for Linux (x86-64).
 #
-#   curl -fsSL https://raw.githubusercontent.com/RedholeTechnologies/Teering/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/RedholeTechnologies/Treering/main/install.sh | sh
 #
 # It goes to ~/.local/bin (or $TREERING_DIR). Nothing needs root. Run it again to update.
 set -eu
 
-base="https://github.com/RedholeTechnologies/Teering/releases/latest/download"
+base="https://github.com/RedholeTechnologies/Treering/releases/latest/download"
 dir="${TREERING_DIR:-$HOME/.local/bin}"
 
 case "$(uname -s)-$(uname -m)" in
