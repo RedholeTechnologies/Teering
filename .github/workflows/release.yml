@@ -1,11 +1,17 @@
 # Builds Treering for Windows and Linux. A version tag (v1.2.3) publishes the builds as a GitHub
-# release anyone can download; running it by hand only builds them, to check a branch.
+# release anyone can download. Run by hand, it only builds the branch - or, given a tag that has
+# no release yet, builds that tag's code and publishes it (the tags made before this workflow).
 name: release
 
 on:
   push:
     tags: ["v*"]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "An existing tag to build and publish (leave empty to only build the branch)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -22,6 +28,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
 
       - uses: actions/setup-dotnet@v4
         with:
@@ -56,18 +64,22 @@ jobs:
           cp LICENSE THIRD-PARTY-NOTICES.md dist/
           tar -czf treering-linux-x64.tar.gz -C dist .
 
-      # The Linux build is not tested above, so it is started for real: the sample project is
-      # made, the server comes up, and the page and a blueprint answer.
+      # The Linux build is not tested above, so it is started for real: the server comes up and
+      # the page answers. A build that has the sample project also makes it and draws it - older
+      # tags, published afterwards, came before the sample.
       - name: Smoke test (Linux)
         if: matrix.rid == 'linux-x64'
         run: |
           export TREERING_HOME="$RUNNER_TEMP/home"
-          ./dist/treering sample
+          sample=no
+          if ./dist/treering sample; then sample=yes; fi
           ./dist/treering serve --no-watch --port 7390 &
           for i in $(seq 1 30); do curl -fs http://127.0.0.1:7390/api/projects > /dev/null && break; sleep 1; done
           curl -fs http://127.0.0.1:7390/ | grep -q 'Treering'
-          curl -fs http://127.0.0.1:7390/api/blueprint | grep -q 'Acme.Shop'
-          curl -fs "http://127.0.0.1:7390/api/blueprint?die=1" | grep -q '"lines"'
+          if [ "$sample" = yes ]; then
+            curl -fs http://127.0.0.1:7390/api/blueprint | grep -q 'Acme.Shop'
+            curl -fs "http://127.0.0.1:7390/api/blueprint?die=1" | grep -q '"lines"'
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
@@ -77,11 +89,14 @@ jobs:
 
   release:
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.tag != ''
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.tag || github.ref }}
           fetch-depth: 0
 
       - uses: actions/download-artifact@v4
@@ -92,10 +107,14 @@ jobs:
       - name: Checksums
         run: cd assets && sha256sum treering-* > SHA256SUMS
 
-      # The release notes are the tag's own message - the release merge that made it.
+      # The release notes are the tag's own message - the release merge that made it. Only the
+      # highest version is marked latest, so publishing an old tag late does not take its place.
       - name: Publish
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           git fetch --force --tags
-          gh release create "$GITHUB_REF_NAME" assets/* --title "$GITHUB_REF_NAME" --notes-from-tag
+          highest="$(git tag -l 'v*' --sort=-v:refname | head -n 1)"
+          latest=false
+          if [ "$TAG" = "$highest" ]; then latest=true; fi
+          gh release create "$TAG" assets/* --title "$TAG" --notes-from-tag --verify-tag --latest="$latest"
