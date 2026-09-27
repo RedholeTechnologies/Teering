@@ -826,7 +826,7 @@ const STRINGS = {
     legendShapes: "class · interface · enum · record · struct",
     legendBorn: "new dependency", legendDied: "broken dependency",
     legendTitle: "Legend", legendCode: "Code", legendLinks: "Links", legendKinds: "Kinds", legendChanges: "Changes",
-    legendOursItem: "Our code", legendTheirsItem: "Libraries",
+    legendOursItem: "Our code", legendTheirsItem: "Libraries", legendTestsItem: "Test code",
     legendReference: "References", legendInherits: "Inherits", legendContains: "Contains",
     legendAdded: "Added", legendRemoved: "Removed",
     legendModule: "Modules, namespaces", legendClass: "Class", legendInterface: "Interface",
@@ -899,7 +899,7 @@ const STRINGS = {
     legendShapes: "클래스 · 인터페이스 · 열거형 · 레코드 · 구조체",
     legendBorn: "새 의존", legendDied: "끊긴 의존",
     legendTitle: "범례", legendCode: "코드", legendLinks: "선", legendKinds: "모양", legendChanges: "변화",
-    legendOursItem: "우리 코드", legendTheirsItem: "라이브러리",
+    legendOursItem: "우리 코드", legendTheirsItem: "라이브러리", legendTestsItem: "테스트 코드",
     legendReference: "참조", legendInherits: "상속", legendContains: "포함",
     legendAdded: "새로 생김", legendRemoved: "없어짐",
     legendModule: "모듈·네임스페이스", legendClass: "클래스", legendInterface: "인터페이스",
@@ -1048,6 +1048,8 @@ const nodeKind = node =>
 
 function legendHides(node) {
   if (!node) return false;
+  // Test code goes with its box - a bubble too, once everything in it is test code.
+  if (node.test && legendOff.has("tests")) return true;
   if (!node.container && node.own && legendOff.has("ours")) return true;
   return legendOff.has(nodeKind(node));
 }
@@ -1062,6 +1064,9 @@ function legendHidesEdge(edge) {
 function swatch(body) {
   return `<svg class="swatch" viewBox="0 0 30 14" aria-hidden="true">${body}</svg>`;
 }
+
+// Test code: our colour, drawn as an outline - there, but not the product.
+const testSwatch = colour => swatch(`<circle cx="15" cy="7" r="4.2" fill="${colour}" fill-opacity="0.18" stroke="${colour}" stroke-width="1.2" stroke-dasharray="2 1.6"/>`);
 
 const TREE_KIND_NAME = () => ({
   module: t("legendModuleOnly"), namespace: t("legendNamespace"),
@@ -1096,6 +1101,7 @@ function renderTreeLegend(body) {
       ["ours", t("legendOursItem"), treeMarkSvg("class", kindColour("class")), rows.filter(node => node.own).length, true],
       ["theirs", t("legendTheirsItem"), treeMarkSvg("class", kindColour("class")).replace("<g ", '<g opacity="0.45" '),
         rows.filter(node => !node.own).length, true],
+      ["tests", t("legendTestsItem"), testSwatch(kindColour("class")), rows.filter(node => node.test).length],
     ]],
     [t("legendStructure"), [row("module"), row("namespace")]],
     [t("legendTypes"), ["class", "interface", "enum", "record", "struct", "delegate"].map(row)],
@@ -1119,6 +1125,7 @@ function renderLegendCard() {
         count(nodes, n => n.own && !n.container)],
       ["theirs", t("legendTheirsItem"), swatch(`<circle cx="15" cy="7" r="4.5" fill="${palette().grey}"/>`),
         count(nodes, n => !n.own && !n.container)],
+      ["tests", t("legendTestsItem"), testSwatch(hues[0]), count(nodes, n => n.test && !n.container)],
     ]],
     [t("legendLinks"), [
       ["reference", t("legendReference"), swatch('<polygon points="2,4 28,6.3 28,7.7 2,10" fill="currentColor" fill-opacity="0.6"/>'),
@@ -1825,9 +1832,12 @@ function openModules(g) {
   const edges = [...merged.values()];
 
   const containers = new Map();
-  const hold = (containerId, memberId) => edges.push({
-    from: containerId, to: memberId, kind: KIND_CONTAINS, weight: 0, inferred: false, state: "same",
-  });
+  const membersOf = new Map();
+  const hold = (containerId, memberId) => {
+    edges.push({ from: containerId, to: memberId, kind: KIND_CONTAINS, weight: 0, inferred: false, state: "same" });
+    if (!membersOf.has(containerId)) membersOf.set(containerId, []);
+    membersOf.get(containerId).push(memberId);
+  };
 
   if (g.groups && g.groups.length) {
     // One package of ours: the server has split it into the branches worth seeing, so the
@@ -1853,6 +1863,12 @@ function openModules(g) {
       }
       hold(node.moduleId, node.id);
     }
+  }
+  // A bubble is test code when everything in it is, so switching tests off takes it away too.
+  const testIds = new Set(g.nodes.filter(node => node.test).map(node => node.id));
+  for (const [id, container] of containers) {
+    const members = membersOf.get(id) ?? [];
+    container.test = members.length > 0 && members.every(member => testIds.has(member));
   }
   nodes.push(...containers.values());
 
@@ -2948,7 +2964,8 @@ const TREE_MARKS = {
   event: c => [["path", { d: "M1 -4.2 L-2.4 0.6 L0.2 0.6 L-1 4.2 L2.6 -0.8 L0 -0.8 Z", fill: c }]],
 };
 const TREE_TOGGLES = ["class", "interface", "enum", "record", "struct", "delegate", "method", "property", "field", "event"];
-const treeHides = node => TREE_TOGGLES.includes(treeKind(node)) && legendOff.has(treeKind(node));
+const treeHides = node =>
+  (node.test && legendOff.has("tests")) || (TREE_TOGGLES.includes(treeKind(node)) && legendOff.has(treeKind(node)));
 
 function treeMark(node, colour) {
   const group = el("g", { class: "mark" });
