@@ -35,11 +35,15 @@ for (var i = 0; i < args.Length; i++)
         i++;
         continue;
     }
+    if (args[i] == "--open") continue;
     argv.Add(args[i]);
 }
 
 return argv.ToArray() switch
 {
+    // Double-clicked, or typed with nothing after it: the web page, opened in the browser.
+    [] => Start(servePort ?? 7377, noWatch ? null : watchMinutes),
+    ["sample"] => InstallSample(),
     ["scan", var scip] => Scan(scip),
     ["load", var scip, var db] => Load(scip, db, ord: 0, fresh: true),
     ["snap", var scip, var db, var ord] when int.TryParse(ord, out var parsed)
@@ -67,7 +71,7 @@ return argv.ToArray() switch
     ["watch", var repo, var db, var minutes] when int.TryParse(minutes, out var parsed)
         => Watch(repo, db, parsed),
     ["mcp", var db] => Mcp(db),
-    ["serve"] => Serve(null, servePort ?? 7377, noWatch ? null : watchMinutes),
+    ["serve"] => Serve(null, servePort ?? 7377, noWatch ? null : watchMinutes, open: args.Contains("--open")),
     ["serve", var db] => Serve(db, servePort ?? 7377, noWatch ? null : watchMinutes),
     ["serve", var db, var port] when int.TryParse(port, out var parsed) => Serve(db, parsed, noWatch ? null : watchMinutes),
     _ => Usage(),
@@ -76,6 +80,9 @@ return argv.ToArray() switch
 static int Usage()
 {
     Console.Error.WriteLine("usage:");
+    Console.Error.WriteLine("  treering                                 start the web page and open it in the browser");
+    Console.Error.WriteLine("       if it is already running, only opens the browser");
+    Console.Error.WriteLine("  treering sample                          add the sample project (a small made-up shop) to look around in");
     Console.Error.WriteLine("  treering import  <repo> [db]             index a whole repository, any language, in one go");
     Console.Error.WriteLine("  treering projects                        list what has been imported");
     Console.Error.WriteLine("  treering scan    <index.scip>            walk the index, report statistics only");
@@ -89,7 +96,7 @@ static int Usage()
     Console.Error.WriteLine("  treering serve   [db] [port]             serve the local web UI (default 7377)");
     Console.Error.WriteLine("       without a db it shows every imported project, and can import more from the page");
     Console.Error.WriteLine($"       keeps imported projects current every {DefaultWatchMinutes} min; --no-watch turns that off,");
-    Console.Error.WriteLine("       --watch-minutes N changes the period, --port N the port");
+    Console.Error.WriteLine("       --watch-minutes N changes the period, --port N the port, --open opens the browser");
     Console.Error.WriteLine("  treering snapshots <db>                  list the snapshots on file");
     Console.Error.WriteLine("  treering diff    <db> <from> <to>        dependency changes between two snapshots");
     Console.Error.WriteLine("  treering growth  <db> <type>             when the callers started piling up");
@@ -794,7 +801,78 @@ static int Mcp(string dbPath)
 /// 볼지 <c>?project=</c> 로 고르고, 화면에서 새로 들여올 수도 있다.
 /// </summary>
 /// <param name="watchMinutes">들여온 프로젝트를 이만큼마다 최신으로 둔다. <c>null</c> 이면 두지 않는다.</param>
-static int Serve(string? dbPath, int port, int? watchMinutes)
+// 인자 없이 켰다 — 더블클릭이 여기로 온다. 이미 떠 있으면 두 번째 서버를 띄우지 않고 브라우저만 연다.
+// 같은 자리를 남의 프로그램이 쓰고 있으면 무엇을 하면 되는지 말한다.
+static int Start(int port, int? watchMinutes)
+{
+    var url = $"http://127.0.0.1:{port}";
+    switch (WhoIsOn(port))
+    {
+        case "treering":
+            Console.WriteLine($"Treering is already running at {url}. Opening it.");
+            OpenBrowser(url);
+            return 0;
+        case "other":
+            Console.Error.WriteLine($"Port {port} is taken by another program. Start Treering on another one: treering --port {port + 1}");
+            PauseIfDoubleClicked();
+            return 1;
+    }
+
+    Console.WriteLine("Keep this window open while you use Treering; closing it stops it.");
+    return Serve(null, port, watchMinutes, open: true);
+}
+
+// 그 포트에서 누가 듣나: 우리(treering), 남(other), 아무도(null).
+static string? WhoIsOn(int port)
+{
+    try
+    {
+        using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
+        var response = client.GetAsync($"http://127.0.0.1:{port}/api/projects").GetAwaiter().GetResult();
+        var body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+        return response.IsSuccessStatusCode && body.Contains("\"projects\"", StringComparison.Ordinal) ? "treering" : "other";
+    }
+    catch (HttpRequestException) { return null; }
+    catch (TaskCanceledException) { return "other"; }
+}
+
+static void OpenBrowser(string url)
+{
+    try
+    {
+        if (OperatingSystem.IsWindows()) Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        else if (OperatingSystem.IsMacOS()) Process.Start("open", url);
+        else Process.Start("xdg-open", url);
+    }
+    catch (Exception error) when (error is System.ComponentModel.Win32Exception or InvalidOperationException)
+    {
+        Console.WriteLine($"Open {url} in your browser.");
+    }
+}
+
+// 더블클릭으로 연 창은 끝나면 바로 닫혀 오류를 읽을 틈이 없다. 콘솔을 이 프로세스가 혼자 쓰면 그 경우다.
+static void PauseIfDoubleClicked()
+{
+    if (!OperatingSystem.IsWindows() || Console.IsInputRedirected) return;
+    try
+    {
+        if (Console.CursorLeft == 0 && Console.CursorTop <= 2)
+        {
+            Console.Error.WriteLine("Press Enter to close.");
+            Console.ReadLine();
+        }
+    }
+    catch (IOException) { /* no console to wait on */ }
+}
+
+static int InstallSample()
+{
+    var info = Sample.Install();
+    Console.WriteLine($"Added the sample project \"{info.Name}\". Run treering and pick it from the project list.");
+    return 0;
+}
+
+static int Serve(string? dbPath, int port, int? watchMinutes, bool open = false)
 {
     if (dbPath is not null && !File.Exists(dbPath))
     {
@@ -860,6 +938,15 @@ static int Serve(string? dbPath, int port, int? watchMinutes)
         var json = context.Request.ContentType?.StartsWith("application/json", StringComparison.OrdinalIgnoreCase) == true;
         return ours && json;
     }
+
+    // 예제 프로젝트: 가져올 저장소 없이 둘러보라고. 만들고 나면 그 프로젝트를 연다.
+    app.MapPost("/api/sample", (HttpContext context) =>
+    {
+        if (dbPath is not null) return Results.BadRequest(new { error = "this server shows one DB - start it with `treering` to add the sample" });
+        if (!FromThisPage(context)) return Results.StatusCode(StatusCodes.Status403Forbidden);
+        var info = Sample.Install();
+        return Results.Ok(new { info.Id, info.Name });
+    });
 
     app.MapPost("/api/import", async (HttpContext context) =>
     {
@@ -1126,6 +1213,7 @@ static int Serve(string? dbPath, int port, int? watchMinutes)
     // 로컬 전용이다. 127.0.0.1 밖으로는 듣지 않는다.
     var url = $"http://127.0.0.1:{port}";
     Console.WriteLine($"Treering is listening on {url}. Ctrl+C to stop.");
+    if (open) app.Lifetime.ApplicationStarted.Register(() => OpenBrowser(url));
     Console.WriteLine(watchMinutes is { } minutes
         ? $"Keeping imported projects current every {minutes} min (--no-watch turns it off)."
         : "Not keeping projects current (--no-watch).");

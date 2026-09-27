@@ -4,7 +4,27 @@ English | [한국어](README.ko.md)
 
 Treering draws a map of your codebase and keeps a copy of it for every commit, so you can see how the structure changed: which types started depending on each other last week, or when a class began to collect callers. It runs entirely on your machine and sends nothing over the network. It doesn't use an LLM, so the same code always produces the same graph.
 
-Treering is still in development. There are no releases yet, and the database format may change. The design notes are in [treering-plan.md](treering-plan.md) (in Korean).
+Treering is still in development, and the database format may change between releases. The design notes are in [treering-plan.md](treering-plan.md) (in Korean).
+
+## Install
+
+Windows (PowerShell):
+
+```powershell
+irm https://raw.githubusercontent.com/RedholeTechnologies/Teering/main/install.ps1 | iex
+```
+
+Linux (x86-64):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/RedholeTechnologies/Teering/main/install.sh | sh
+```
+
+Each script downloads the latest build from [Releases](https://github.com/RedholeTechnologies/Teering/releases), checks it against the published checksum, and puts `treering` on your PATH. On Windows it also adds Treering to the Start menu. Neither needs administrator rights, and running a script again updates Treering. If you'd rather not run a script, download the zip or tarball from Releases and unpack it anywhere.
+
+Then run `treering`, or open it from the Start menu. It starts the server and opens http://127.0.0.1:7377 in your browser. If Treering is already running, it only opens the browser.
+
+To look around before importing anything, choose **Or look around a sample project first** on the first screen. It adds `acme-shop`, a small made-up online shop with a month of history. `treering sample` adds it from the command line.
 
 ## Install the indexers
 

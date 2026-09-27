@@ -367,11 +367,18 @@
     font-family: "JetBrains Mono", "Cascadia Code", "Cascadia Mono", Consolas, ui-monospace, monospace;
   }
   #importPath:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
-  #importer button:not(.pick):not(.close) {
+  #importer button:not(.pick):not(.close):not(.sample) {
     font: inherit; color: var(--fg); background: transparent; border: 1px solid var(--line);
     border-radius: 8px; padding: 7px 16px; cursor: pointer; white-space: nowrap;
   }
-  #importer button:not(.pick):not(.close):hover:not(:disabled) { border-color: var(--muted); }
+  #importer button:not(.pick):not(.close):not(.sample):hover:not(:disabled) { border-color: var(--muted); }
+  /* Nothing to import yet, or just curious: a sample project to look around in. */
+  #importer .sample {
+    display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 6px 2px;
+    background: none; border: none; color: var(--accent); font: inherit; font-size: 13.5px; cursor: pointer;
+  }
+  #importer .sample:hover:not(:disabled) { text-decoration: underline; text-underline-offset: 3px; }
+  #importer .sample:disabled { color: var(--muted); cursor: progress; }
   #importer button.primary, #importer.no-pick #importGo {
     background: var(--accent) !important; border-color: var(--accent) !important; color: var(--bg) !important; font-weight: 600;
   }
@@ -797,6 +804,7 @@
             <button id="importGo" type="button" data-t="importGo"></button>
           </div>
         </details>
+        <div><button id="importSample" class="sample" type="button"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5 8 2.5l5.5 11M4.6 9.5h6.8"/></svg><span data-t="importSample"></span></button></div>
       </div>
 
       <div class="progress">
@@ -893,6 +901,7 @@ const STRINGS = {
     importPick: "Choose a folder…", importPicking: "Pick the repository in the folder window…",
     importPickNote: "C#, TypeScript and Python are found and indexed. Nothing is written inside the folder.",
     importByPath: "Or type its path", importGo: "Import",
+    importSample: "Or look around a sample project first", importSampleBusy: "Making the sample…",
     importDetails: "Details", importKeepsGoing: "You can close this - the import keeps going, and the project appears in the menu when it is done.",
     importAgain: "Choose another folder…",
     stepWaiting: "Waiting", stepRunning: "Indexing…", stepSkipped: "Skipped", stepFailed: "Failed",
@@ -982,6 +991,7 @@ const STRINGS = {
     importPick: "폴더 고르기…", importPicking: "폴더 창에서 저장소를 고르세요…",
     importPickNote: "C#, TypeScript, Python 을 찾아 색인합니다. 폴더 안에는 아무것도 쓰지 않습니다.",
     importByPath: "경로를 직접 입력", importGo: "가져오기",
+    importSample: "먼저 예제 프로젝트로 둘러보기", importSampleBusy: "예제를 만드는 중…",
     importDetails: "자세한 기록", importKeepsGoing: "닫아도 됩니다 - 가져오기는 계속되고, 끝나면 프로젝트 메뉴에 나타납니다.",
     importAgain: "다른 폴더 고르기…",
     stepWaiting: "대기", stepRunning: "색인 중…", stepSkipped: "건너뜀", stepFailed: "실패",
@@ -5679,6 +5689,26 @@ projectSelect.addEventListener("change", () => {
   location.search = "?project=" + encodeURIComponent(projectSelect.value);
 });
 importGo.addEventListener("click", startImport);
+// The sample is made on the server in a second or two, then opened like any project.
+document.getElementById("importSample").addEventListener("click", async event => {
+  const button = event.currentTarget;
+  const label = button.querySelector("span");
+  button.disabled = true;
+  label.textContent = t("importSampleBusy");
+  try {
+    const response = await fetch("/api/sample", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+    if (response.ok) {
+      const info = await response.json();
+      location.search = "?project=" + encodeURIComponent(info.id);
+      return;
+    }
+  } catch { /* said below */ }
+  button.disabled = false;
+  label.textContent = t("importSample");
+  // The problem box lives with the progress, which the idle form does not show.
+  setImportState("failed");
+  showProblem(t("problemOther"));
+});
 importPick.addEventListener("click", pickFolder);
 document.getElementById("importAgain").addEventListener("click", pickFolder);
 document.getElementById("importClose").addEventListener("click", closeImporter);
