@@ -629,14 +629,11 @@
   #stage.chip { background: #0d1116; color: #e6edf3; }
   #stage.chip .bpbox:hover > .frame { stroke: #ffffff; stroke-width: 2.4; }
   #stage.chip .bpitem:hover > rect { stroke: #ffffff; }
-  /* Drawing or schematic: a small switch over the sheet's corner. */
-  #bpLook {
-    position: absolute; top: 12px; left: 12px; z-index: 5;
-    background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16); backdrop-filter: blur(6px);
+  /* The blueprint's three looks sit in the shape switch, set off from the map's shapes. */
+  .segmented .bp-first { margin-left: 5px; position: relative; }
+  .segmented .bp-first::before {
+    content: ""; position: absolute; left: -4px; top: 6px; bottom: 6px; width: 1px; background: var(--line);
   }
-  #bpLook[hidden] { display: none; }
-  #bpLook button { width: auto; padding: 0 12px; font: inherit; font-size: 12.5px; }
 
   #panel {
     width: 370px; flex: none; overflow-y: auto; background: var(--panel);
@@ -736,7 +733,9 @@
       <button type="button" role="radio" aria-checked="false" data-shape="rings" data-t-label="styleRings"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="1.4"/><circle cx="8" cy="8" r="3.8"/><circle cx="8" cy="8" r="6.2"/></svg></button>
       <button type="button" role="radio" aria-checked="false" data-shape="layers" data-t-label="styleLayers"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="2.6" rx="1"/><rect x="2.5" y="6.7" width="11" height="2.6" rx="1"/><rect x="2.5" y="10.9" width="11" height="2.6" rx="1"/></svg></button>
       <button type="button" role="radio" aria-checked="false" data-shape="tree" data-t-label="styleTree"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="3.5" cy="8" r="1.3"/><circle cx="12" cy="3.5" r="1.3"/><circle cx="12" cy="8" r="1.3"/><circle cx="12" cy="12.5" r="1.3"/><path d="M4.8 8h5.9M6.5 8V3.5h4.2M6.5 8v4.5h4.2"/></svg></button>
-      <button type="button" role="radio" aria-checked="false" data-shape="blueprint" data-t-label="styleBlueprint"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.3" y="1.8" width="5.4" height="3.6" rx="0.6"/><rect x="1.6" y="10.6" width="5.4" height="3.6" rx="0.6"/><rect x="9" y="10.6" width="5.4" height="3.6" rx="0.6"/><path d="M8 5.4v2.6M4.3 10.6V8h7.4v2.6"/></svg></button>
+      <button type="button" role="radio" aria-checked="false" class="bp-first" data-shape="blueprint" data-look="drawing" data-t-label="styleBpDrawing"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.3" y="1.8" width="5.4" height="3.6" rx="0.6"/><rect x="1.6" y="10.6" width="5.4" height="3.6" rx="0.6"/><rect x="9" y="10.6" width="5.4" height="3.6" rx="0.6"/><path d="M8 5.4v2.6M4.3 10.6V8h7.4v2.6"/></svg></button>
+      <button type="button" role="radio" aria-checked="false" data-shape="blueprint" data-look="schematic" data-t-label="styleBpSchematic"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="4.2" y="3" width="7.6" height="10" rx="0.8"/><path d="M1.5 5.5h2.7M1.5 8h2.7M1.5 10.5h2.7M11.8 5.5h2.7M11.8 10.5h2.7"/><circle cx="6" cy="4.8" r="0.5"/></svg></button>
+      <button type="button" role="radio" aria-checked="false" data-shape="blueprint" data-look="chip" data-t-label="styleBpChip"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="0.6"/><path d="M2 8.5h7M9 2v12M9 6h5"/></svg></button>
     </div>
     <button id="ownToggle" class="toggle" type="button" aria-pressed="false"><span data-t="scopeOwn"></span></button>
     <div class="pop" id="timeTool">
@@ -822,11 +821,6 @@
 
 <div id="middle" class="needs-map">
   <svg id="stage"></svg>
-  <div id="bpLook" class="segmented" role="radiogroup" data-t-label="bpLook" hidden>
-    <button type="button" role="radio" aria-checked="true" data-look="drawing" data-t="bpLookDrawing"></button>
-    <button type="button" role="radio" aria-checked="false" data-look="schematic" data-t="bpLookSchematic"></button>
-    <button type="button" role="radio" aria-checked="false" data-look="chip" data-t="bpLookChip"></button>
-  </div>
   <aside id="panel" hidden></aside>
   <section id="legendCard" class="needs-map" aria-labelledby="legendTitle">
     <button id="legendToggle" type="button" aria-expanded="true" aria-controls="legendBody">
@@ -931,7 +925,7 @@ const STRINGS = {
     bpEmpty: "Nothing to draw here", bpEmptyWhy: "Nothing on this level is tied to anything else, or it is all switched off in the legend.",
     legendBoxes: "Boxes", legendOurBox: "Our code", legendOutside: "Outside this level", legendNoDoc: "No doc comment",
     legendUses: "Uses", legendImplements: "Implements",
-    bpLook: "Look", bpLookDrawing: "Drawing", bpLookSchematic: "Schematic", bpLookChip: "Chip",
+    styleBpDrawing: "Blueprint: drawing", styleBpSchematic: "Blueprint: schematic", styleBpChip: "Blueprint: chip",
     dieLines: n => `≈${n} lines`,
     dieKey: "area = lines of code, estimated · inner blocks = one level down · white = uses, dashed = implements · pads = what stands outside",
     legendRegions: "Regions", legendRegion: "Our code", legendPad: "Pad: outside", legendArea: "Area = lines (estimated)",
@@ -1019,7 +1013,7 @@ const STRINGS = {
     bpEmpty: "그릴 것이 없습니다", bpEmptyWhy: "이 층에는 서로 이어진 것이 없거나, 범례에서 모두 꺼져 있습니다.",
     legendBoxes: "상자", legendOurBox: "우리 코드", legendOutside: "이 층 바깥", legendNoDoc: "주석 없음",
     legendUses: "쓴다", legendImplements: "구현한다",
-    bpLook: "모양", bpLookDrawing: "도면", bpLookSchematic: "회로도", bpLookChip: "칩",
+    styleBpDrawing: "설계도: 도면", styleBpSchematic: "설계도: 회로도", styleBpChip: "설계도: 칩",
     dieLines: n => `≈${n}줄`,
     dieKey: "면적 = 코드 줄 수(어림) · 안쪽 칸 = 한 단 아래 · 흰 배선 = 쓴다, 점선 = 구현 · 패드 = 바깥",
     legendRegions: "영역", legendRegion: "우리 코드", legendPad: "패드: 바깥", legendArea: "면적 = 줄 수(어림)",
@@ -1178,7 +1172,6 @@ function drawLegend() {
   // What the marks mean lives in the legend card now; the footer keeps the one line on how to move.
   legend.innerHTML = `<span class="hint">${t(isTree() ? "hintTree" : isBlueprint() ? "hintBlueprint" : "hintMouse")}</span>`;
   document.body.classList.toggle("tree-view", isTree());
-  document.getElementById("bpLook").hidden = !isBlueprint();
   stage.classList.toggle("schematic", isBlueprint() && bpLook === "schematic");
   stage.classList.toggle("chip", isBlueprint() && bpLook === "chip");
   renderLegendCard();
@@ -4935,38 +4928,21 @@ function renderBlueprintLegend(body) {
   legendRows(body, groups, { keyOnly: ["bpOurs", "bpNoDoc", "bpBus", "bpJunction", "bpArea"] });
 }
 
-// Drawing or schematic. The choice is kept, and a new look frames the sheet afresh.
-const bpLookSwitch = document.getElementById("bpLook");
-function syncBpLook() {
-  for (const button of bpLookSwitch.querySelectorAll("[data-look]")) {
-    const on = button.dataset.look === bpLook;
-    button.setAttribute("aria-checked", String(on));
-    button.tabIndex = on ? 0 : -1;
-  }
-}
-bpLookSwitch.addEventListener("click", event => {
-  const button = event.target.closest("[data-look]");
-  if (!button || button.dataset.look === bpLook) return;
-  bpLook = button.dataset.look;
+// Drawing, schematic or chip - chosen on the shape switch. The choice is kept, and a new look
+// frames the sheet afresh.
+function setBpLook(look) {
+  if (look === bpLook) return;
+  bpLook = look;
   try { localStorage.setItem("treering-bp-look", bpLook); } catch { /* fine without it */ }
-  syncBpLook();
+  if (!isBlueprint() || !bpSheet) return;
   bpHovered = null;
   // The chip needs sizes the other looks do not ask for; the sheet is fetched again with them.
-  if (bpLook === "chip" && bpSheet && !bpSheet.lines) { loadBlueprint({ descend: false }); return; }
+  if (bpLook === "chip" && !bpSheet.lines) { loadBlueprint({ descend: false }); return; }
+  drawLegend();
   bpFitNext = true;
   buildBlueprint();
   paintBlueprint();
-});
-bpLookSwitch.addEventListener("keydown", event => {
-  if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) return;
-  event.preventDefault();
-  const looks = ["drawing", "schematic", "chip"];
-  const step = event.key === "ArrowLeft" || event.key === "ArrowUp" ? -1 : 1;
-  const other = bpLookSwitch.querySelector(`[data-look="${looks[(looks.indexOf(bpLook) + step + looks.length) % looks.length]}"]`);
-  other.click();
-  other.focus();
-});
-syncBpLook();
+}
 
 // ---- search ------------------------------------------------------------------------
 // Type a name, pick a line, and the map takes you to where that thing lives: a type opens
@@ -5156,7 +5132,7 @@ const ownToggle = document.getElementById("ownToggle");
 // so it looks its elements up rather than use the constants below.
 function syncTools() {
   for (const button of document.querySelectorAll("#shapes [data-shape]")) {
-    const on = button.dataset.shape === style;
+    const on = button.dataset.shape === style && (!button.dataset.look || button.dataset.look === bpLook);
     button.setAttribute("aria-checked", String(on));
     button.tabIndex = on ? 0 : -1;
   }
@@ -5169,17 +5145,23 @@ function syncTools() {
   document.getElementById("timeLabel").textContent = from ? `${from} → ${at}` : at;
 }
 
+// A blueprint button sets its look first, so the sheet it loads is drawn in it from the start.
+function chooseShape(button) {
+  if (button.dataset.look) setBpLook(button.dataset.look);
+  applyStyle(button.dataset.shape);
+  syncTools();
+}
 for (const button of shapeButtons) {
-  button.addEventListener("click", () => applyStyle(button.dataset.shape));
+  button.addEventListener("click", () => chooseShape(button));
 }
 // A radio group moves with the arrow keys, and Tab lands only on the one that is on.
 document.getElementById("shapes").addEventListener("keydown", event => {
   const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
   if (!step) return;
   event.preventDefault();
-  const at = shapeButtons.findIndex(button => button.dataset.shape === style);
+  const at = shapeButtons.findIndex(button => button.getAttribute("aria-checked") === "true");
   const next = shapeButtons[(at + step + shapeButtons.length) % shapeButtons.length];
-  applyStyle(next.dataset.shape);
+  chooseShape(next);
   next.focus();
 });
 
