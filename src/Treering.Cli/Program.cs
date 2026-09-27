@@ -994,6 +994,36 @@ static int Serve(string? dbPath, int port, int? watchMinutes)
             });
     });
 
+    // 설계도 한 장. id 가 없으면 모듈, 모듈·네임스페이스면 그 안, 타입이면 그 타입과 둘레.
+    app.MapGet("/api/blueprint", (long? id, int? at, int? from, int? own, string? project) =>
+    {
+        using var db = GraphDb.Open(Resolve(project));
+        var sheet = Blueprint.Of(db, id, at, from, own == 1);
+        if (sheet is null) return Results.NotFound(new { error = $"no blueprint for {id}" });
+
+        string State(EdgeState state) => state.ToString().ToLowerInvariant();
+        return Results.Ok(new
+        {
+            Level = sheet.Level.ToString().ToLowerInvariant(),
+            sheet.Parent,
+            sheet.ParentDisplay,
+            Boxes = sheet.Boxes.Select(box => new
+            {
+                box.Id, box.Display, Kind = (int)box.Kind, box.Flavor, box.Role, box.RoleFrom,
+                Items = box.Items.Select(item => new
+                {
+                    item.Id, item.Display, item.Flavor, item.Shape, item.Signature, State = State(item.State),
+                }),
+                box.More, State = State(box.State), box.Own, box.Test, box.Outside,
+            }),
+            Links = sheet.Links.Select(link => new
+            {
+                link.From, link.To, Kind = (int)link.Kind, link.Weight, link.Labels, State = State(link.State),
+            }),
+            sheet.Hidden,
+        });
+    });
+
     app.MapGet("/api/map", (string? granularity, long? seed, int? depth, int? at, int? from, int? own, int? open, string? project) =>
     {
         if (!Enum.TryParse<Granularity>(granularity ?? "module", ignoreCase: true, out var level))
