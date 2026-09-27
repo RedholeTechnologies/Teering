@@ -4,6 +4,10 @@ English | [한국어](README.ko.md)
 
 Treering draws a map of your codebase and keeps a copy of it for every commit, so you can see how the structure changed: which types started depending on each other last week, or when a class began to collect callers. It runs entirely on your machine and sends nothing over the network. It doesn't use an LLM, so the same code always produces the same graph.
 
+![Opening a module and one of its namespaces in the schematic, coming back out, and the same sheet as a chip floor plan](docs/screenshots/demo.gif)
+
+*Click a box to go inside it; the part you opened frames what it holds. Then back out, and the same sheet as a chip.*
+
 ![The blueprint as a schematic, compared with a month earlier: the Billing module is new and the web pages no longer call the database](docs/screenshots/schematic-compare.png)
 
 *The sample project's modules as a schematic, compared with a month earlier. Green is new: a Billing module now implements the payment interface. Red dashed is gone: the web pages used to call the database directly.*
