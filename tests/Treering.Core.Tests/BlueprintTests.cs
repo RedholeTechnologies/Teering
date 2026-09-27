@@ -70,7 +70,7 @@ public sealed class BlueprintTests : IDisposable
     /// Data 의 OrderStore 에 저장한다. <paramref name="withBilling"/> 이면 Billing 의 CardGateway 가
     /// 그 인터페이스를 구현하고, 아니면 Web 이 Data 를 직접 부른다(옛 설계).
     /// </summary>
-    private void Snapshot(int ord, bool withBilling)
+    private void Snapshot(int ord, bool withBilling, bool busy = false)
     {
         var page = File("CheckoutPage.cs",
             "+" + Web + "Web/CheckoutPage#",
@@ -78,6 +78,11 @@ public sealed class BlueprintTests : IDisposable
             Shop + "Shop/Orders/Order#", Shop + "Shop/Orders/Cart#",
             Lib + "Toolkit/Json#");
         if (!withBilling) page.Occurrences.Add(At(Data + "Data/OrderStore#", 20, definition: false));
+        if (busy)
+        {
+            page.Occurrences.Add(At(Shop + "Shop/Orders/Receipt#", 21, definition: false));
+            page.Occurrences.Add(At(Shop + "Shop/Orders/Coupon#", 22, definition: false));
+        }
 
         var service = File("OrderService.cs",
             "+" + Shop + "Shop/Checkout/OrderService#",
@@ -100,7 +105,9 @@ public sealed class BlueprintTests : IDisposable
 
         var orders = File("Order.cs",
             "+" + Shop + "Shop/Orders/Order#",
-            "+" + Shop + "Shop/Orders/Cart#");
+            "+" + Shop + "Shop/Orders/Cart#",
+            "+" + Shop + "Shop/Orders/Receipt#",
+            "+" + Shop + "Shop/Orders/Coupon#");
         Describe(orders, Shop + "Shop/Orders/Order#", "public class Order", "What was bought, and for how much.");
 
         var store = File("OrderStore.cs",
@@ -178,6 +185,28 @@ public sealed class BlueprintTests : IDisposable
         var labels = Link(Sheet(), "Web", "Shop").Labels;
 
         Assert.Equal(["Cart", "Order"], labels);
+    }
+
+    [Fact]
+    public void A_line_says_how_many_names_it_carries_beyond_those_it_shows()
+    {
+        // The schematic draws this as a bus and writes its width; it must count every name,
+        // not only the few the label has room for.
+        Snapshot(0, withBilling: true);
+
+        Assert.Equal(2, Link(Sheet(), "Web", "Shop").Width);
+        Assert.Equal(1, Link(Sheet(), "Shop", "Data").Width);
+    }
+
+    [Fact]
+    public void A_line_carrying_more_names_than_its_label_shows_still_counts_them_all()
+    {
+        Snapshot(0, withBilling: true, busy: true);
+
+        var line = Link(Sheet(), "Web", "Shop");
+
+        Assert.Equal(3, line.Labels.Count);
+        Assert.Equal(4, line.Width);
     }
 
     [Fact]

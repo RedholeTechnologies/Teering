@@ -38,8 +38,11 @@ public sealed record BlueprintBox(
 /// 선이 무엇으로 이어졌는가. 쓰는 선은 쓰이는 타입, 구현 선은 구현하는 타입, 타입 한 장에서는
 /// 가운데 타입의 멤버 — 굵기만으로는 «무엇을» 쓰는지 알 수 없다.
 /// </param>
+/// <param name="Width">
+/// 이 선에 실린 이름이 모두 몇 가지인가. 이름표는 몇 개만 적으므로 따로 센다 — 회로도의 버스 폭이다.
+/// </param>
 public sealed record BlueprintLink(
-    long From, long To, EdgeKind Kind, int Weight, IReadOnlyList<string> Labels, EdgeState State);
+    long From, long To, EdgeKind Kind, int Weight, IReadOnlyList<string> Labels, EdgeState State, int Width = 1);
 
 /// <param name="Hidden">너무 많아 뺀 상자 수. 숨기지 않고 알린다.</param>
 public sealed record BlueprintResult(
@@ -348,7 +351,7 @@ public static class Blueprint
         var result = links
             .Where(pair => kept.Contains(pair.Key.From) && kept.Contains(pair.Key.To))
             .Select(pair => new BlueprintLink(pair.Key.From, pair.Key.To, pair.Key.Kind, pair.Value.Weight,
-                pair.Value.Labels(db, LabelLimit), span.StateOf(pair.Value.Now, pair.Value.Then)))
+                pair.Value.Labels(db, LabelLimit), span.StateOf(pair.Value.Now, pair.Value.Then), pair.Value.Width(db)))
             .OrderByDescending(link => link.Weight)
             .ToList();
 
@@ -388,6 +391,8 @@ public static class Blueprint
         }
 
         public void Name(long type, int weight) => _names[type] = _names.GetValueOrDefault(type) + weight;
+
+        public int Width(SqliteConnection db) => Math.Max(1, Displays(db, _names.Keys).Values.Distinct().Count());
 
         public IReadOnlyList<string> Labels(SqliteConnection db, int limit)
         {
@@ -598,11 +603,12 @@ public static class Blueprint
             .Select(pair =>
             {
                 var other = pair.Key.From == type ? pair.Key.To : pair.Key.From;
-                var names = labels.GetValueOrDefault((other, pair.Key.Kind), [])
+                var all = labels.GetValueOrDefault((other, pair.Key.Kind), []);
+                var names = all
                     .OrderByDescending(label => label.Value).ThenBy(label => label.Key, StringComparer.Ordinal)
                     .Take(LabelLimit).Select(label => label.Key).ToList();
                 return new BlueprintLink(pair.Key.From, pair.Key.To, pair.Key.Kind, pair.Value.Weight, names,
-                    span.StateOf(pair.Value.Now, pair.Value.Then));
+                    span.StateOf(pair.Value.Now, pair.Value.Then), Math.Max(1, all.Count));
             })
             .OrderByDescending(link => link.Weight)
             .ToList();
