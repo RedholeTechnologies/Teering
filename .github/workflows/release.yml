@@ -87,8 +87,65 @@ jobs:
           path: treering-${{ matrix.rid }}.*
           if-no-files-found: error
 
-  release:
+  # MCP bundles (.mcpb): the same executable with a manifest, so an agent host can install
+  # Treering as an MCP server in one step. One per platform, made from the builds above.
+  bundle:
     needs: build
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: builds
+          merge-multiple: true
+
+      - name: Bundle
+        run: |
+          case "$TAG" in v*) version="${TAG#v}" ;; *) version="0.0.0-dev" ;; esac
+          for rid in win-x64 linux-x64; do
+            dir="mcpb-$rid"; mkdir -p "$dir/server"
+            if [ "$rid" = win-x64 ]; then
+              unzip -q builds/treering-win-x64.zip -d "$dir/unpacked"; exe=treering.exe; platform=win32
+            else
+              mkdir -p "$dir/unpacked"; tar -xzf builds/treering-linux-x64.tar.gz -C "$dir/unpacked"; exe=treering; platform=linux
+            fi
+            mv "$dir/unpacked/$exe" "$dir/server/$exe"; chmod +x "$dir/server/$exe"
+            mv "$dir/unpacked/LICENSE" "$dir/unpacked/THIRD-PARTY-NOTICES.md" "$dir/"; rm -rf "$dir/unpacked"
+            jq -n --arg version "$version" --arg exe "server/$exe" --arg platform "$platform" '{
+              manifest_version: "0.3",
+              name: "treering",
+              display_name: "Treering",
+              version: $version,
+              description: "A local map of your codebase over time: symbols, callers, subgraphs and how the structure changed.",
+              long_description: "Treering indexes a repository (C#, TypeScript, JavaScript, Python) and keeps a snapshot of its structure for every update. These tools answer from those snapshots: find a symbol, the types that call one, the subgraph around a point, and the dependencies that appeared or went away between two snapshots. Everything runs on your machine. Import a repository first with `treering`, or add the sample with `treering sample`.",
+              author: { name: "Redhole Technologies" },
+              repository: { type: "git", url: "https://github.com/RedholeTechnologies/Treering" },
+              homepage: "https://github.com/RedholeTechnologies/Treering",
+              license: "Apache-2.0",
+              server: { type: "binary", entry_point: $exe, mcp_config: { command: ("${__dirname}/" + $exe), args: ["mcp"] } },
+              tools: [
+                { name: "list_projects", description: "The repositories imported into Treering." },
+                { name: "find_symbol", description: "Find a symbol by name." },
+                { name: "callers_of", description: "The types that call a type." },
+                { name: "subgraph", description: "The subgraph around one point, within a budget." },
+                { name: "changed_since", description: "Dependencies that appeared or went away between two snapshots." },
+                { name: "snapshots", description: "The snapshots on file." }
+              ],
+              compatibility: { platforms: [$platform] }
+            }' > "$dir/manifest.json"
+            (cd "$dir" && zip -qr "../treering-$rid.mcpb" .)
+          done
+          ls -la *.mcpb
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mcpb
+          path: treering-*.mcpb
+          if-no-files-found: error
+
+  release:
+    needs: [build, bundle]
     if: startsWith(github.ref, 'refs/tags/v') || inputs.tag != ''
     runs-on: ubuntu-latest
     env:
@@ -118,3 +175,46 @@ jobs:
           latest=false
           if [ "$TAG" = "$highest" ]; then latest=true; fi
           gh release create "$TAG" assets/* --title "$TAG" --notes-from-tag --verify-tag --latest="$latest"
+
+  # The official MCP Registry lists the release's bundles under io.github.RedholeTechnologies.
+  # It trusts this workflow through GitHub's OIDC token - no password or key is stored. Only a new
+  # version tag is published; tags published late (by hand) are not, and nor is a branch build.
+  registry:
+    needs: release
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: mcpb
+          path: mcpb
+
+      - name: server.json
+        run: |
+          base="https://github.com/${{ github.repository }}/releases/download/$TAG"
+          win="$(sha256sum mcpb/treering-win-x64.mcpb | cut -d' ' -f1)"
+          linux="$(sha256sum mcpb/treering-linux-x64.mcpb | cut -d' ' -f1)"
+          jq -n --arg version "${TAG#v}" --arg base "$base" --arg win "$win" --arg linux "$linux" '{
+            "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+            name: "io.github.RedholeTechnologies/treering",
+            title: "Treering",
+            description: "A local map of your codebase over time: symbols, callers, subgraphs and structural change.",
+            repository: { url: "https://github.com/RedholeTechnologies/Treering", source: "github" },
+            version: $version,
+            packages: [
+              { registryType: "mcpb", identifier: ($base + "/treering-win-x64.mcpb"), fileSha256: $win, transport: { type: "stdio" } },
+              { registryType: "mcpb", identifier: ($base + "/treering-linux-x64.mcpb"), fileSha256: $linux, transport: { type: "stdio" } }
+            ]
+          }' > server.json
+          cat server.json
+
+      - name: Publish
+        run: |
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish
