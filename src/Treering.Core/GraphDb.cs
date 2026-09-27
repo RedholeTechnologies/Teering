@@ -205,6 +205,31 @@ public static class GraphDb
             command.ExecuteNonQuery();
         }
 
+        // 옛 DB 를 지금 모양으로 맞춘다. 화면은 여러 요청을 한꺼번에 보내므로 같은 DB 가 동시에 처음
+        // 열린다 — 잠금 없이 맞추면 둘 다 «칸이 없다» 를 보고 둘 다 늘리려다 하나가
+        // duplicate column 으로 실패한다. 그래서 쓰기 잠금(BEGIN IMMEDIATE) 안에서, 잠근 뒤에 다시 보고
+        // 맞춘다. 이미 맞는 DB 는 잠그지 않는다.
+        if (NeedsCatchingUp(connection))
+        {
+            using var transaction = connection.BeginTransaction(deferred: false);
+            CatchUpSchema(connection);
+            transaction.Commit();
+        }
+
+        return connection;
+    }
+
+    private static readonly string[] AddedColumns = ["own", "doc", "test"];
+
+    private static bool NeedsCatchingUp(SqliteConnection connection)
+    {
+        using var look = connection.CreateCommand();
+        look.CommandText = "SELECT COUNT(*) FROM pragma_table_info('symbol') WHERE name IN ('own', 'doc', 'test')";
+        return Convert.ToInt32(look.ExecuteScalar()) < AddedColumns.Length || UserVersion(connection) < SchemaVersion;
+    }
+
+    private static void CatchUpSchema(SqliteConnection connection)
+    {
         // 열을 늘리기 전에 만든 DB 는 이 열이 0 인 채로 열린다. 그대로 두면 「우리 코드만」
         // 이 아무것도 없다고 조용히 거짓말을 한다. 한 번 채우고 넘어간다.
         if (AddColumnIfMissing(connection, "symbol", "own", "INTEGER NOT NULL DEFAULT 0"))
@@ -225,8 +250,6 @@ public static class GraphDb
         if (version < 1) CatchUp(connection);
         if (version < 2) AdoptLifeless(connection);
         if (version < SchemaVersion) Stamp(connection);
-
-        return connection;
     }
 
     /// <summary>
@@ -339,11 +362,8 @@ public static class GraphDb
             while (reader.Read()) ords.Add(reader.GetInt32(0));
         }
 
-        using (var transaction = connection.BeginTransaction())
-        {
-            foreach (var ord in ords) RollEdges(connection, ord);
-            transaction.Commit();
-        }
+        // 여는 쪽이 이미 잡은 쓰기 잠금 안에서 돈다 — 한 번에 들어가거나 하나도 안 들어간다.
+        foreach (var ord in ords) RollEdges(connection, ord);
     }
 
     private static int UserVersion(SqliteConnection connection)

@@ -106,6 +106,38 @@ public sealed class OpeningOldDatabasesTests : IDisposable
     }
 
     [Fact]
+    public void Many_requests_opening_an_old_database_at_once_all_succeed()
+    {
+        // The page asks for the map, the tree and the snapshots together, so an old database
+        // is first opened by several requests at the same moment. Each used to see a column
+        // missing and add it, and all but one failed with "duplicate column name".
+        // A race shows up only sometimes, so it is run several times over, many requests at once.
+        Snapshot(0, Vendor + "Vendor/Clock#");
+        var failures = new System.Collections.Concurrent.ConcurrentBag<Exception>();
+        for (var round = 0; round < 5; round++)
+        {
+            Raw("DROP INDEX IF EXISTS sym_own; ALTER TABLE symbol DROP COLUMN own; ALTER TABLE symbol DROP COLUMN doc; ALTER TABLE symbol DROP COLUMN test; PRAGMA user_version = 0;");
+            SqliteConnection.ClearAllPools();
+
+            const int Requests = 16;
+            using var start = new Barrier(Requests);
+            var threads = Enumerable.Range(0, Requests).Select(_ => new Thread(() =>
+            {
+                start.SignalAndWait();
+                try { using var db = GraphDb.Open(_dbPath); }
+                catch (Exception exception) { failures.Add(exception); }
+            })).ToList();
+            threads.ForEach(thread => thread.Start());
+            threads.ForEach(thread => thread.Join());
+            SqliteConnection.ClearAllPools();
+        }
+
+        Assert.Empty(failures);
+        using var opened = GraphDb.Open(_dbPath);
+        Assert.Contains(Search.Find(opened, "Cart"), hit => hit.Display == "Cart" && hit.Own);
+    }
+
+    [Fact]
     public void A_current_database_is_not_rolled_again_on_every_open()
     {
         Snapshot(0, Ours + "Billing/Invoice#");
