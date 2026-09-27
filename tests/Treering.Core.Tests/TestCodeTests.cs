@@ -62,6 +62,8 @@ public sealed class TestCodeTests : IDisposable
     [InlineData("Shop.Test", true)]
     [InlineData("Shop.UnitTests", true)]
     [InlineData("Shop.IntegrationTests", true)]
+    [InlineData("Shop.FunctionalTests", true)]
+    [InlineData("Shop.E2ETests", true)]
     [InlineData("Shop.Testing", false)]
     [InlineData("Contests", false)]
     [InlineData("Shop", false)]
