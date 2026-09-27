@@ -615,6 +615,8 @@
   /* The blueprint: cards on a faint grid, square lines between them. A line's colour follows the
      theme's accent, pulled a little toward the text so it reads as ink rather than as a highlight. */
   :root { --bp-line: color-mix(in srgb, var(--accent) 70%, var(--fg)); }
+  /* A drag on the sheet pans it; it must not paint the names it passes over blue. */
+  #stage, #stage * { -webkit-user-select: none; user-select: none; }
   #stage .bpbox { cursor: pointer; }
   #stage .bpbox .frame { transition: stroke 120ms ease-out; }
   #stage .bpbox:hover > .frame { stroke: var(--accent); }
@@ -933,7 +935,7 @@ const STRINGS = {
     dieLines: n => `≈${n} lines`,
     dieKey: "area = lines of code, estimated · inner blocks = one level down · white = uses, dashed = implements · pads = what stands outside",
     legendRegions: "Regions", legendRegion: "Our code", legendPad: "Pad: outside", legendArea: "Area = lines (estimated)",
-    schTitle: "TREERING · BLUEPRINT", schSheet: "SHEET",
+    schTitle: "TREERING · BLUEPRINT", schSheet: "SHEET", schInside: "INSIDE",
     schKey: "● joined   ┼ no dot: not joined   ╱n bus of n   ○ socket: an interface",
     legendParts: "Parts", legendOurPart: "Our code (U)", legendConnector: "Outside (J)",
     legendWire: "Wire: uses", legendSocket: "Socket: implements", legendBus: "Bus: several names", legendJunction: "Joined wires",
@@ -1021,7 +1023,7 @@ const STRINGS = {
     dieLines: n => `≈${n}줄`,
     dieKey: "면적 = 코드 줄 수(어림) · 안쪽 칸 = 한 단 아래 · 흰 배선 = 쓴다, 점선 = 구현 · 패드 = 바깥",
     legendRegions: "영역", legendRegion: "우리 코드", legendPad: "패드: 바깥", legendArea: "면적 = 줄 수(어림)",
-    schTitle: "TREERING · 설계도", schSheet: "SHEET",
+    schTitle: "TREERING · 설계도", schSheet: "SHEET", schInside: "내부",
     schKey: "● 접점: 이어짐   ┼ 점 없는 교차: 안 이어짐   ╱n 버스: n가닥   ○ 소켓: 인터페이스",
     legendParts: "부품", legendOurPart: "우리 코드 (U)", legendConnector: "바깥 (J)",
     legendWire: "배선: 쓴다", legendSocket: "소켓: 구현한다", legendBus: "버스: 여러 이름", legendJunction: "접점",
@@ -3790,7 +3792,8 @@ function bpLayout(models, links, opts = {}) {
   let frame = null;
   if (F) {
     const inside = boxes.filter(b => !b.model.box.outside);
-    const x0 = Math.min(...inside.map(b => b.x)) - 22, x1 = Math.max(...inside.map(b => b.x + b.model.w)) + 22;
+    const pad = opts.framePad ?? [22, 22];
+    const x0 = Math.min(...inside.map(b => b.x)) - pad[0], x1 = Math.max(...inside.map(b => b.x + b.model.w)) + pad[1];
     const y0 = top[firstIn] - F + 6;
     const y1 = top[lastIn] + layerH[lastIn] + F - 6;
     frame = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
@@ -3899,6 +3902,8 @@ function drawDrawing(root, sheet, boxes, links, shown) {
 
   root.append(el("rect", { x: -4000, y: -4000, width: plan.width + 8000, height: plan.height + 8000, fill: "url(#bp-grid)" }));
   if (plan.frame) root.append(bpFrameDrawing(plan.frame));
+  bpDom.left = Math.min(0, plan.frame?.x ?? 0);
+  bpDom.top = Math.min(0, (plan.frame?.y ?? 0) - 14);
   const wires = el("g", {});
   const cards = el("g", {});
   const tags = el("g", {});
@@ -3952,9 +3957,17 @@ function drawDrawing(root, sheet, boxes, links, shown) {
 // and a type's sheet has the type itself in the middle, so neither has one.
 const bpFramed = sheet => bpTrail.length > 1 && sheet.level !== "type";
 
+// What the sheet is inside of. Sheets passed straight through (one box of ours in them) are part
+// of the way in, so their names come along: "checkout › cards" rather than just "cards".
 function bpFrameName() {
-  const here = bpTrail[bpTrail.length - 1];
-  return { name: here.label ?? bpSheet?.parentDisplay ?? "", designator: here.designator ?? null };
+  const steps = [bpTrail[bpTrail.length - 1]];
+  for (let i = bpTrail.length - 2; i > 0 && bpTrail[i].skip; i--) steps.unshift(bpTrail[i]);
+  const here = steps[steps.length - 1];
+  return {
+    name: steps.map(step => step.label ?? bpSheet?.parentDisplay ?? "").join(" › "),
+    designator: steps[0].designator ?? null,
+    role: here.role ?? null,
+  };
 }
 
 function bpFrameDrawing(frame) {
@@ -3965,13 +3978,14 @@ function bpFrameDrawing(frame) {
     style: "fill: color-mix(in srgb, var(--accent) 4%, transparent); stroke: color-mix(in srgb, var(--accent) 45%, var(--line))",
     "stroke-width": 1.4, "stroke-dasharray": "8 5",
   }));
-  const font = `600 12.5px ${getComputedStyle(document.body).fontFamily}`;
+  const font = `650 14px ${getComputedStyle(document.body).fontFamily}`;
   const text = bpFit(name, font, Math.max(80, frame.w - 60));
-  const tab = el("g", { transform: `translate(${frame.x + 16} ${frame.y - 11})` });
+  const tab = el("g", { transform: `translate(${frame.x + 16} ${frame.y - 13})` });
   tab.append(el("rect", {
-    width: bpWidth(text, font) + 22, height: 22, rx: 6, style: "fill: var(--bg); stroke: color-mix(in srgb, var(--accent) 45%, var(--line))",
+    width: bpWidth(text, font) + 26, height: 26, rx: 7, style: "fill: var(--bg); stroke: color-mix(in srgb, var(--accent) 55%, var(--line))",
+    "stroke-width": 1.4,
   }));
-  const label = el("text", { x: 11, y: 15, "font-size": 12.5, "font-weight": 600, style: "fill: var(--accent)" });
+  const label = el("text", { x: 13, y: 18, "font-size": 14, "font-weight": 650, style: "fill: var(--accent)" });
   label.textContent = text;
   tab.append(label);
   const tip = document.createElementNS(SVG, "title");
@@ -3980,23 +3994,39 @@ function bpFrameDrawing(frame) {
   return group;
 }
 
+// The part you went into, opened up: the same body and edge as a part, its designator and name
+// across a header band - so the sheet reads as the inside of U2, not as a loose set of parts.
 function schFrame(frame) {
-  const { name, designator } = bpFrameName();
+  const { name, designator, role } = bpFrameName();
   const group = el("g", { class: "bpframe" });
   group.append(el("rect", {
-    x: frame.x, y: frame.y, width: frame.w, height: frame.h, fill: "#ffd479", "fill-opacity": 0.03,
-    stroke: SCH.net, "stroke-width": 1.3,
+    x: frame.x, y: frame.y, width: frame.w, height: frame.h, rx: 4, fill: SCH.body, "fill-opacity": 0.45,
+    stroke: SCH.edge, "stroke-width": 2.2,
   }));
-  const font = `700 11.5px ${BP_MONO}`;
-  const text = bpFit([designator, name].filter(Boolean).join(" · "), font, Math.max(80, frame.w - 40));
-  const tab = el("g", { transform: `translate(${frame.x + 12} ${frame.y - 10})` });
-  tab.append(el("rect", { width: bpWidth(text, font) + 18, height: 20, fill: SCH.bg, stroke: SCH.net, "stroke-width": 1.2 }));
-  const label = el("text", { x: 9, y: 14, "font-size": 11.5, "font-weight": 700, "font-family": BP_MONO, fill: SCH.net });
-  label.textContent = text;
-  tab.append(label);
+  group.append(el("rect", { x: frame.x, y: frame.y, width: frame.w, height: 40, rx: 4, fill: SCH.body, stroke: SCH.edge, "stroke-width": 2.2 }));
+  group.append(el("circle", { cx: frame.x + 12, cy: frame.y + 12, r: 3, fill: SCH.edge }));
+  if (designator) {
+    const tag = el("text", { x: frame.x + 22, y: frame.y + 16, "font-size": 11, "font-family": BP_MONO, fill: SCH.faint });
+    tag.textContent = designator;
+    group.append(tag);
+  }
+  const title = el("text", {
+    x: frame.x + frame.w / 2, y: frame.y + (role ? 19 : 25), "font-size": 16, "font-weight": 700, "font-family": BP_MONO,
+    "text-anchor": "middle", fill: SCH.text,
+  });
+  title.textContent = bpFit(name, `700 16px ${BP_MONO}`, frame.w - 120);
+  group.append(title);
+  if (role) {
+    const line = el("text", { x: frame.x + frame.w / 2, y: frame.y + 33, "font-size": 11, "text-anchor": "middle", fill: SCH.muted });
+    line.textContent = bpFit(role, `11px ${getComputedStyle(document.body).fontFamily}`, frame.w - 120);
+    group.append(line);
+  }
+  const inside = el("text", { x: frame.x + frame.w - 12, y: frame.y + 16, "font-size": 10, "font-family": BP_MONO, "text-anchor": "end", fill: SCH.faint });
+  inside.textContent = t("schInside");
+  group.append(inside);
   const tip = document.createElementNS(SVG, "title");
-  tip.textContent = name;
-  group.append(tab, tip);
+  tip.textContent = [designator, name].filter(Boolean).join(" · ");
+  group.append(tip);
   return group;
 }
 
@@ -4037,7 +4067,7 @@ function drawSchematic(root, sheet, boxes, links, shown) {
   // the layout has said which wires share a pin. So it is laid out twice.
   const opts = {
     wrapAt: Math.max(700, (stage.clientHeight || 800) / 0.8), gapX: 34, channel: 96, lead: 30,
-    pins: { start: SCH.head, pitch: SCH.pitch }, frame: bpFramed(sheet),
+    pins: { start: SCH.head, pitch: SCH.pitch }, frame: bpFramed(sheet), framePad: [64, 22],
   };
   const turned = models => models.map(model => ({ ...model, w: model.h, h: model.w }));
   let models = boxes.map(box => schModel(box, links, null));
@@ -4060,6 +4090,8 @@ function drawSchematic(root, sheet, boxes, links, shown) {
   // cross into it from the connectors outside.
   const frame = plan.frame && { x: plan.frame.y, y: plan.frame.x, w: plan.frame.h, h: plan.frame.w };
   if (frame) root.append(schFrame(frame));
+  bpDom.left = Math.min(0, frame?.x ?? 0);
+  bpDom.top = Math.min(0, (frame?.y ?? 0) - 4);
   const wires = el("g", {});
   const parts = el("g", {});
   const marks = el("g", {});
@@ -4609,9 +4641,12 @@ function paintBlueprint() {
   // A new sheet is framed to the screen once: all of it, if it fits at a readable size.
   if (bpFitNext && bpDom.width) {
     bpFitNext = false;
-    zoom = Math.max(0.4, Math.min(1, (width - 64) / bpDom.width, (height - 64) / bpDom.height));
-    panX = Math.max(32, (width - bpDom.width * zoom) / 2);
-    panY = Math.max(36, (height - bpDom.height * zoom) / 2);
+    // A frame can reach above and left of the drawing's origin; the fit takes it in.
+    const left = bpDom.left ?? 0, top = bpDom.top ?? 0;
+    const w = bpDom.width - left, h = bpDom.height - top;
+    zoom = Math.max(0.4, Math.min(1, (width - 64) / w, (height - 64) / h));
+    panX = Math.max(32, (width - w * zoom) / 2) - left * zoom;
+    panY = Math.max(36, (height - h * zoom) / 2) - top * zoom;
   }
   bpDom.root.setAttribute("transform", `translate(${panX.toFixed(1)} ${panY.toFixed(1)}) scale(${zoom})`);
   bpDom.empty?.setAttribute("transform", `translate(${width / 2} ${height / 2 - 10})`);
@@ -4664,6 +4699,15 @@ async function loadBlueprint({ descend = true } = {}) {
   }
 
   if (sheet && step.id != null && step.label == null) step.label = sheet.parentDisplay;
+
+  // Going in or out moves: the sheet on screen is kept aside while the next is built, then the
+  // two pass through each other.
+  const motion = bpMotion;
+  bpMotion = null;
+  const old = motion && sheet && bpDom?.root?.isConnected && !reducedMotion()
+    ? { root: bpDom.root, x: panX, y: panY, z: zoom, width: bpDom.width, height: bpDom.height } : null;
+  old?.root.remove();
+
   bpSheet = sheet;
   bpHovered = null;
   bpFitNext = true;
@@ -4671,6 +4715,93 @@ async function loadBlueprint({ descend = true } = {}) {
   drawLegend();
   buildBlueprint();
   paintBlueprint();
+  if (old && bpDom.width) {
+    stage.insertBefore(old.root, bpDom.root);
+    bpTransition(motion, old);
+  }
+}
+
+// ---- moving between sheets ------------------------------------------------------------
+// Going in, the box you clicked opens up into the next sheet: the old sheet grows about that box
+// until the box is where the new sheet lands, while the new sheet grows out of the box. Coming
+// out is the same run backwards - the sheet you leave shrinks into its box on the one above.
+let bpMotion = null;
+let bpMoving = 0;
+
+function bpScreenRect(element) {
+  const s = stage.getBoundingClientRect(), r = element.getBoundingClientRect();
+  return { x: r.left - s.left, y: r.top - s.top, w: Math.max(1, r.width), h: Math.max(1, r.height) };
+}
+
+function bpTransition(motion, old) {
+  const next = bpDom.root;
+  const W = bpDom.width, H = bpDom.height;
+  const end = { x: panX, y: panY, z: zoom };
+  let fromNew, toOld;
+  const fit = (r, w, h) => {
+    const z = Math.min(r.w / w, r.h / h);
+    return { x: r.x + (r.w - w * z) / 2, y: r.y + (r.h - h * z) / 2, z };
+  };
+
+  if (motion.kind === "in") {
+    const r = motion.rect;
+    fromNew = fit(r, W, H);
+    // Grow the old sheet about the clicked box until the box covers where the new sheet ends.
+    const target = { x: end.x, y: end.y, w: W * end.z, h: H * end.z };
+    const k = Math.min(target.w / r.w, target.h / r.h);
+    const z = old.z * k;
+    const cx = (r.x - old.x) / old.z, cy = (r.y - old.y) / old.z;
+    toOld = { x: target.x + (target.w - r.w * k) / 2 - cx * z, y: target.y + (target.h - r.h * k) / 2 - cy * z, z };
+  } else {
+    const box = motion.leaving != null ? next.querySelector(`.bpbox[data-id="${motion.leaving}"]`) : null;
+    if (box) {
+      const r = bpScreenRect(box);
+      // The new sheet starts zoomed so that this box covers where the old sheet was.
+      const was = { x: old.x, y: old.y, w: old.width * old.z, h: old.height * old.z };
+      const k = Math.min(was.w / r.w, was.h / r.h);
+      const z = end.z * k;
+      const cx = (r.x - end.x) / end.z, cy = (r.y - end.y) / end.z;
+      fromNew = { x: was.x + (was.w - r.w * k) / 2 - cx * z, y: was.y + (was.h - r.h * k) / 2 - cy * z, z };
+      toOld = fit(r, old.width, old.height);
+    } else {
+      fromNew = end;
+      toOld = { x: old.x, y: old.y, z: old.z };
+    }
+  }
+
+  const run = ++bpMoving;
+  const started = performance.now();
+  const duration = 520;
+  const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const place = (node, a, b, t) => {
+    const z = a.z * Math.pow(b.z / a.z, t);
+    node.setAttribute("transform", `translate(${lerp(a.x, b.x, t).toFixed(1)} ${lerp(a.y, b.y, t).toFixed(1)}) scale(${z})`);
+  };
+  const oldFrom = { x: old.x, y: old.y, z: old.z };
+  const frame = now => {
+    if (run !== bpMoving) { old.root.remove(); return; }
+    const t = Math.min(1, (now - started) / duration), e = ease(t);
+    place(next, fromNew, end, e);
+    place(old.root, oldFrom, toOld, e);
+    next.style.opacity = Math.min(1, Math.max(0, (t - 0.2) / 0.6)).toFixed(3);
+    old.root.style.opacity = Math.max(0, 1 - t / 0.65).toFixed(3);
+    if (t < 1) { tick(); return; }
+    old.root.remove();
+    next.style.opacity = "";
+    paintBlueprint();
+  };
+  // Frames come from the display; where it hands them out slowly (a page not being painted) a
+  // timer keeps the move going, so it ends on time rather than in one jump.
+  const tick = () => {
+    let done = false;
+    const go = () => { if (!done) { done = true; frame(performance.now()); } };
+    requestAnimationFrame(go);
+    setTimeout(go, 32);
+  };
+  place(next, fromNew, end, 0);
+  next.style.opacity = "0";
+  tick();
 }
 
 function drawBlueprintCrumbs() {
@@ -4688,15 +4819,17 @@ function bpDescribe() {
   else { panel.hidden = true; openDetail = null; }
 }
 
-function bpOpen(id, label, designator = null) {
-  bpTrail.push({ id, label, designator });
+function bpOpen(id, label, designator = null, role = null, from = null) {
+  if (from) bpMotion = { kind: "in", rect: bpScreenRect(from) };
+  bpTrail.push({ id, label, designator, role });
   loadBlueprint().then(bpDescribe);
 }
 
 function bpUp() {
   if (bpTrail.length < 2) return;
-  bpTrail.pop();
-  while (bpTrail.length > 1 && bpTrail[bpTrail.length - 1].skip) bpTrail.pop();
+  let leaving = bpTrail.pop().id;
+  while (bpTrail.length > 1 && bpTrail[bpTrail.length - 1].skip) leaving = bpTrail.pop().id;
+  bpMotion = { kind: "out", leaving };
   loadBlueprint({ descend: false }).then(bpDescribe);
 }
 
@@ -4707,13 +4840,14 @@ function bpClick(target) {
   if (target.dataset.bp === "item") {
     const id = Number(target.dataset.item);
     if (target.dataset.member) showDetail(id);
-    else bpOpen(id, target.dataset.name);
+    else bpOpen(id, target.dataset.name, null, null, target);
     return;
   }
   const id = Number(target.dataset.id);
   if (bpSheet.level === "type" && id === bpSheet.parent) { showDetail(id); return; }
   const box = bpSheet.boxes.find(candidate => candidate.id === id);
-  bpOpen(id, box?.display ?? null, bpLook === "schematic" ? bpDom?.names?.get(id) ?? null : null);
+  bpOpen(id, box?.display ?? null, bpLook === "schematic" ? bpDom?.names?.get(id) ?? null : null,
+    box?.role ? bpPlain(box.role) : null, target);
 }
 
 // Search: a module, namespace or type opens its sheet; a member opens its type's.
@@ -4976,7 +5110,12 @@ crumbs.addEventListener("click", event => {
   const button = event.target.closest("button");
   if (!button) return;
   const step = Number(button.dataset.step);
-  if (isBlueprint()) { bpTrail = bpTrail.slice(0, step + 1); loadBlueprint({ descend: false }).then(bpDescribe); return; }
+  if (isBlueprint()) {
+    bpMotion = { kind: "out", leaving: bpTrail[step + 1]?.id ?? null };
+    bpTrail = bpTrail.slice(0, step + 1);
+    loadBlueprint({ descend: false }).then(bpDescribe);
+    return;
+  }
   // Several levels up at once still lands beside the branch you came down.
   const leaving = trail[step + 1]?.seed ?? null;
   trail = trail.slice(0, step + 1);
