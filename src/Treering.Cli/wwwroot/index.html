@@ -615,12 +615,28 @@
   /* The blueprint: cards on a faint grid, square lines between them. A line's colour follows the
      theme's accent, pulled a little toward the text so it reads as ink rather than as a highlight. */
   :root { --bp-line: color-mix(in srgb, var(--accent) 70%, var(--fg)); }
+  /* A drag on the sheet pans it; it must not paint the names it passes over blue. */
+  #stage, #stage * { -webkit-user-select: none; user-select: none; }
   #stage .bpbox { cursor: pointer; }
   #stage .bpbox .frame { transition: stroke 120ms ease-out; }
   #stage .bpbox:hover > .frame { stroke: var(--accent); }
   #stage .bpitem:hover .bphit { fill: color-mix(in srgb, var(--fg) 7%, transparent); }
   #stage .bplabel { paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
   #stage .bpbox, #stage path, #stage .bplabel { transition: opacity 120ms ease-out; }
+  /* The schematic draws in light on dark whatever the theme - its colours are in the script. */
+  #stage.schematic { background: #0b1a2e; color: #d7e9ff; }
+  #stage.schematic .bpbox:hover > .frame { stroke: #ffd479; }
+  #stage.chip { background: #0d1116; color: #e6edf3; }
+  #stage.chip .bpbox:hover > .frame { stroke: #ffffff; stroke-width: 2.4; }
+  #stage.chip .bpitem:hover > rect { stroke: #ffffff; }
+  /* Drawing or schematic: a small switch over the sheet's corner. */
+  #bpLook {
+    position: absolute; top: 12px; left: 12px; z-index: 5;
+    background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16); backdrop-filter: blur(6px);
+  }
+  #bpLook[hidden] { display: none; }
+  #bpLook button { width: auto; padding: 0 12px; font: inherit; font-size: 12.5px; }
 
   #panel {
     width: 370px; flex: none; overflow-y: auto; background: var(--panel);
@@ -806,6 +822,11 @@
 
 <div id="middle" class="needs-map">
   <svg id="stage"></svg>
+  <div id="bpLook" class="segmented" role="radiogroup" data-t-label="bpLook" hidden>
+    <button type="button" role="radio" aria-checked="true" data-look="drawing" data-t="bpLookDrawing"></button>
+    <button type="button" role="radio" aria-checked="false" data-look="schematic" data-t="bpLookSchematic"></button>
+    <button type="button" role="radio" aria-checked="false" data-look="chip" data-t="bpLookChip"></button>
+  </div>
   <aside id="panel" hidden></aside>
   <section id="legendCard" class="needs-map" aria-labelledby="legendTitle">
     <button id="legendToggle" type="button" aria-expanded="true" aria-controls="legendBody">
@@ -910,6 +931,14 @@ const STRINGS = {
     bpEmpty: "Nothing to draw here", bpEmptyWhy: "Nothing on this level is tied to anything else, or it is all switched off in the legend.",
     legendBoxes: "Boxes", legendOurBox: "Our code", legendOutside: "Outside this level", legendNoDoc: "No doc comment",
     legendUses: "Uses", legendImplements: "Implements",
+    bpLook: "Look", bpLookDrawing: "Drawing", bpLookSchematic: "Schematic", bpLookChip: "Chip",
+    dieLines: n => `≈${n} lines`,
+    dieKey: "area = lines of code, estimated · inner blocks = one level down · white = uses, dashed = implements · pads = what stands outside",
+    legendRegions: "Regions", legendRegion: "Our code", legendPad: "Pad: outside", legendArea: "Area = lines (estimated)",
+    schTitle: "TREERING · BLUEPRINT", schSheet: "SHEET", schInside: "INSIDE",
+    schKey: "● joined   ┼ no dot: not joined   ╱n bus of n   ○ socket: an interface",
+    legendParts: "Parts", legendOurPart: "Our code (U)", legendConnector: "Outside (J)",
+    legendWire: "Wire: uses", legendSocket: "Socket: implements", legendBus: "Bus: several names", legendJunction: "Joined wires",
     hintTree: "click to open or close · point at one to see what it calls · Ctrl+wheel zooms",
     themeAuto: "System", themeLight: "Light", themeDark: "Dark", themeSkyfall: "Skyfall",
     themeObsidian: "Obsidian", themeSlate: "Slate", themeMac: "Mac",
@@ -990,6 +1019,14 @@ const STRINGS = {
     bpEmpty: "그릴 것이 없습니다", bpEmptyWhy: "이 층에는 서로 이어진 것이 없거나, 범례에서 모두 꺼져 있습니다.",
     legendBoxes: "상자", legendOurBox: "우리 코드", legendOutside: "이 층 바깥", legendNoDoc: "주석 없음",
     legendUses: "쓴다", legendImplements: "구현한다",
+    bpLook: "모양", bpLookDrawing: "도면", bpLookSchematic: "회로도", bpLookChip: "칩",
+    dieLines: n => `≈${n}줄`,
+    dieKey: "면적 = 코드 줄 수(어림) · 안쪽 칸 = 한 단 아래 · 흰 배선 = 쓴다, 점선 = 구현 · 패드 = 바깥",
+    legendRegions: "영역", legendRegion: "우리 코드", legendPad: "패드: 바깥", legendArea: "면적 = 줄 수(어림)",
+    schTitle: "TREERING · 설계도", schSheet: "SHEET", schInside: "내부",
+    schKey: "● 접점: 이어짐   ┼ 점 없는 교차: 안 이어짐   ╱n 버스: n가닥   ○ 소켓: 인터페이스",
+    legendParts: "부품", legendOurPart: "우리 코드 (U)", legendConnector: "바깥 (J)",
+    legendWire: "배선: 쓴다", legendSocket: "소켓: 구현한다", legendBus: "버스: 여러 이름", legendJunction: "접점",
     treeRows: "줄", treeMore: "개 더",
     hintTree: "클릭: 펼치기·접기 · 마우스를 올리면 호출선 · Ctrl+휠: 확대",
     themeAuto: "시스템", themeLight: "밝게", themeDark: "어둡게", themeSkyfall: "스카이폴",
@@ -1124,6 +1161,8 @@ function applyLanguage(name) {
 
   drawCrumbs();
   drawLegend();
+  // The blueprint writes words into its boxes ("No doc comment", the title block); redraw them.
+  if (isBlueprint() && bpSheet) { buildBlueprint(); paintBlueprint(); }
   if (graph) describeCounts();
   // The panel was built in the old language and stays on screen. Build it again.
   if (openDetail !== null && !panel.hidden) showDetail(openDetail);
@@ -1139,6 +1178,9 @@ function drawLegend() {
   // What the marks mean lives in the legend card now; the footer keeps the one line on how to move.
   legend.innerHTML = `<span class="hint">${t(isTree() ? "hintTree" : isBlueprint() ? "hintBlueprint" : "hintMouse")}</span>`;
   document.body.classList.toggle("tree-view", isTree());
+  document.getElementById("bpLook").hidden = !isBlueprint();
+  stage.classList.toggle("schematic", isBlueprint() && bpLook === "schematic");
+  stage.classList.toggle("chip", isBlueprint() && bpLook === "chip");
   renderLegendCard();
 }
 
@@ -3361,6 +3403,11 @@ let bpDom = null;
 let bpHovered = null;
 let bpFitNext = false;
 let bpCanvas = null;
+let bpLook = "drawing";
+try {
+  const saved = localStorage.getItem("treering-bp-look");
+  if (saved === "schematic" || saved === "chip") bpLook = saved;
+} catch { /* fine */ }
 
 function bpWidth(text, font) {
   bpCanvas ??= document.createElement("canvas").getContext("2d");
@@ -3462,7 +3509,12 @@ function bpModel(box, sheet) {
 // Tiers by the longest path of "uses" from the top, a loop being one tier; dummy points carry a
 // line that skips tiers, so it runs in the gaps between boxes rather than through them. Each tier
 // is ordered under what it is tied to, then boxes slide toward their lines without overlapping.
-function bpLayout(models, links) {
+// Options, for the schematic: wrapAt (how long a tier may run), gapX (between boxes in a tier),
+// channel and lead (the gap between tiers and where its first track sits), and pins - ports at a
+// fixed pitch from pins.start instead of spread along the side, the arriving ones merged when they
+// carry the same names, so wires meet on one pin with a dot where they join.
+function bpLayout(models, links, opts = {}) {
+  const gapX = opts.gapX ?? BP.gapX;
   const index = new Map(models.map((model, i) => [model.box.id, i]));
   const edges = links.map(link => ({ link, a: index.get(link.from), b: index.get(link.to) }))
     .filter(edge => edge.a !== undefined && edge.b !== undefined && edge.a !== edge.b);
@@ -3495,14 +3547,16 @@ function bpLayout(models, links) {
   models.forEach((model, i) => {
     if (!model.box.outside) return;
     const used = edges.some(edge => edge.b === i), uses = edges.some(edge => edge.a === i);
-    if (used && !uses) tierOf[i] = floor;
-    else if (uses && !used) tierOf[i] = -1;
+    // Only used, or both ways: the floor. Only using us: the roof. Nothing outside is left among
+    // our own boxes, so the frame round them - what the sheet is inside of - takes none of it in.
+    if (uses && !used) tierOf[i] = -1;
+    else if (used) tierOf[i] = floor;
   });
 
   // A tier wider than the screen wraps onto rows, each then a tier of its own; lines from the
   // upper rows run down through the gaps of the lower ones. Rows are even, not filled and left
   // ragged, and the boxes with lines going down sit in the last row, nearest where they go.
-  const wrapAt = Math.max(1100, (stage.clientWidth || 1200) / 0.85);
+  const wrapAt = opts.wrapAt ?? Math.max(1100, (stage.clientWidth || 1200) / 0.85);
   const downward = models.map(() => 0);
   for (const edge of edges) if (tierOf[edge.b] > tierOf[edge.a]) downward[edge.a]++;
   const layerOf = new Array(models.length);
@@ -3510,12 +3564,12 @@ function bpLayout(models, links) {
   for (const tier of [...new Set(tierOf)].sort((p, q) => p - q)) {
     const members = models.map((_, i) => i).filter(i => tierOf[i] === tier)
       .sort((p, q) => (models[p].box.outside - models[q].box.outside) || (downward[p] - downward[q]) || (p - q));
-    const total = members.reduce((sum, i) => sum + models[i].w + BP.gapX, 0);
+    const total = members.reduce((sum, i) => sum + models[i].w + gapX, 0);
     const rows = Math.max(1, Math.ceil(total / wrapAt));
     const each = total / rows;
     let row = 0, width = 0;
     for (const i of members) {
-      const w = models[i].w + BP.gapX;
+      const w = models[i].w + gapX;
       if (width && width + w / 2 > each * (row + 1) && row < rows - 1) row++;
       width += w;
       layerOf[i] = nextLayer + row;
@@ -3569,7 +3623,7 @@ function bpLayout(models, links) {
   }
 
   const x = new Float64Array(verts.length);
-  const gap = (p, q) => verts[p].dummy || verts[q].dummy ? BP.dummyGap : BP.gapX;
+  const gap = (p, q) => verts[p].dummy || verts[q].dummy ? BP.dummyGap : gapX;
   const space = (p, q) => verts[p].w / 2 + gap(p, q) + verts[q].w / 2;
   for (const row of layers) {
     row.forEach((v, k) => { x[v] = k ? x[row[k - 1]] + space(row[k - 1], v) : 0; });
@@ -3614,13 +3668,28 @@ function bpLayout(models, links) {
     else hang(topOf, seg.v, seg, seg.u);
   }
   const portX = new Map();
+  const pinCount = new Map();
+  const linkOf = seg => seg.loop ? seg.loop.link : chains[seg.c].edge.link;
   const spread = (map, side) => {
     for (const [v, list] of map) {
       list.sort((p, q) => x[p.other] - x[q.other]);
-      list.forEach((entry, j) => {
-        const px = verts[v].dummy ? x[v] : x[v] - verts[v].w / 2 + verts[v].w * (j + 1) / (list.length + 1);
+      const pinned = opts.pins && !verts[v].dummy;
+      // On the arriving side, wires carrying the same names share one pin.
+      const slots = [];
+      for (const entry of list) {
+        const link = linkOf(entry.seg);
+        const key = pinned && side === "t" && !entry.seg.loop ? `${link.kind}|${link.labels.join(",")}` : entry;
+        entry.slot = slots.indexOf(key);
+        if (entry.slot < 0) { slots.push(key); entry.slot = slots.length - 1; }
+      }
+      for (const entry of list) {
+        const left = x[v] - verts[v].w / 2;
+        const px = verts[v].dummy ? x[v]
+          : pinned ? left + opts.pins.start + opts.pins.pitch * (entry.slot + 0.5)
+          : left + verts[v].w * (entry.slot + 1) / (slots.length + 1);
         portX.set(`${side}:${v}:${segments.indexOf(entry.seg)}`, px);
-      });
+      }
+      if (!verts[v].dummy) pinCount.set(`${side}:${verts[v].i}`, slots.length);
     }
   };
   spread(bottomOf, "b");
@@ -3645,13 +3714,28 @@ function bpLayout(models, links) {
     }
     trackCount[l] = ends.length;
   }
-  const channelH = trackCount.map(n => BP.channel + Math.max(0, n - 1) * BP.track);
+  // A frame round our own boxes needs a strip of its own on each side, where no track runs: after
+  // the tracks leaving the roof, and before the tracks going down to the floor.
+  const outsideLayer = layers.map(row => row.some(v => !verts[v].dummy)
+    && row.every(v => verts[v].dummy || models[verts[v].i].box.outside));
+  const hasInside = outsideLayer.some(outside => !outside);
+  const F = opts.frame && hasInside ? 44 : 0;
+  const lead = new Array(layerCount).fill(opts.lead ?? 24);
+  const channelH = trackCount.map(n => (opts.channel ?? BP.channel) + Math.max(0, n - 1) * BP.track);
+  for (let l = 0; l + 1 < layerCount; l++) {
+    if (outsideLayer[l] && !outsideLayer[l + 1]) channelH[l] += F;
+    if (!outsideLayer[l] && outsideLayer[l + 1]) { channelH[l] += F; lead[l] += F; }
+  }
+  // With nothing on the roof, the frame's top strip is room above the drawing; the same below.
+  const firstIn = outsideLayer.findIndex(outside => !outside);
+  const lastIn = outsideLayer.length - 1 - [...outsideLayer].reverse().findIndex(outside => !outside);
   const top = [];
-  for (let l = 0, y = 0; l < layerCount; l++) { top[l] = y; y += layerH[l] + channelH[l]; }
-  const trackY = (l, track) => top[l] + layerH[l] + 24 + Math.max(0, track) * BP.track;
+  for (let l = 0, y = F && firstIn === 0 ? F : 0; l < layerCount; l++) { top[l] = y; y += layerH[l] + channelH[l]; }
+  const trackY = (l, track) => top[l] + layerH[l] + lead[l] + Math.max(0, track) * BP.track;
   const bottomY = v => top[verts[v].layer] + (verts[v].dummy ? layerH[verts[v].layer] : verts[v].h);
 
   const paths = [];
+  const joins = new Map();
   chains.forEach((chain, c) => {
     const segs = segments.filter(seg => seg.c === c && !seg.loop);
     const points = [];
@@ -3673,6 +3757,12 @@ function bpLayout(models, links) {
       const end = { x: x2 + 5, y: y2 - 7, room: bpRoom(topOf, "t", seg.v, x2, port) };
       if (!label) label = start;
       if (seg === segs[segs.length - 1] && end.room > label.room) label = end;
+      // Where this wire runs onto the last leg into its pin - shared, when the pin is.
+      if (seg === segs[segs.length - 1]) {
+        const key = `${seg.v}:${x2.toFixed(1)}`;
+        if (!joins.has(key)) joins.set(key, []);
+        joins.get(key).push([x2, track >= 0 ? trackY(seg.layer, track) : y1]);
+      }
     }
     paths.push({ link: chain.edge.link, points, label, down: chain.down });
   });
@@ -3686,10 +3776,32 @@ function bpLayout(models, links) {
     });
   }
 
+  // A dot where a wire joins a leg another wire already runs on - the farthest one starts the leg.
+  const dots = [];
+  for (const list of joins.values()) {
+    if (list.length < 2) continue;
+    list.sort((p, q) => p[1] - q[1]).slice(1).forEach(point => dots.push(point));
+  }
+
   const boxes = models.map((model, i) => ({ model, x: x[i] - model.w / 2, y: top[layerOf[i]] }));
   const width = Math.max(0, ...boxes.map(b => b.x + b.model.w));
   const height = layerCount ? top[layerCount - 1] + layerH[layerCount - 1] + (trackCount[layerCount - 1] ? channelH[layerCount - 1] : 0) : 0;
-  return { boxes, paths, width, height };
+  const pins = i => ({ out: pinCount.get(`b:${i}`) ?? 0, in: pinCount.get(`t:${i}`) ?? 0 });
+
+  // The frame: round every one of our boxes, its top and bottom in the strips kept for it.
+  let frame = null;
+  if (F) {
+    const inside = boxes.filter(b => !b.model.box.outside);
+    const pad = opts.framePad ?? [22, 22];
+    const x0 = Math.min(...inside.map(b => b.x)) - pad[0], x1 = Math.max(...inside.map(b => b.x + b.model.w)) + pad[1];
+    const y0 = top[firstIn] - F + 6;
+    const y1 = top[lastIn] + layerH[lastIn] + F - 6;
+    frame = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+  }
+  const tall = F && lastIn === layerCount - 1 ? Math.max(height, top[lastIn] + layerH[lastIn] + F) : height;
+  // The frame reaches a little past the outermost boxes; the sheet's own margin shows that part.
+  const wide = frame ? Math.max(width, frame.x + frame.w) : width;
+  return { boxes, paths, width: wide, height: tall, dots, pins, frame };
 }
 
 // How much room a label has: up to the next line on the same side of the same box.
@@ -3716,6 +3828,9 @@ function bpMarkers(defs) {
   const grid = el("pattern", { id: "bp-grid", width: 24, height: 24, patternUnits: "userSpaceOnUse" });
   grid.append(el("path", { d: "M24 0H0V24", fill: "none", stroke: "var(--line)", "stroke-width": 0.6, "stroke-opacity": 0.55 }));
   defs.append(grid);
+  const board = el("pattern", { id: "sch-grid", width: 20, height: 20, patternUnits: "userSpaceOnUse" });
+  board.append(el("path", { d: "M20 0H0V20", fill: "none", stroke: "#15324f", "stroke-width": 0.7 }));
+  defs.append(board);
 }
 
 // Test code is off in the blueprint until asked for: a drawing of the design, with a box per test
@@ -3755,12 +3870,40 @@ function buildBlueprint() {
   const tied = new Set(links.flatMap(link => [link.from, link.to]));
   const boxes = visible.filter(box => !box.outside || tied.has(box.id));
   const shown = new Map(boxes.map(box => [box.id, box]));
+  stage.classList.toggle("schematic", bpLook === "schematic");
+  stage.classList.toggle("chip", bpLook === "chip");
+  if (bpLook === "schematic") drawSchematic(root, sheet, boxes, links, shown);
+  else if (bpLook === "chip") drawChip(root, sheet, boxes, links, shown);
+  else drawDrawing(root, sheet, boxes, links, shown);
+
+  if (!boxes.length) {
+    const empty = el("g", { class: "bpempty" });
+    const head = el("text", { "text-anchor": "middle", "font-size": 15, "font-weight": 600, fill: "currentColor" });
+    head.textContent = t("bpEmpty");
+    const why = el("text", { "text-anchor": "middle", y: 22, "font-size": 12.5, fill: "var(--muted)" });
+    why.textContent = t("bpEmptyWhy");
+    empty.append(head, why);
+    stage.append(empty);
+    bpDom.empty = empty;
+  }
+
+  counts.textContent = t("bpCounts")(boxes.length.toLocaleString(), links.length.toLocaleString()) +
+    (sheet.hidden ? " · " + t("bpHidden")(sheet.hidden) : "");
+  renderLegendCard();
+  if (bpHovered !== null) bpHover(bpHovered);
+}
+
+// The drawing look: cards on a faint grid, lines in the theme's ink, labels where there is room.
+function drawDrawing(root, sheet, boxes, links, shown) {
   const models = boxes.map(box => bpModel(box, sheet));
-  const plan = bpLayout(models, links);
+  const plan = bpLayout(models, links, { frame: bpFramed(sheet) });
   bpDom.width = plan.width;
   bpDom.height = plan.height;
 
   root.append(el("rect", { x: -4000, y: -4000, width: plan.width + 8000, height: plan.height + 8000, fill: "url(#bp-grid)" }));
+  if (plan.frame) root.append(bpFrameDrawing(plan.frame));
+  bpDom.left = Math.min(0, plan.frame?.x ?? 0);
+  bpDom.top = Math.min(0, (plan.frame?.y ?? 0) - 14);
   const wires = el("g", {});
   const cards = el("g", {});
   const tags = el("g", {});
@@ -3807,22 +3950,598 @@ function buildBlueprint() {
   }
 
   for (const { model, x, y } of plan.boxes) cards.append(bpBox(model, x, y));
+}
 
-  if (!boxes.length) {
-    const empty = el("g", { class: "bpempty" });
-    const head = el("text", { "text-anchor": "middle", "font-size": 15, "font-weight": 600, fill: "currentColor" });
-    head.textContent = t("bpEmpty");
-    const why = el("text", { "text-anchor": "middle", y: 22, "font-size": 12.5, fill: "var(--muted)" });
-    why.textContent = t("bpEmptyWhy");
-    empty.append(head, why);
-    stage.append(empty);
-    bpDom.empty = empty;
+// Inside something, the sheet says what: a frame round our own boxes, named for where you went
+// in - as the map keeps the thing you opened on screen as a ring. The top sheet is inside nothing,
+// and a type's sheet has the type itself in the middle, so neither has one.
+const bpFramed = sheet => bpTrail.length > 1 && sheet.level !== "type";
+
+// What the sheet is inside of. Sheets passed straight through (one box of ours in them) are part
+// of the way in, so their names come along: "checkout › cards" rather than just "cards".
+function bpFrameName() {
+  const steps = [bpTrail[bpTrail.length - 1]];
+  for (let i = bpTrail.length - 2; i > 0 && bpTrail[i].skip; i--) steps.unshift(bpTrail[i]);
+  const here = steps[steps.length - 1];
+  return {
+    name: steps.map(step => step.label ?? bpSheet?.parentDisplay ?? "").join(" › "),
+    designator: steps[0].designator ?? null,
+    role: here.role ?? null,
+  };
+}
+
+function bpFrameDrawing(frame) {
+  const { name } = bpFrameName();
+  const group = el("g", { class: "bpframe" });
+  group.append(el("rect", {
+    x: frame.x, y: frame.y, width: frame.w, height: frame.h, rx: 12,
+    style: "fill: color-mix(in srgb, var(--accent) 4%, transparent); stroke: color-mix(in srgb, var(--accent) 45%, var(--line))",
+    "stroke-width": 1.4, "stroke-dasharray": "8 5",
+  }));
+  const font = `650 14px ${getComputedStyle(document.body).fontFamily}`;
+  const text = bpFit(name, font, Math.max(80, frame.w - 60));
+  const tab = el("g", { transform: `translate(${frame.x + 16} ${frame.y - 13})` });
+  tab.append(el("rect", {
+    width: bpWidth(text, font) + 26, height: 26, rx: 7, style: "fill: var(--bg); stroke: color-mix(in srgb, var(--accent) 55%, var(--line))",
+    "stroke-width": 1.4,
+  }));
+  const label = el("text", { x: 13, y: 18, "font-size": 14, "font-weight": 650, style: "fill: var(--accent)" });
+  label.textContent = text;
+  tab.append(label);
+  const tip = document.createElementNS(SVG, "title");
+  tip.textContent = name;
+  group.append(tab, tip);
+  return group;
+}
+
+// The part you went into, opened up: the same body and edge as a part, its designator and name
+// across a header band - so the sheet reads as the inside of U2, not as a loose set of parts.
+function schFrame(frame) {
+  const { name, designator, role } = bpFrameName();
+  const group = el("g", { class: "bpframe" });
+  group.append(el("rect", {
+    x: frame.x, y: frame.y, width: frame.w, height: frame.h, rx: 4, fill: SCH.body, "fill-opacity": 0.45,
+    stroke: SCH.edge, "stroke-width": 2.2,
+  }));
+  group.append(el("rect", { x: frame.x, y: frame.y, width: frame.w, height: 40, rx: 4, fill: SCH.body, stroke: SCH.edge, "stroke-width": 2.2 }));
+  group.append(el("circle", { cx: frame.x + 12, cy: frame.y + 12, r: 3, fill: SCH.edge }));
+  if (designator) {
+    const tag = el("text", { x: frame.x + 22, y: frame.y + 16, "font-size": 11, "font-family": BP_MONO, fill: SCH.faint });
+    tag.textContent = designator;
+    group.append(tag);
+  }
+  const title = el("text", {
+    x: frame.x + frame.w / 2, y: frame.y + (role ? 19 : 25), "font-size": 16, "font-weight": 700, "font-family": BP_MONO,
+    "text-anchor": "middle", fill: SCH.text,
+  });
+  title.textContent = bpFit(name, `700 16px ${BP_MONO}`, frame.w - 120);
+  group.append(title);
+  if (role) {
+    const line = el("text", { x: frame.x + frame.w / 2, y: frame.y + 33, "font-size": 11, "text-anchor": "middle", fill: SCH.muted });
+    line.textContent = bpFit(role, `11px ${getComputedStyle(document.body).fontFamily}`, frame.w - 120);
+    group.append(line);
+  }
+  const inside = el("text", { x: frame.x + frame.w - 12, y: frame.y + 16, "font-size": 10, "font-family": BP_MONO, "text-anchor": "end", fill: SCH.faint });
+  inside.textContent = t("schInside");
+  group.append(inside);
+  const tip = document.createElementNS(SVG, "title");
+  tip.textContent = [designator, name].filter(Boolean).join(" · ");
+  group.append(tip);
+  return group;
+}
+
+// ---- the schematic look ---------------------------------------------------------------
+// The same sheet as a circuit drawing: boxes are parts (U1, U2 … and J1 … for what stands
+// outside), what a part is used for comes in on pins on its left and what it uses leaves from
+// pins on its right, and signals run left to right. A line carrying several names is a bus with
+// its width marked; wires carrying the same names meet on one pin, a dot where they join; an
+// interface is a socket its implementers plug into. Its colours are its own, whatever the theme:
+// a schematic is drawn in light on dark.
+const SCH = {
+  head: 48, pitch: 20, stub: 14, minW: 150, maxW: 380,
+  bg: "#0b1a2e", grid: "#15324f", body: "#0f2440", edge: "#9ec9ff", text: "#d7e9ff", muted: "#8fb3d9",
+  faint: "#6f8fb3", wire: "#5ad1e6", bus: "#7fe3f2", net: "#ffd479", born: "#58e0a8", died: "#ff7a6b",
+};
+
+const schPinName = link => link.labels.join(", ") + (link.width > link.labels.length ? " …" : "");
+
+function schModel(box, links, counts) {
+  const sans = getComputedStyle(document.body).fontFamily;
+  const fonts = { title: `700 13px ${BP_MONO}`, role: `11px ${sans}`, pin: `10.5px ${BP_MONO}` };
+  const into = links.filter(link => link.to === box.id), out = links.filter(link => link.from === box.id);
+  const widest = list => Math.max(0, ...list.map(link => bpWidth(schPinName(link), fonts.pin)));
+  const role = box.outside ? null : box.role ? bpPlain(box.role) : null;
+  const w = Math.round(Math.min(SCH.maxW, Math.max(SCH.minW,
+    bpWidth(box.display, fonts.title) + 28,
+    Math.min(260, role ? bpWidth(role, fonts.role) : 0) + 28,
+    Math.min(150, widest(into)) + Math.min(150, widest(out)) + 44)));
+  const lines = counts ? Math.max(counts.in, counts.out) : Math.max(into.length, out.length);
+  const items = !lines ? box.items.slice(0, 3) : [];
+  const h = SCH.head + Math.max(lines, items.length, 1) * SCH.pitch + 8;
+  return { box, w, h, role, items, fonts };
+}
+
+function drawSchematic(root, sheet, boxes, links, shown) {
+  // Laid out on its side: the layout's tiers become columns, its rows the height of the drawing.
+  // Pins sit at a fixed pitch, so a part is as tall as its busiest side - which is known only once
+  // the layout has said which wires share a pin. So it is laid out twice.
+  const opts = {
+    wrapAt: Math.max(700, (stage.clientHeight || 800) / 0.8), gapX: 34, channel: 96, lead: 30,
+    pins: { start: SCH.head, pitch: SCH.pitch }, frame: bpFramed(sheet), framePad: [64, 22],
+  };
+  const turned = models => models.map(model => ({ ...model, w: model.h, h: model.w }));
+  let models = boxes.map(box => schModel(box, links, null));
+  let plan = bpLayout(turned(models), links, opts);
+  models = boxes.map((box, i) => schModel(box, links, plan.pins(i)));
+  plan = bpLayout(turned(models), links, opts);
+
+  const flip = ([px, py]) => [py, px];
+  const placed = plan.boxes.map(({ model, x, y }, i) => ({ model: models[i], x: y, y: x }));
+  const width = plan.height, height = plan.width;
+
+  // Parts are numbered as they are read: left to right, then top to bottom.
+  const order = placed.slice().sort((p, q) => (p.x - q.x) || (p.y - q.y));
+  const names = new Map();
+  let ours = 0, theirs = 0;
+  for (const part of order) names.set(part.model.box.id, part.model.box.outside ? `J${++theirs}` : `U${++ours}`);
+
+  root.append(el("rect", { x: -4000, y: -4000, width: width + 8000, height: height + 8000, fill: "url(#sch-grid)" }));
+  // What this sheet is inside of: a hierarchical sheet round our parts, its ports where wires
+  // cross into it from the connectors outside.
+  const frame = plan.frame && { x: plan.frame.y, y: plan.frame.x, w: plan.frame.h, h: plan.frame.w };
+  if (frame) root.append(schFrame(frame));
+  bpDom.left = Math.min(0, frame?.x ?? 0);
+  bpDom.top = Math.min(0, (frame?.y ?? 0) - 4);
+  const wires = el("g", {});
+  const parts = el("g", {});
+  const marks = el("g", {});
+  root.append(wires, parts, marks);
+
+  const byId = new Map(placed.map(part => [part.model.box.id, part]));
+  const pinNames = [];
+  for (const path of plan.paths) {
+    const link = path.link;
+    const points = path.points.map(flip);
+    const [start, end] = [points[0], points[points.length - 1]];
+    const [first, last] = path.down ? [link.from, link.to] : [link.to, link.from];
+    const outside = shown.get(link.from)?.outside || shown.get(link.to)?.outside;
+    const inherit = link.kind === KIND_INHERIT;
+    const colour = link.state === "born" ? SCH.born : link.state === "died" ? SCH.died : outside ? SCH.faint : SCH.wire;
+    const bus = link.width > 1 && !inherit;
+
+    const group = el("g", {});
+    const wire = el("path", {
+      d: "M" + points.map(([px, py]) => `${px.toFixed(1)} ${py.toFixed(1)}`).join(" L"),
+      // A wire out to a connector is context, bus or not: thinner, and in the connector's grey.
+      fill: "none", stroke: bus && !outside ? SCH.bus : colour,
+      "stroke-width": bus ? (outside ? 2.2 : 3.6) : outside ? 1.1 : 1.4, "stroke-linejoin": "round",
+    });
+    if (inherit || link.state === "died") wire.setAttribute("stroke-dasharray", link.state === "died" ? "4 3" : "6 4");
+    if (link.state === "born" || link.state === "died") wire.setAttribute("stroke", colour);
+    group.append(wire);
+
+    // Pin stubs, a touch brighter than the wire, just outside each part's edge.
+    for (const [px, py, sign] of [[start[0], start[1], 1], [end[0], end[1], end[0] > byId.get(last)?.x + 1 ? 1 : -1]]) {
+      group.append(el("path", { d: `M${px} ${py}h${sign * SCH.stub}`, stroke: SCH.edge, "stroke-width": 1.4 }));
+    }
+    if (bus) {
+      const bx = start[0] + SCH.stub + 10;
+      const tint = outside ? SCH.faint : SCH.bus;
+      group.append(el("path", { d: `M${bx - 4} ${start[1] + 6}L${bx + 4} ${start[1] - 6}`, stroke: tint, "stroke-width": 1.2 }));
+      const count = el("text", { x: bx + 5, y: start[1] - 6, "font-size": 9.5, "font-family": BP_MONO, fill: tint });
+      count.textContent = link.width;
+      group.append(count);
+    }
+    if (inherit) {
+      // The interface's pin is a socket; the implementer plugs into it.
+      const [sx, sy] = link.to === first ? start : end;
+      const socket = el("circle", { cx: sx + (link.to === first ? SCH.stub : -SCH.stub), cy: sy, r: 5, fill: SCH.bg, stroke: colour, "stroke-width": 1.4 });
+      group.append(socket);
+    }
+    const title = document.createElementNS(SVG, "title");
+    title.textContent = `${shown.get(link.from)?.display} → ${shown.get(link.to)?.display}` +
+      (link.labels.length ? `\n${link.labels.join(", ")}${link.width > link.labels.length ? ` (+${link.width - link.labels.length})` : ""}` : "");
+    group.append(title);
+    wires.append(group);
+    bpDom.links.push({ link, wire: group, text: null, quiet: false });
+
+    pinNames.push({ part: first, point: start, link }, { part: last, point: end, link });
+
+    // A sheet port where the wire crosses the frame: an arrow pointing the way the use runs.
+    if (frame && (shown.get(link.from)?.outside !== shown.get(link.to)?.outside)) {
+      for (let k = 0; k + 1 < points.length; k++) {
+        const [[px, py], [qx, qy]] = [points[k], points[k + 1]];
+        if (Math.abs(py - qy) > 0.5 || py < frame.y || py > frame.y + frame.h) continue;
+        for (const edge of [frame.x, frame.x + frame.w]) {
+          if ((px - edge) * (qx - edge) >= 0) continue;
+          // The points run from the chain's first part; the use runs from link.from to link.to.
+          const d = Math.sign(qx - px) * (path.down ? 1 : -1);
+          group.append(el("polygon", {
+            points: [[edge - 7 * d, py - 5], [edge + 2 * d, py - 5], [edge + 7 * d, py], [edge + 2 * d, py + 5], [edge - 7 * d, py + 5]]
+              .map(([ax, ay]) => `${ax.toFixed(1)},${ay.toFixed(1)}`).join(" "),
+            fill: SCH.bg, stroke: SCH.net, "stroke-width": 1.2,
+          }));
+        }
+      }
+    }
   }
 
-  counts.textContent = t("bpCounts")(boxes.length.toLocaleString(), links.length.toLocaleString()) +
-    (sheet.hidden ? " · " + t("bpHidden")(sheet.hidden) : "");
-  renderLegendCard();
-  if (bpHovered !== null) bpHover(bpHovered);
+  for (const [px, py] of plan.dots.map(flip)) {
+    marks.append(el("circle", { cx: px, cy: py, r: 3.6, fill: SCH.wire }));
+  }
+  bpDom.dots = plan.dots.length;
+
+  for (const part of placed) parts.append(schPart(part, names.get(part.model.box.id), pinNames));
+  bpDom.names = names;
+
+  // The title block and the key, as on any drawing sheet.
+  // The key sits under the block, so a narrow sheet does not run one into the other.
+  const block = schTitleBlock(Math.max(width - 190, 0), height + 34);
+  const key = el("text", { x: Math.max(width - 190, 0) + 190, y: height + 34 + 78 + 16, "font-size": 10, "font-family": BP_MONO,
+    fill: SCH.muted, "text-anchor": "end" });
+  key.textContent = t("schKey");
+  root.append(block, key);
+  bpDom.width = Math.max(width, 190);
+  bpDom.height = height + 34 + 78 + 22;
+}
+
+function schPart({ model, x, y }, name, pinNames) {
+  const { box, w, h, role, items, fonts } = model;
+  const state = box.state === "born" || box.state === "died" ? box.state : null;
+  const stroke = state === "born" ? SCH.born : state === "died" ? SCH.died : box.outside ? SCH.faint : SCH.edge;
+  const group = el("g", { class: "bpbox", transform: `translate(${x.toFixed(1)} ${y.toFixed(1)})`, "data-bp": "box" });
+  group.dataset.id = box.id;
+
+  const label = el("text", { x: 0, y: -6, "font-size": 10, "font-family": BP_MONO, fill: SCH.faint });
+  label.textContent = name + (state ? `  ${t(state === "born" ? "bpNew" : "bpGone")}` : "") + (box.test ? "  test" : "");
+  if (state) label.setAttribute("fill", stroke);
+  group.append(label);
+
+  const body = el("rect", {
+    class: "frame", width: w, height: h, rx: 3, fill: box.outside ? SCH.bg : SCH.body,
+    stroke, "stroke-width": state ? 1.8 : 1.4,
+  });
+  if (box.outside || state === "died") body.setAttribute("stroke-dasharray", "4 3");
+  group.append(body);
+  if (!box.outside) group.append(el("circle", { cx: 9, cy: 9, r: 2.5, fill: stroke }));
+
+  const title = el("text", {
+    x: w / 2, y: 22, "font-size": 13, "font-weight": 700, "font-family": BP_MONO, "text-anchor": "middle",
+    fill: box.outside ? SCH.muted : SCH.text,
+  });
+  title.textContent = bpFit(box.display, fonts.title, w - 24);
+  group.append(title);
+  if (role) {
+    const line = el("text", { x: w / 2, y: 37, "font-size": 11, "text-anchor": "middle", fill: SCH.muted });
+    line.textContent = bpFit(role, fonts.role, w - 20);
+    group.append(line);
+  }
+
+  // Pin names, inside the part beside each pin - once per pin, however many wires meet on it.
+  const seen = new Set();
+  for (const { part, point, link } of pinNames) {
+    if (part !== box.id) continue;
+    const px = point[0] - x, py = point[1] - y;
+    const key = `${Math.round(px)}:${Math.round(py)}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const right = px > w / 2;
+    const text = el("text", {
+      x: right ? w - 7 : 7, y: py + 3.5, "font-size": 10.5, "font-family": BP_MONO,
+      "text-anchor": right ? "end" : "start",
+      fill: link.state === "born" ? SCH.born : link.state === "died" ? SCH.died : SCH.muted,
+    });
+    text.textContent = bpFit(schPinName(link), fonts.pin, w / 2 - 12);
+    group.append(text);
+  }
+  items.forEach((item, i) => {
+    const text = el("text", { x: w / 2, y: SCH.head + 14 + i * SCH.pitch, "font-size": 10.5, "font-family": BP_MONO, "text-anchor": "middle", fill: SCH.faint });
+    text.textContent = bpFit(item.display, fonts.pin, w - 20);
+    group.append(text);
+  });
+
+  const tip = document.createElementNS(SVG, "title");
+  tip.textContent = [`${name} · ${box.display}`, box.role ? bpPlain(box.role) : null,
+    box.roleFrom ? `(${t("bpBorrowed")(box.roleFrom)})` : null].filter(Boolean).join("\n");
+  group.prepend(tip);
+  return group;
+}
+
+function schTitleBlock(x, y) {
+  const project = projectSelect.selectedOptions[0]?.textContent ?? "";
+  const sheet = bpTrail[bpTrail.length - 1].label ?? t("all");
+  const snapshot = (atSelect.selectedOptions[0]?.textContent ?? "").replace(/^ord \d+ · /, "");
+  const rows = [t("schTitle"), project, `${t("schSheet")} ${bpTrail.length} · ${sheet}`,
+    fromSelect.value ? `${(fromSelect.selectedOptions[0]?.textContent ?? "").replace(/^ord \d+ · /, "")} → ${snapshot}` : snapshot];
+  const group = el("g", { transform: `translate(${x} ${y})` });
+  group.append(el("rect", { width: 190, height: rows.length * 19 + 2, fill: SCH.bg, stroke: SCH.faint }));
+  rows.forEach((row, i) => {
+    if (i) group.append(el("line", { x1: 0, x2: 190, y1: i * 19 + 1, y2: i * 19 + 1, stroke: SCH.faint, "stroke-width": 0.8 }));
+    const text = el("text", {
+      x: 8, y: i * 19 + 14, "font-size": i ? 10 : 10.5, "font-weight": i ? 400 : 700, "font-family": BP_MONO,
+      fill: i ? SCH.muted : SCH.text,
+    });
+    text.textContent = bpFit(row, `${i ? 400 : 700} ${i ? 10 : 10.5}px ${BP_MONO}`, 176);
+    group.append(text);
+  });
+  return group;
+}
+
+// ---- the chip look ---------------------------------------------------------------------
+// The same sheet as a die floor plan: our boxes are regions tiled over the die, each as big as
+// its code; inside a region its blocks are the next level down, tiled the same way. What stands
+// outside is a pad on the die's edge - users on the left, what we use on the right. Dependencies
+// are wires on the top layer, running square over the blocks, with a via where they land. Where
+// the drawing and the schematic say who uses whom, this says where the weight is.
+const CHIP = {
+  width: 1000, height: 640, margin: 120, head: 30, gap: 6,
+  bg: "#0d1116", die: "#12171d", ring: "#56606c", ring2: "#39424d", pad: "#b7c0ca",
+  text: "#e6edf3", muted: "#9aa6b3", faint: "#56606c", wire: "#ffffff", born: "#58e0a8", died: "#ff7a6b",
+  hues: ["#2bb3a3", "#9b86f0", "#f0b64a", "#f0876b", "#5fa8ff", "#e46fb0", "#8fd16a", "#d9c25a"],
+};
+
+const chipLines = n => t("dieLines")(n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : Math.round(n));
+
+// Squarified tiling: rows of tiles kept as close to square as the space allows, biggest first.
+function squarify(items, x, y, w, h) {
+  const total = items.reduce((sum, item) => sum + item.value, 0);
+  if (!items.length || total <= 0 || w <= 0 || h <= 0) return [];
+  const scale = (w * h) / total;
+  const rest = items.slice().sort((p, q) => q.value - p.value).map(item => ({ item, area: item.value * scale }));
+  const out = [];
+  let rx = x, ry = y, rw = w, rh = h;
+  const worst = (row, side) => {
+    const sum = row.reduce((acc, r) => acc + r.area, 0);
+    const most = Math.max(...row.map(r => r.area)), least = Math.min(...row.map(r => r.area));
+    return Math.max((side * side * most) / (sum * sum), (sum * sum) / (side * side * least));
+  };
+  const lay = row => {
+    const sum = row.reduce((acc, r) => acc + r.area, 0);
+    if (rw >= rh) {
+      const cw = sum / rh;
+      let cy = ry;
+      for (const r of row) { const ch = r.area / cw; out.push({ item: r.item, x: rx, y: cy, w: cw, h: ch }); cy += ch; }
+      rx += cw; rw -= cw;
+    } else {
+      const ch = sum / rw;
+      let cx = rx;
+      for (const r of row) { const cw = r.area / ch; out.push({ item: r.item, x: cx, y: ry, w: cw, h: ch }); cx += cw; }
+      ry += ch; rh -= ch;
+    }
+  };
+  let row = [];
+  while (rest.length) {
+    const side = Math.min(rw, rh);
+    if (!row.length || worst([...row, rest[0]], side) <= worst(row, side)) { row.push(rest.shift()); continue; }
+    lay(row);
+    row = [];
+  }
+  if (row.length) lay(row);
+  return out;
+}
+
+function chipPatterns(defs) {
+  const angles = [45, -45, null, 90, 30, -30, 0, 60];
+  CHIP.hues.forEach((hue, k) => {
+    const angle = angles[k % angles.length];
+    const pattern = el("pattern", {
+      id: `die-h${k}`, width: 7, height: 7, patternUnits: "userSpaceOnUse",
+      ...(angle === null ? {} : { patternTransform: `rotate(${angle})` }),
+    });
+    pattern.append(el("rect", { width: 7, height: 7, style: `fill: color-mix(in srgb, ${hue} 16%, ${CHIP.die})` }));
+    pattern.append(angle === null
+      ? el("circle", { cx: 3.5, cy: 3.5, r: 1.1, fill: hue, "fill-opacity": 0.6 })
+      : el("path", { d: "M0 0V7", stroke: hue, "stroke-width": 1.3, "stroke-opacity": 0.5 }));
+    defs.append(pattern);
+  });
+  const tests = el("pattern", { id: "die-tests", width: 10, height: 10, patternUnits: "userSpaceOnUse" });
+  tests.append(el("rect", { width: 10, height: 10, fill: "#161b21" }), el("path", { d: "M0 10L10 0", stroke: "#3a4552" }));
+  defs.append(tests);
+}
+
+function drawChip(root, sheet, boxes, links, shown) {
+  // Inside something, the die is that thing: its name stands over the die.
+  const T = bpFramed(sheet) ? 38 : 0;
+  const die = el("g", { transform: `translate(0 ${T})` });
+  root.append(die);
+  if (T) {
+    const { name } = bpFrameName();
+    const title = el("text", { x: CHIP.margin - 14, y: 22, "font-size": 15, "font-weight": 700, "font-family": BP_MONO, fill: CHIP.text });
+    title.textContent = bpFit(name, `700 15px ${BP_MONO}`, CHIP.width);
+    root.append(title);
+  }
+  chipPatterns(stage.querySelector("defs"));
+  const lines = sheet.lines ?? {};
+  const blocks = sheet.blocks ?? {};
+  const ours = boxes.filter(box => !box.outside);
+  const pads = boxes.filter(box => box.outside);
+  const { width: W, height: H, margin: M } = CHIP;
+
+  // The die, and its seal ring.
+  die.append(el("rect", { x: M - 14, y: 6, width: W + 28, height: H + 28, fill: CHIP.die, stroke: CHIP.ring, "stroke-width": 2 }));
+  die.append(el("rect", { x: M - 6, y: 14, width: W + 12, height: H + 12, fill: "none", stroke: CHIP.ring2 }));
+
+  // Regions: as big as their code. A region too small to hold its name is given a floor.
+  const total = ours.reduce((sum, box) => sum + (lines[box.id] ?? 0), 0) || ours.length;
+  const floor = total * 0.035;
+  const tiles = squarify(ours.map(box => ({ box, value: Math.max(floor, lines[box.id] ?? 0) })), M, 20, W, H);
+  const at = new Map();
+  const regions = el("g", {});
+  const wires = el("g", {});
+  const tags = el("g", {});
+  die.append(regions, wires, tags);
+
+  tiles.forEach((tile, k) => {
+    const box = tile.item.box;
+    const x = tile.x + CHIP.gap / 2, y = tile.y + CHIP.gap / 2, w = tile.w - CHIP.gap, h = tile.h - CHIP.gap;
+    at.set(box.id, { x, y, w, h });
+    const hue = box.test ? CHIP.faint : CHIP.hues[k % CHIP.hues.length];
+    const state = box.state === "born" || box.state === "died" ? box.state : null;
+    const group = el("g", { class: "bpbox", "data-bp": "box" });
+    group.dataset.id = box.id;
+    const frame = el("rect", {
+      class: "frame", x, y, width: w, height: h, fill: box.test ? "url(#die-tests)" : `url(#die-h${k % CHIP.hues.length})`,
+      stroke: state === "born" ? CHIP.born : state === "died" ? CHIP.died : hue, "stroke-width": state ? 2.2 : 1.5,
+    });
+    if (state === "died" || box.test) frame.setAttribute("stroke-dasharray", "5 4");
+    group.append(frame);
+
+    const font = `700 14px ${BP_MONO}`, small = `10px ${BP_MONO}`;
+    const size = chipLines(lines[box.id] ?? 0);
+    const room = w - 20;
+    const name = el("text", { x: x + 10, y: y + 20, "font-size": 14, "font-weight": 700, "font-family": BP_MONO, style: `fill: color-mix(in srgb, ${hue} 60%, #ffffff)` });
+    name.textContent = bpFit(box.display, font, room - (room > 200 ? bpWidth(size, small) + 12 : 0));
+    group.append(name);
+    if (room > 200) {
+      const amount = el("text", { x: x + w - 10, y: y + 20, "font-size": 10, "font-family": BP_MONO, "text-anchor": "end", style: `fill: color-mix(in srgb, ${hue} 60%, #ffffff)` });
+      amount.textContent = size + (state ? `  ${t(state === "born" ? "bpNew" : "bpGone")}` : "");
+      group.append(amount);
+    }
+
+    // Blocks: one level down, tiled inside the region the same way.
+    const inner = (blocks[box.id] ?? []).map(block => ({ block, value: Math.max(1, block.lines) }));
+    const cells = squarify(inner, x + 8, y + CHIP.head, w - 16, h - CHIP.head - 8);
+    for (const cell of cells) {
+      if (cell.w < 18 || cell.h < 14) continue;
+      const { block } = cell.item;
+      const item = el("g", { class: "bpitem", "data-bp": "item" });
+      item.dataset.item = block.id;
+      item.dataset.member = "";
+      item.dataset.name = block.display;
+      item.append(el("rect", {
+        x: cell.x + 2, y: cell.y + 2, width: cell.w - 4, height: cell.h - 4,
+        style: `fill: color-mix(in srgb, ${hue} 12%, ${CHIP.bg}); stroke: ${hue}; stroke-opacity: 0.75`,
+      }));
+      if (cell.w > 46 && cell.h > 22) {
+        const label = el("text", { x: cell.x + 8, y: cell.y + 16, "font-size": 10.5, "font-family": BP_MONO, style: `fill: color-mix(in srgb, ${hue} 35%, #ffffff)` });
+        label.textContent = bpFit(block.display, `10.5px ${BP_MONO}`, cell.w - 14);
+        item.append(label);
+        if (cell.h > 36) {
+          const amount = el("text", { x: cell.x + 8, y: cell.y + 29, "font-size": 9, "font-family": BP_MONO, style: `fill: color-mix(in srgb, ${hue} 45%, ${CHIP.muted})` });
+          amount.textContent = chipLines(block.lines);
+          item.append(amount);
+        }
+      }
+      const tip = document.createElementNS(SVG, "title");
+      tip.textContent = `${block.display} · ${chipLines(block.lines)}`;
+      item.append(tip);
+      group.append(item);
+    }
+    if (!cells.length && box.items.length && h > CHIP.head + 16) {
+      box.items.slice(0, Math.floor((h - CHIP.head - 6) / 14)).forEach((entry, i) => {
+        const text = el("text", { x: x + 10, y: y + CHIP.head + 12 + i * 14, "font-size": 9.5, "font-family": BP_MONO, style: `fill: color-mix(in srgb, ${hue} 45%, ${CHIP.muted})` });
+        text.textContent = bpFit(entry.display, `9.5px ${BP_MONO}`, w - 20);
+        group.append(text);
+      });
+    }
+    const tip = document.createElementNS(SVG, "title");
+    tip.textContent = [`${box.display} · ${size}`, box.role ? bpPlain(box.role) : null].filter(Boolean).join("\n");
+    group.prepend(tip);
+    regions.append(group);
+  });
+
+  // Pads: users on the left edge, what we use on the right, both ways along the bottom.
+  const sideOf = box => {
+    const used = links.some(link => link.to === box.id), uses = links.some(link => link.from === box.id);
+    return used && !uses ? "right" : uses && !used ? "left" : "bottom";
+  };
+  const bySide = { left: [], right: [], bottom: [] };
+  for (const box of pads) bySide[sideOf(box)].push(box);
+  for (const [side, list] of Object.entries(bySide)) {
+    list.forEach((box, i) => {
+      const along = (i + 1) / (list.length + 1);
+      const px = side === "left" ? M - 42 : side === "right" ? M + W + 26 : M + W * along - 8;
+      const py = side === "bottom" ? H + 50 : 20 + H * along - 8;
+      at.set(box.id, { x: px, y: py, w: 16, h: 16, pad: side });
+      const group = el("g", { class: "bpbox", "data-bp": "box" });
+      group.dataset.id = box.id;
+      group.append(el("rect", { class: "frame", x: px, y: py, width: 16, height: 16, fill: CHIP.pad, stroke: CHIP.ring }));
+      const label = el("text", {
+        x: side === "left" ? px - 6 : side === "right" ? px + 22 : px + 8, y: side === "bottom" ? py + 30 : py + 12,
+        "font-size": 10, "font-family": BP_MONO, fill: CHIP.muted,
+        "text-anchor": side === "left" ? "end" : side === "right" ? "start" : "middle",
+      });
+      label.textContent = bpFit(box.display, `10px ${BP_MONO}`, side === "bottom" ? 110 : 100);
+      group.append(label);
+      const tip = document.createElementNS(SVG, "title");
+      tip.textContent = box.display;
+      group.append(tip);
+      regions.append(group);
+    });
+  }
+
+  // Wires on the top layer: square, over the blocks, a via at each end.
+  const centre = r => [r.x + r.w / 2, r.y + r.h / 2];
+  const used = new Map();
+  const nudge = id => { const n = used.get(id) ?? 0; used.set(id, n + 1); return (n % 5 - 2) * 7; };
+  const heaviest = Math.max(1, ...links.map(link => link.weight));
+  for (const link of links) {
+    const a = at.get(link.from), b = at.get(link.to);
+    if (!a || !b) continue;
+    const toPad = a.pad || b.pad;
+    let [ax, ay] = centre(a), [bx, by] = centre(b);
+    ay += a.pad ? 0 : nudge(link.from);
+    bx += b.pad ? 0 : nudge(link.to);
+    let points;
+    if (toPad) {
+      const [pad, region] = a.pad ? [a, b] : [b, a];
+      const [padX, padY] = centre(pad);
+      const ry = Math.min(region.y + region.h - 8, Math.max(region.y + 8, padY));
+      const edge = pad.pad === "left" ? region.x : pad.pad === "right" ? region.x + region.w : null;
+      points = edge === null
+        ? [[Math.min(region.x + region.w - 8, Math.max(region.x + 8, padX)), region.y + region.h], [Math.min(region.x + region.w - 8, Math.max(region.x + 8, padX)), padY - 8]]
+        : [[edge, ry], [pad.pad === "left" ? M - 20 : M + W + 20, ry], [pad.pad === "left" ? M - 20 : M + W + 20, padY], [pad.pad === "left" ? padX + 8 : padX - 8, padY]];
+    } else if (bx > a.x && bx < a.x + a.w) {
+      // Straight above or below: one vertical run from edge to edge.
+      points = [[bx, by > ay ? a.y + a.h : a.y], [bx, by > ay ? b.y : b.y + b.h]];
+    } else if (ay > b.y && ay < b.y + b.h) {
+      // Side by side: one horizontal run.
+      points = [[bx > ax ? a.x + a.w : a.x, ay], [bx > ax ? b.x : b.x + b.w, ay]];
+    } else {
+      // Across, then down or up into the other region.
+      points = [[bx > ax ? a.x + a.w : a.x, ay], [bx, ay], [bx, by > ay ? b.y : b.y + b.h]];
+    }
+    const state = link.state === "born" || link.state === "died" ? link.state : null;
+    const colour = state === "born" ? CHIP.born : state === "died" ? CHIP.died : toPad ? CHIP.pad : CHIP.wire;
+    const group = el("g", {});
+    const wire = el("path", {
+      d: "M" + points.map(([px, py]) => `${px.toFixed(1)} ${py.toFixed(1)}`).join(" L"), fill: "none",
+      stroke: colour, "stroke-width": toPad ? 1.3 : (1.6 + 2.6 * Math.log1p(link.weight) / Math.log1p(heaviest)).toFixed(2),
+      "stroke-opacity": toPad ? 0.6 : 0.9, "stroke-linecap": "square",
+    });
+    if (link.kind === KIND_INHERIT || state === "died") wire.setAttribute("stroke-dasharray", "6 4");
+    group.append(wire);
+    for (const [px, py] of [points[0], points[points.length - 1]]) {
+      group.append(el("rect", { x: px - 3, y: py - 3, width: 6, height: 6, fill: CHIP.bg, stroke: colour, "stroke-width": 1.2 }));
+    }
+    if (!toPad && link.labels.length) {
+      const [lx, ly] = points[1] ?? points[0];
+      const text = bpFit(link.labels.join(", "), `9.5px ${BP_MONO}`, 150);
+      const tw = bpWidth(text, `9.5px ${BP_MONO}`) + 10;
+      const tag = el("g", {});
+      tag.append(el("rect", { x: lx + 6, y: ly - 16, width: tw, height: 14, rx: 2, fill: CHIP.bg, "fill-opacity": 0.9, stroke: colour, "stroke-opacity": 0.5 }));
+      const label = el("text", { x: lx + 11, y: ly - 6, "font-size": 9.5, "font-family": BP_MONO, fill: colour });
+      label.textContent = text;
+      tag.append(label);
+      group.append(tag);
+    }
+    const title = document.createElementNS(SVG, "title");
+    title.textContent = `${shown.get(link.from)?.display} → ${shown.get(link.to)?.display}` + (link.labels.length ? `\n${link.labels.join(", ")}` : "");
+    group.append(title);
+    wires.append(group);
+    bpDom.links.push({ link, wire: group, text: null, quiet: false });
+  }
+
+  // The chip's marking, and the key under the die.
+  const project = projectSelect.selectedOptions[0]?.textContent ?? "";
+  const marking = el("text", { x: M + W - 4, y: H + 30, "font-size": 9, "font-family": BP_MONO, fill: CHIP.faint, "text-anchor": "end" });
+  marking.textContent = [project, bpTrail[bpTrail.length - 1].label ?? t("all"),
+    (atSelect.selectedOptions[0]?.textContent ?? "").replace(/^ord \d+ · /, "")].filter(Boolean).join(" · ");
+  const key = el("text", { x: M - 14, y: H + (bySide.bottom.length ? 104 : 62), "font-size": 10, "font-family": BP_MONO, fill: CHIP.muted });
+  key.textContent = t("dieKey");
+  tags.append(marking, key);
+  bpDom.width = M + W + M;
+  bpDom.height = T + H + (bySide.bottom.length ? 112 : 70);
 }
 
 function bpBox(model, x, y) {
@@ -3922,9 +4641,12 @@ function paintBlueprint() {
   // A new sheet is framed to the screen once: all of it, if it fits at a readable size.
   if (bpFitNext && bpDom.width) {
     bpFitNext = false;
-    zoom = Math.max(0.4, Math.min(1, (width - 64) / bpDom.width, (height - 64) / bpDom.height));
-    panX = Math.max(32, (width - bpDom.width * zoom) / 2);
-    panY = Math.max(36, (height - bpDom.height * zoom) / 2);
+    // A frame can reach above and left of the drawing's origin; the fit takes it in.
+    const left = bpDom.left ?? 0, top = bpDom.top ?? 0;
+    const w = bpDom.width - left, h = bpDom.height - top;
+    zoom = Math.max(0.4, Math.min(1, (width - 64) / w, (height - 64) / h));
+    panX = Math.max(32, (width - w * zoom) / 2) - left * zoom;
+    panY = Math.max(36, (height - h * zoom) / 2) - top * zoom;
   }
   bpDom.root.setAttribute("transform", `translate(${panX.toFixed(1)} ${panY.toFixed(1)}) scale(${zoom})`);
   bpDom.empty?.setAttribute("transform", `translate(${width / 2} ${height / 2 - 10})`);
@@ -3956,6 +4678,7 @@ async function loadBlueprint({ descend = true } = {}) {
   if (scopeSelect.value === "own") params.set("own", "1");
   if (atSelect.value) params.set("at", atSelect.value);
   if (fromSelect.value) params.set("from", fromSelect.value);
+  if (bpLook === "chip") params.set("die", "1");
 
   let sheet = null;
   try {
@@ -3976,6 +4699,15 @@ async function loadBlueprint({ descend = true } = {}) {
   }
 
   if (sheet && step.id != null && step.label == null) step.label = sheet.parentDisplay;
+
+  // Going in or out moves: the sheet on screen is kept aside while the next is built, then the
+  // two pass through each other.
+  const motion = bpMotion;
+  bpMotion = null;
+  const old = motion && sheet && bpDom?.root?.isConnected && !reducedMotion()
+    ? { root: bpDom.root, x: panX, y: panY, z: zoom, width: bpDom.width, height: bpDom.height } : null;
+  old?.root.remove();
+
   bpSheet = sheet;
   bpHovered = null;
   bpFitNext = true;
@@ -3983,6 +4715,93 @@ async function loadBlueprint({ descend = true } = {}) {
   drawLegend();
   buildBlueprint();
   paintBlueprint();
+  if (old && bpDom.width) {
+    stage.insertBefore(old.root, bpDom.root);
+    bpTransition(motion, old);
+  }
+}
+
+// ---- moving between sheets ------------------------------------------------------------
+// Going in, the box you clicked opens up into the next sheet: the old sheet grows about that box
+// until the box is where the new sheet lands, while the new sheet grows out of the box. Coming
+// out is the same run backwards - the sheet you leave shrinks into its box on the one above.
+let bpMotion = null;
+let bpMoving = 0;
+
+function bpScreenRect(element) {
+  const s = stage.getBoundingClientRect(), r = element.getBoundingClientRect();
+  return { x: r.left - s.left, y: r.top - s.top, w: Math.max(1, r.width), h: Math.max(1, r.height) };
+}
+
+function bpTransition(motion, old) {
+  const next = bpDom.root;
+  const W = bpDom.width, H = bpDom.height;
+  const end = { x: panX, y: panY, z: zoom };
+  let fromNew, toOld;
+  const fit = (r, w, h) => {
+    const z = Math.min(r.w / w, r.h / h);
+    return { x: r.x + (r.w - w * z) / 2, y: r.y + (r.h - h * z) / 2, z };
+  };
+
+  if (motion.kind === "in") {
+    const r = motion.rect;
+    fromNew = fit(r, W, H);
+    // Grow the old sheet about the clicked box until the box covers where the new sheet ends.
+    const target = { x: end.x, y: end.y, w: W * end.z, h: H * end.z };
+    const k = Math.min(target.w / r.w, target.h / r.h);
+    const z = old.z * k;
+    const cx = (r.x - old.x) / old.z, cy = (r.y - old.y) / old.z;
+    toOld = { x: target.x + (target.w - r.w * k) / 2 - cx * z, y: target.y + (target.h - r.h * k) / 2 - cy * z, z };
+  } else {
+    const box = motion.leaving != null ? next.querySelector(`.bpbox[data-id="${motion.leaving}"]`) : null;
+    if (box) {
+      const r = bpScreenRect(box);
+      // The new sheet starts zoomed so that this box covers where the old sheet was.
+      const was = { x: old.x, y: old.y, w: old.width * old.z, h: old.height * old.z };
+      const k = Math.min(was.w / r.w, was.h / r.h);
+      const z = end.z * k;
+      const cx = (r.x - end.x) / end.z, cy = (r.y - end.y) / end.z;
+      fromNew = { x: was.x + (was.w - r.w * k) / 2 - cx * z, y: was.y + (was.h - r.h * k) / 2 - cy * z, z };
+      toOld = fit(r, old.width, old.height);
+    } else {
+      fromNew = end;
+      toOld = { x: old.x, y: old.y, z: old.z };
+    }
+  }
+
+  const run = ++bpMoving;
+  const started = performance.now();
+  const duration = 520;
+  const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const place = (node, a, b, t) => {
+    const z = a.z * Math.pow(b.z / a.z, t);
+    node.setAttribute("transform", `translate(${lerp(a.x, b.x, t).toFixed(1)} ${lerp(a.y, b.y, t).toFixed(1)}) scale(${z})`);
+  };
+  const oldFrom = { x: old.x, y: old.y, z: old.z };
+  const frame = now => {
+    if (run !== bpMoving) { old.root.remove(); return; }
+    const t = Math.min(1, (now - started) / duration), e = ease(t);
+    place(next, fromNew, end, e);
+    place(old.root, oldFrom, toOld, e);
+    next.style.opacity = Math.min(1, Math.max(0, (t - 0.2) / 0.6)).toFixed(3);
+    old.root.style.opacity = Math.max(0, 1 - t / 0.65).toFixed(3);
+    if (t < 1) { tick(); return; }
+    old.root.remove();
+    next.style.opacity = "";
+    paintBlueprint();
+  };
+  // Frames come from the display; where it hands them out slowly (a page not being painted) a
+  // timer keeps the move going, so it ends on time rather than in one jump.
+  const tick = () => {
+    let done = false;
+    const go = () => { if (!done) { done = true; frame(performance.now()); } };
+    requestAnimationFrame(go);
+    setTimeout(go, 32);
+  };
+  place(next, fromNew, end, 0);
+  next.style.opacity = "0";
+  tick();
 }
 
 function drawBlueprintCrumbs() {
@@ -4000,15 +4819,17 @@ function bpDescribe() {
   else { panel.hidden = true; openDetail = null; }
 }
 
-function bpOpen(id, label) {
-  bpTrail.push({ id, label });
+function bpOpen(id, label, designator = null, role = null, from = null) {
+  if (from) bpMotion = { kind: "in", rect: bpScreenRect(from) };
+  bpTrail.push({ id, label, designator, role });
   loadBlueprint().then(bpDescribe);
 }
 
 function bpUp() {
   if (bpTrail.length < 2) return;
-  bpTrail.pop();
-  while (bpTrail.length > 1 && bpTrail[bpTrail.length - 1].skip) bpTrail.pop();
+  let leaving = bpTrail.pop().id;
+  while (bpTrail.length > 1 && bpTrail[bpTrail.length - 1].skip) leaving = bpTrail.pop().id;
+  bpMotion = { kind: "out", leaving };
   loadBlueprint({ descend: false }).then(bpDescribe);
 }
 
@@ -4019,13 +4840,14 @@ function bpClick(target) {
   if (target.dataset.bp === "item") {
     const id = Number(target.dataset.item);
     if (target.dataset.member) showDetail(id);
-    else bpOpen(id, target.dataset.name);
+    else bpOpen(id, target.dataset.name, null, null, target);
     return;
   }
   const id = Number(target.dataset.id);
   if (bpSheet.level === "type" && id === bpSheet.parent) { showDetail(id); return; }
   const box = bpSheet.boxes.find(candidate => candidate.id === id);
-  bpOpen(id, box?.display ?? null);
+  bpOpen(id, box?.display ?? null, bpLook === "schematic" ? bpDom?.names?.get(id) ?? null : null,
+    box?.role ? bpPlain(box.role) : null, target);
 }
 
 // Search: a module, namespace or type opens its sheet; a member opens its type's.
@@ -4075,8 +4897,76 @@ function renderBlueprintLegend(body) {
         links.filter(link => link.state === "died").length + boxes.filter(box => box.state === "died").length],
     ]]);
   }
-  legendRows(body, groups, { keyOnly: ["bpOurs", "bpNoDoc"] });
+  // The schematic names the same things as a circuit drawing does, drawn in its own colours.
+  if (bpLook === "schematic") {
+    const part = (stroke, dash) => swatch(`<rect x="4" y="1.5" width="22" height="11" rx="1.5" fill="${SCH.body}" stroke="${stroke}" stroke-width="1.2"${dash ? ' stroke-dasharray="3 2"' : ""}/>`);
+    const wire = (colour, width, dash, extra = "") => swatch(`<rect width="30" height="14" rx="2" fill="${SCH.bg}"/>` +
+      `<line x1="3" y1="7" x2="27" y2="7" stroke="${colour}" stroke-width="${width}"${dash ? ` stroke-dasharray="${dash}"` : ""}/>${extra}`);
+    groups[0] = [t("legendParts"), [
+      ["bpOurs", t("legendOurPart"), part(SCH.edge), boxes.filter(box => !box.outside).length, true],
+      ["bpOutside", t("legendConnector"), part(SCH.faint, true), boxes.filter(box => box.outside).length],
+      ["bpTests", t("legendTestsItem"), part(SCH.faint), boxes.filter(box => box.test).length],
+    ]];
+    groups[1] = [t("legendLinks"), [
+      ["bpUses", t("legendWire"), wire(SCH.wire, 1.4), links.filter(link => link.kind !== KIND_INHERIT).length, true],
+      ["bpImplements", t("legendSocket"), wire(SCH.wire, 1.4, "4 3", `<circle cx="24" cy="7" r="3.5" fill="${SCH.bg}" stroke="${SCH.wire}" stroke-width="1.2"/>`),
+        links.filter(link => link.kind === KIND_INHERIT).length, true],
+      ["bpBus", t("legendBus"), wire(SCH.bus, 3.4), links.filter(link => link.kind !== KIND_INHERIT && link.width > 1).length],
+      ["bpJunction", t("legendJunction"), wire(SCH.wire, 1.4, null, `<circle cx="15" cy="7" r="3" fill="${SCH.wire}"/>`), bpDom?.dots ?? 0],
+    ]];
+  }
+  if (bpLook === "chip") {
+    const tile = (fill, stroke, dash) => swatch(`<rect x="4" y="1.5" width="22" height="11" fill="${fill}" stroke="${stroke}" stroke-width="1.2"${dash ? ' stroke-dasharray="3 2"' : ""}/>`);
+    const wire = (colour, dash) => swatch(`<rect width="30" height="14" rx="2" fill="${CHIP.bg}"/>` +
+      `<line x1="5" y1="7" x2="25" y2="7" stroke="${colour}" stroke-width="2"${dash ? ` stroke-dasharray="${dash}"` : ""}/>` +
+      `<rect x="2.5" y="4.5" width="5" height="5" fill="${CHIP.bg}" stroke="${colour}"/><rect x="22.5" y="4.5" width="5" height="5" fill="${CHIP.bg}" stroke="${colour}"/>`);
+    groups[0] = [t("legendRegions"), [
+      ["bpOurs", t("legendRegion"), tile(`color-mix(in srgb, ${CHIP.hues[0]} 25%, ${CHIP.die})`, CHIP.hues[0]), boxes.filter(box => !box.outside).length, true],
+      ["bpOutside", t("legendPad"), swatch(`<rect x="9" y="1" width="12" height="12" fill="${CHIP.pad}" stroke="${CHIP.ring}"/>`), boxes.filter(box => box.outside).length],
+      ["bpTests", t("legendTestsItem"), tile("#161b21", "#3a4552", true), boxes.filter(box => box.test).length],
+      ["bpArea", t("legendArea"), swatch(`<rect x="2" y="3" width="8" height="8" fill="none" stroke="${CHIP.muted}"/><rect x="13" y="1" width="14" height="12" fill="none" stroke="${CHIP.muted}"/>`),
+        Math.round(Object.values(bpSheet?.lines ?? {}).reduce((sum, n) => sum + n, 0)), true],
+    ]];
+    groups[1] = [t("legendLinks"), [
+      ["bpUses", t("legendUses"), wire(CHIP.wire), links.filter(link => link.kind !== KIND_INHERIT).length, true],
+      ["bpImplements", t("legendImplements"), wire(CHIP.wire, "4 3"), links.filter(link => link.kind === KIND_INHERIT).length, true],
+    ]];
+  }
+  legendRows(body, groups, { keyOnly: ["bpOurs", "bpNoDoc", "bpBus", "bpJunction", "bpArea"] });
 }
+
+// Drawing or schematic. The choice is kept, and a new look frames the sheet afresh.
+const bpLookSwitch = document.getElementById("bpLook");
+function syncBpLook() {
+  for (const button of bpLookSwitch.querySelectorAll("[data-look]")) {
+    const on = button.dataset.look === bpLook;
+    button.setAttribute("aria-checked", String(on));
+    button.tabIndex = on ? 0 : -1;
+  }
+}
+bpLookSwitch.addEventListener("click", event => {
+  const button = event.target.closest("[data-look]");
+  if (!button || button.dataset.look === bpLook) return;
+  bpLook = button.dataset.look;
+  try { localStorage.setItem("treering-bp-look", bpLook); } catch { /* fine without it */ }
+  syncBpLook();
+  bpHovered = null;
+  // The chip needs sizes the other looks do not ask for; the sheet is fetched again with them.
+  if (bpLook === "chip" && bpSheet && !bpSheet.lines) { loadBlueprint({ descend: false }); return; }
+  bpFitNext = true;
+  buildBlueprint();
+  paintBlueprint();
+});
+bpLookSwitch.addEventListener("keydown", event => {
+  if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) return;
+  event.preventDefault();
+  const looks = ["drawing", "schematic", "chip"];
+  const step = event.key === "ArrowLeft" || event.key === "ArrowUp" ? -1 : 1;
+  const other = bpLookSwitch.querySelector(`[data-look="${looks[(looks.indexOf(bpLook) + step + looks.length) % looks.length]}"]`);
+  other.click();
+  other.focus();
+});
+syncBpLook();
 
 // ---- search ------------------------------------------------------------------------
 // Type a name, pick a line, and the map takes you to where that thing lives: a type opens
@@ -4220,7 +5110,12 @@ crumbs.addEventListener("click", event => {
   const button = event.target.closest("button");
   if (!button) return;
   const step = Number(button.dataset.step);
-  if (isBlueprint()) { bpTrail = bpTrail.slice(0, step + 1); loadBlueprint({ descend: false }).then(bpDescribe); return; }
+  if (isBlueprint()) {
+    bpMotion = { kind: "out", leaving: bpTrail[step + 1]?.id ?? null };
+    bpTrail = bpTrail.slice(0, step + 1);
+    loadBlueprint({ descend: false }).then(bpDescribe);
+    return;
+  }
   // Several levels up at once still lands beside the branch you came down.
   const leaving = trail[step + 1]?.seed ?? null;
   trail = trail.slice(0, step + 1);
