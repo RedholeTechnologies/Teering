@@ -200,6 +200,72 @@ public sealed class LoaderTests : IDisposable
         Assert.Equal(0, stats.AttributedReferences);
     }
 
+    /// <summary>
+    /// 최상위 문만 있는 Program.cs. 정의는 하나도 없고, scip-dotnet 이 적는 대로
+    /// <c>args</c> 가 컴파일러가 만든 <c>Program.&lt;Main&gt;$</c> 의 매개변수로 나온다.
+    /// </summary>
+    private LoadStats LoadTopLevelProgram(string args = "``/Program#`<Main>$`().(args)")
+    {
+        var program = new Document { RelativePath = "Program.cs", Language = "C#" };
+        program.Occurrences.Add(Definition("local 0", 0, 4));
+        program.Occurrences.Add(Reference(args, 0, 43));
+        program.Occurrences.Add(Reference("local 0", 2, 0));
+        program.Occurrences.Add(Reference("Hosting/Bus#AddBus().", 2, 8));
+
+        var bus = new Document { RelativePath = "Bus.cs", Language = "C#" };
+        bus.Occurrences.Add(Definition("Hosting/Bus#", 0));
+        bus.Occurrences.Add(Definition("Hosting/Bus#AddBus().", 2));
+
+        var index = new Scip.Index { Metadata = new Metadata { ProjectRoot = "file:///demo" } };
+        index.Documents.Add(program);
+        index.Documents.Add(bus);
+        using (var stream = File.Create(_scipPath))
+        {
+            index.WriteTo(stream);
+        }
+
+        using var db = GraphDb.Open(_dbPath);
+        return Loader.Load(db, _scipPath, ord: 0, indexer: "test");
+    }
+
+    [Fact]
+    public void Calls_in_top_level_statements_belong_to_the_generated_program()
+    {
+        var stats = LoadTopLevelProgram("``/Program#`<Main>$`().(args)");
+
+        Assert.Equal(0, stats.UnattributedReferences);
+        Assert.Equal(1, EdgesFromProgramTo("AddBus"));
+    }
+
+    [Fact]
+    public void An_overloaded_main_still_belongs_to_the_same_program()
+    {
+        // scip-dotnet 은 <Main>$ 에 (+1) 같은 겹침 표시를 붙이기도 한다. 주인은 그래도 Program 이다.
+        LoadTopLevelProgram("``/Program#`<Main>$`(+1).(args)");
+
+        Assert.Equal(1, EdgesFromProgramTo("AddBus"));
+    }
+
+    private int EdgesFromProgramTo(string target)
+    {
+        using var db = GraphDb.Open(_dbPath);
+        return Count(db, $"""
+            SELECT COUNT(*) FROM edge_life e
+            JOIN symbol f ON f.id = e.from_id
+            JOIN symbol t ON t.id = e.to_id
+            WHERE e.kind = 3 AND f.key LIKE '%``/Program#' AND t.display = '{target}'
+            """);
+    }
+
+    [Fact]
+    public void The_generated_program_counts_as_our_own_code()
+    {
+        LoadTopLevelProgram();
+        using var db = GraphDb.Open(_dbPath);
+
+        Assert.Equal(1, Count(db, "SELECT COUNT(*) FROM symbol WHERE key LIKE '%``/Program#' AND own = 1"));
+    }
+
     [Fact]
     public void Everything_is_born_in_the_loaded_snapshot_and_still_alive()
     {
