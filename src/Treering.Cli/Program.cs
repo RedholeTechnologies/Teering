@@ -1018,7 +1018,7 @@ static int Serve(string? dbPath, int port, int? watchMinutes)
             }),
             Links = sheet.Links.Select(link => new
             {
-                link.From, link.To, Kind = (int)link.Kind, link.Weight, link.Labels, State = State(link.State),
+                link.From, link.To, Kind = (int)link.Kind, link.Weight, link.Labels, State = State(link.State), link.Width,
             }),
             sheet.Hidden,
         });
