@@ -70,6 +70,7 @@ return argv.ToArray() switch
     ["watch", var repo, var db] => Watch(repo, db, DefaultWatchMinutes),
     ["watch", var repo, var db, var minutes] when int.TryParse(minutes, out var parsed)
         => Watch(repo, db, parsed),
+    ["mcp"] => Mcp(null),
     ["mcp", var db] => Mcp(db),
     ["serve"] => Serve(null, servePort ?? 7377, noWatch ? null : watchMinutes, open: args.Contains("--open")),
     ["serve", var db] => Serve(db, servePort ?? 7377, noWatch ? null : watchMinutes),
@@ -105,7 +106,8 @@ static int Usage()
     Console.Error.WriteLine("       --restore (C# only) when packages moved");
     Console.Error.WriteLine($"  treering watch   <repo> [db] [minutes]   keep it current on a timer (default {DefaultWatchMinutes})");
     Console.Error.WriteLine("       update and watch find an imported repository's DB by themselves");
-    Console.Error.WriteLine("  treering mcp     <db>                    MCP server (stdio). Agents attach here");
+    Console.Error.WriteLine("  treering mcp     [db]                    MCP server (stdio). Agents attach here");
+    Console.Error.WriteLine("       without a db it answers about every imported project; each tool takes the project to ask");
     return 1;
 }
 
@@ -774,21 +776,27 @@ static List<string> WatchedChanges(string repo, string dbPath)
     return changed;
 }
 
-static int Mcp(string dbPath)
+// 에이전트가 붙는 곳. DB 를 주면 그것 하나를, 안 주면 들여온 프로젝트 전부를 답한다 —
+// 도구마다 project 로 고르고, 비우면 가장 최근에 들여온 것이다.
+static int Mcp(string? dbPath)
 {
-    if (!File.Exists(dbPath))
+    if (dbPath is not null && !File.Exists(dbPath))
     {
         Console.Error.WriteLine($"no such DB: {dbPath}");
         return 1;
     }
 
-    McpTools.Use(Path.GetFullPath(dbPath));
+    McpTools.Use(dbPath is null ? null : Path.GetFullPath(dbPath));
 
     var builder = Host.CreateApplicationBuilder();
     // stdio 가 프로토콜 통로다. 로그가 섞이면 대화가 깨지므로 stderr 로 돌린다.
     builder.Logging.ClearProviders();
     builder.Services
-        .AddMcpServer()
+        .AddMcpServer(options => options.ServerInfo = new ModelContextProtocol.Protocol.Implementation
+        {
+            Name = "treering",
+            Version = typeof(McpTools).Assembly.GetName().Version?.ToString(3) ?? "0.0.0",
+        })
         .WithStdioServerTransport()
         .WithToolsFromAssembly();
 

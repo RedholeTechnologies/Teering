@@ -125,10 +125,18 @@ treering growth graph.db InvoiceModel
 ## Use it from an agent
 
 ```bash
-treering mcp graph.db
+treering mcp
 ```
 
-This runs a Model Context Protocol (MCP) server over stdio with five tools: `find_symbol`, `callers_of`, `subgraph`, `changed_since` and `snapshots`. They run the same queries as the page, with the same size limits. When a result would be too large, the response says what was left out so the agent can narrow the question and ask again.
+This runs a Model Context Protocol (MCP) server over stdio for the projects you've imported. It has six tools: `list_projects`, `find_symbol`, `callers_of`, `subgraph`, `changed_since` and `snapshots`. Each tool takes a `project` (a name or id from `list_projects`); left empty, it asks the most recently imported one. They run the same queries as the page, with the same size limits. When a result would be too large, the response says what was left out so the agent can narrow the question and ask again. `treering mcp graph.db` answers about that one database only.
+
+To add it to Claude Code:
+
+```bash
+claude mcp add treering -- treering mcp
+```
+
+In other hosts, the command is `treering` with the argument `mcp`. Each release also carries MCP bundles (`treering-win-x64.mcpb`, `treering-linux-x64.mcpb`) for hosts that install MCPB in one step, and is published to the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.RedholeTechnologies/treering`.
 
 ## Performance
 

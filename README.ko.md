@@ -125,10 +125,18 @@ treering growth graph.db InvoiceModel
 ## 에이전트에서 쓰기
 
 ```bash
-treering mcp graph.db
+treering mcp
 ```
 
-stdio 로 MCP(Model Context Protocol) 서버를 띄웁니다. 도구는 `find_symbol`, `callers_of`, `subgraph`, `changed_since`, `snapshots` 다섯 가지입니다. 화면과 같은 질의를 같은 크기 제한으로 실행하고, 결과가 너무 크면 무엇이 빠졌는지 알려 주어 에이전트가 범위를 좁혀 다시 물을 수 있게 합니다.
+가져온 프로젝트들을 대상으로 stdio MCP(Model Context Protocol) 서버를 띄웁니다. 도구는 `list_projects`, `find_symbol`, `callers_of`, `subgraph`, `changed_since`, `snapshots` 여섯 가지입니다. 도구마다 `project`(`list_projects` 가 알려 주는 이름이나 id)를 받고, 비우면 가장 최근에 가져온 프로젝트에 묻습니다. 화면과 같은 질의를 같은 크기 제한으로 실행하고, 결과가 너무 크면 무엇이 빠졌는지 알려 주어 에이전트가 범위를 좁혀 다시 물을 수 있게 합니다. `treering mcp graph.db` 처럼 DB 를 주면 그 하나만 답합니다.
+
+Claude Code 에 추가하려면:
+
+```bash
+claude mcp add treering -- treering mcp
+```
+
+다른 호스트에서는 명령 `treering`, 인자 `mcp` 로 등록합니다. 릴리스마다 MCP 번들(`treering-win-x64.mcpb`, `treering-linux-x64.mcpb`)도 함께 올라가 MCPB 를 한 번에 설치하는 호스트에서 쓸 수 있고, [MCP Registry](https://registry.modelcontextprotocol.io) 에 `io.github.RedholeTechnologies/treering` 으로 게시됩니다.
 
 ## 성능
 
