@@ -3545,8 +3545,10 @@ function bpLayout(models, links, opts = {}) {
   models.forEach((model, i) => {
     if (!model.box.outside) return;
     const used = edges.some(edge => edge.b === i), uses = edges.some(edge => edge.a === i);
-    if (used && !uses) tierOf[i] = floor;
-    else if (uses && !used) tierOf[i] = -1;
+    // Only used, or both ways: the floor. Only using us: the roof. Nothing outside is left among
+    // our own boxes, so the frame round them - what the sheet is inside of - takes none of it in.
+    if (uses && !used) tierOf[i] = -1;
+    else if (used) tierOf[i] = floor;
   });
 
   // A tier wider than the screen wraps onto rows, each then a tier of its own; lines from the
@@ -3710,10 +3712,24 @@ function bpLayout(models, links, opts = {}) {
     }
     trackCount[l] = ends.length;
   }
+  // A frame round our own boxes needs a strip of its own on each side, where no track runs: after
+  // the tracks leaving the roof, and before the tracks going down to the floor.
+  const outsideLayer = layers.map(row => row.some(v => !verts[v].dummy)
+    && row.every(v => verts[v].dummy || models[verts[v].i].box.outside));
+  const hasInside = outsideLayer.some(outside => !outside);
+  const F = opts.frame && hasInside ? 44 : 0;
+  const lead = new Array(layerCount).fill(opts.lead ?? 24);
   const channelH = trackCount.map(n => (opts.channel ?? BP.channel) + Math.max(0, n - 1) * BP.track);
+  for (let l = 0; l + 1 < layerCount; l++) {
+    if (outsideLayer[l] && !outsideLayer[l + 1]) channelH[l] += F;
+    if (!outsideLayer[l] && outsideLayer[l + 1]) { channelH[l] += F; lead[l] += F; }
+  }
+  // With nothing on the roof, the frame's top strip is room above the drawing; the same below.
+  const firstIn = outsideLayer.findIndex(outside => !outside);
+  const lastIn = outsideLayer.length - 1 - [...outsideLayer].reverse().findIndex(outside => !outside);
   const top = [];
-  for (let l = 0, y = 0; l < layerCount; l++) { top[l] = y; y += layerH[l] + channelH[l]; }
-  const trackY = (l, track) => top[l] + layerH[l] + (opts.lead ?? 24) + Math.max(0, track) * BP.track;
+  for (let l = 0, y = F && firstIn === 0 ? F : 0; l < layerCount; l++) { top[l] = y; y += layerH[l] + channelH[l]; }
+  const trackY = (l, track) => top[l] + layerH[l] + lead[l] + Math.max(0, track) * BP.track;
   const bottomY = v => top[verts[v].layer] + (verts[v].dummy ? layerH[verts[v].layer] : verts[v].h);
 
   const paths = [];
@@ -3769,7 +3785,20 @@ function bpLayout(models, links, opts = {}) {
   const width = Math.max(0, ...boxes.map(b => b.x + b.model.w));
   const height = layerCount ? top[layerCount - 1] + layerH[layerCount - 1] + (trackCount[layerCount - 1] ? channelH[layerCount - 1] : 0) : 0;
   const pins = i => ({ out: pinCount.get(`b:${i}`) ?? 0, in: pinCount.get(`t:${i}`) ?? 0 });
-  return { boxes, paths, width, height, dots, pins };
+
+  // The frame: round every one of our boxes, its top and bottom in the strips kept for it.
+  let frame = null;
+  if (F) {
+    const inside = boxes.filter(b => !b.model.box.outside);
+    const x0 = Math.min(...inside.map(b => b.x)) - 22, x1 = Math.max(...inside.map(b => b.x + b.model.w)) + 22;
+    const y0 = top[firstIn] - F + 6;
+    const y1 = top[lastIn] + layerH[lastIn] + F - 6;
+    frame = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+  }
+  const tall = F && lastIn === layerCount - 1 ? Math.max(height, top[lastIn] + layerH[lastIn] + F) : height;
+  // The frame reaches a little past the outermost boxes; the sheet's own margin shows that part.
+  const wide = frame ? Math.max(width, frame.x + frame.w) : width;
+  return { boxes, paths, width: wide, height: tall, dots, pins, frame };
 }
 
 // How much room a label has: up to the next line on the same side of the same box.
@@ -3864,11 +3893,12 @@ function buildBlueprint() {
 // The drawing look: cards on a faint grid, lines in the theme's ink, labels where there is room.
 function drawDrawing(root, sheet, boxes, links, shown) {
   const models = boxes.map(box => bpModel(box, sheet));
-  const plan = bpLayout(models, links);
+  const plan = bpLayout(models, links, { frame: bpFramed(sheet) });
   bpDom.width = plan.width;
   bpDom.height = plan.height;
 
   root.append(el("rect", { x: -4000, y: -4000, width: plan.width + 8000, height: plan.height + 8000, fill: "url(#bp-grid)" }));
+  if (plan.frame) root.append(bpFrameDrawing(plan.frame));
   const wires = el("g", {});
   const cards = el("g", {});
   const tags = el("g", {});
@@ -3917,6 +3947,59 @@ function drawDrawing(root, sheet, boxes, links, shown) {
   for (const { model, x, y } of plan.boxes) cards.append(bpBox(model, x, y));
 }
 
+// Inside something, the sheet says what: a frame round our own boxes, named for where you went
+// in - as the map keeps the thing you opened on screen as a ring. The top sheet is inside nothing,
+// and a type's sheet has the type itself in the middle, so neither has one.
+const bpFramed = sheet => bpTrail.length > 1 && sheet.level !== "type";
+
+function bpFrameName() {
+  const here = bpTrail[bpTrail.length - 1];
+  return { name: here.label ?? bpSheet?.parentDisplay ?? "", designator: here.designator ?? null };
+}
+
+function bpFrameDrawing(frame) {
+  const { name } = bpFrameName();
+  const group = el("g", { class: "bpframe" });
+  group.append(el("rect", {
+    x: frame.x, y: frame.y, width: frame.w, height: frame.h, rx: 12,
+    style: "fill: color-mix(in srgb, var(--accent) 4%, transparent); stroke: color-mix(in srgb, var(--accent) 45%, var(--line))",
+    "stroke-width": 1.4, "stroke-dasharray": "8 5",
+  }));
+  const font = `600 12.5px ${getComputedStyle(document.body).fontFamily}`;
+  const text = bpFit(name, font, Math.max(80, frame.w - 60));
+  const tab = el("g", { transform: `translate(${frame.x + 16} ${frame.y - 11})` });
+  tab.append(el("rect", {
+    width: bpWidth(text, font) + 22, height: 22, rx: 6, style: "fill: var(--bg); stroke: color-mix(in srgb, var(--accent) 45%, var(--line))",
+  }));
+  const label = el("text", { x: 11, y: 15, "font-size": 12.5, "font-weight": 600, style: "fill: var(--accent)" });
+  label.textContent = text;
+  tab.append(label);
+  const tip = document.createElementNS(SVG, "title");
+  tip.textContent = name;
+  group.append(tab, tip);
+  return group;
+}
+
+function schFrame(frame) {
+  const { name, designator } = bpFrameName();
+  const group = el("g", { class: "bpframe" });
+  group.append(el("rect", {
+    x: frame.x, y: frame.y, width: frame.w, height: frame.h, fill: "#ffd479", "fill-opacity": 0.03,
+    stroke: SCH.net, "stroke-width": 1.3,
+  }));
+  const font = `700 11.5px ${BP_MONO}`;
+  const text = bpFit([designator, name].filter(Boolean).join(" · "), font, Math.max(80, frame.w - 40));
+  const tab = el("g", { transform: `translate(${frame.x + 12} ${frame.y - 10})` });
+  tab.append(el("rect", { width: bpWidth(text, font) + 18, height: 20, fill: SCH.bg, stroke: SCH.net, "stroke-width": 1.2 }));
+  const label = el("text", { x: 9, y: 14, "font-size": 11.5, "font-weight": 700, "font-family": BP_MONO, fill: SCH.net });
+  label.textContent = text;
+  tab.append(label);
+  const tip = document.createElementNS(SVG, "title");
+  tip.textContent = name;
+  group.append(tab, tip);
+  return group;
+}
+
 // ---- the schematic look ---------------------------------------------------------------
 // The same sheet as a circuit drawing: boxes are parts (U1, U2 … and J1 … for what stands
 // outside), what a part is used for comes in on pins on its left and what it uses leaves from
@@ -3954,7 +4037,7 @@ function drawSchematic(root, sheet, boxes, links, shown) {
   // the layout has said which wires share a pin. So it is laid out twice.
   const opts = {
     wrapAt: Math.max(700, (stage.clientHeight || 800) / 0.8), gapX: 34, channel: 96, lead: 30,
-    pins: { start: SCH.head, pitch: SCH.pitch },
+    pins: { start: SCH.head, pitch: SCH.pitch }, frame: bpFramed(sheet),
   };
   const turned = models => models.map(model => ({ ...model, w: model.h, h: model.w }));
   let models = boxes.map(box => schModel(box, links, null));
@@ -3973,6 +4056,10 @@ function drawSchematic(root, sheet, boxes, links, shown) {
   for (const part of order) names.set(part.model.box.id, part.model.box.outside ? `J${++theirs}` : `U${++ours}`);
 
   root.append(el("rect", { x: -4000, y: -4000, width: width + 8000, height: height + 8000, fill: "url(#sch-grid)" }));
+  // What this sheet is inside of: a hierarchical sheet round our parts, its ports where wires
+  // cross into it from the connectors outside.
+  const frame = plan.frame && { x: plan.frame.y, y: plan.frame.x, w: plan.frame.h, h: plan.frame.w };
+  if (frame) root.append(schFrame(frame));
   const wires = el("g", {});
   const parts = el("g", {});
   const marks = el("g", {});
@@ -4027,6 +4114,24 @@ function drawSchematic(root, sheet, boxes, links, shown) {
     bpDom.links.push({ link, wire: group, text: null, quiet: false });
 
     pinNames.push({ part: first, point: start, link }, { part: last, point: end, link });
+
+    // A sheet port where the wire crosses the frame: an arrow pointing the way the use runs.
+    if (frame && (shown.get(link.from)?.outside !== shown.get(link.to)?.outside)) {
+      for (let k = 0; k + 1 < points.length; k++) {
+        const [[px, py], [qx, qy]] = [points[k], points[k + 1]];
+        if (Math.abs(py - qy) > 0.5 || py < frame.y || py > frame.y + frame.h) continue;
+        for (const edge of [frame.x, frame.x + frame.w]) {
+          if ((px - edge) * (qx - edge) >= 0) continue;
+          // The points run from the chain's first part; the use runs from link.from to link.to.
+          const d = Math.sign(qx - px) * (path.down ? 1 : -1);
+          group.append(el("polygon", {
+            points: [[edge - 7 * d, py - 5], [edge + 2 * d, py - 5], [edge + 7 * d, py], [edge + 2 * d, py + 5], [edge - 7 * d, py + 5]]
+              .map(([ax, ay]) => `${ax.toFixed(1)},${ay.toFixed(1)}`).join(" "),
+            fill: SCH.bg, stroke: SCH.net, "stroke-width": 1.2,
+          }));
+        }
+      }
+    }
   }
 
   for (const [px, py] of plan.dots.map(flip)) {
@@ -4035,6 +4140,7 @@ function drawSchematic(root, sheet, boxes, links, shown) {
   bpDom.dots = plan.dots.length;
 
   for (const part of placed) parts.append(schPart(part, names.get(part.model.box.id), pinNames));
+  bpDom.names = names;
 
   // The title block and the key, as on any drawing sheet.
   // The key sits under the block, so a narrow sheet does not run one into the other.
@@ -4202,6 +4308,16 @@ function chipPatterns(defs) {
 }
 
 function drawChip(root, sheet, boxes, links, shown) {
+  // Inside something, the die is that thing: its name stands over the die.
+  const T = bpFramed(sheet) ? 38 : 0;
+  const die = el("g", { transform: `translate(0 ${T})` });
+  root.append(die);
+  if (T) {
+    const { name } = bpFrameName();
+    const title = el("text", { x: CHIP.margin - 14, y: 22, "font-size": 15, "font-weight": 700, "font-family": BP_MONO, fill: CHIP.text });
+    title.textContent = bpFit(name, `700 15px ${BP_MONO}`, CHIP.width);
+    root.append(title);
+  }
   chipPatterns(stage.querySelector("defs"));
   const lines = sheet.lines ?? {};
   const blocks = sheet.blocks ?? {};
@@ -4210,8 +4326,8 @@ function drawChip(root, sheet, boxes, links, shown) {
   const { width: W, height: H, margin: M } = CHIP;
 
   // The die, and its seal ring.
-  root.append(el("rect", { x: M - 14, y: 6, width: W + 28, height: H + 28, fill: CHIP.die, stroke: CHIP.ring, "stroke-width": 2 }));
-  root.append(el("rect", { x: M - 6, y: 14, width: W + 12, height: H + 12, fill: "none", stroke: CHIP.ring2 }));
+  die.append(el("rect", { x: M - 14, y: 6, width: W + 28, height: H + 28, fill: CHIP.die, stroke: CHIP.ring, "stroke-width": 2 }));
+  die.append(el("rect", { x: M - 6, y: 14, width: W + 12, height: H + 12, fill: "none", stroke: CHIP.ring2 }));
 
   // Regions: as big as their code. A region too small to hold its name is given a floor.
   const total = ours.reduce((sum, box) => sum + (lines[box.id] ?? 0), 0) || ours.length;
@@ -4221,7 +4337,7 @@ function drawChip(root, sheet, boxes, links, shown) {
   const regions = el("g", {});
   const wires = el("g", {});
   const tags = el("g", {});
-  root.append(regions, wires, tags);
+  die.append(regions, wires, tags);
 
   tiles.forEach((tile, k) => {
     const box = tile.item.box;
@@ -4393,7 +4509,7 @@ function drawChip(root, sheet, boxes, links, shown) {
   key.textContent = t("dieKey");
   tags.append(marking, key);
   bpDom.width = M + W + M;
-  bpDom.height = H + (bySide.bottom.length ? 112 : 70);
+  bpDom.height = T + H + (bySide.bottom.length ? 112 : 70);
 }
 
 function bpBox(model, x, y) {
@@ -4572,8 +4688,8 @@ function bpDescribe() {
   else { panel.hidden = true; openDetail = null; }
 }
 
-function bpOpen(id, label) {
-  bpTrail.push({ id, label });
+function bpOpen(id, label, designator = null) {
+  bpTrail.push({ id, label, designator });
   loadBlueprint().then(bpDescribe);
 }
 
@@ -4597,7 +4713,7 @@ function bpClick(target) {
   const id = Number(target.dataset.id);
   if (bpSheet.level === "type" && id === bpSheet.parent) { showDetail(id); return; }
   const box = bpSheet.boxes.find(candidate => candidate.id === id);
-  bpOpen(id, box?.display ?? null);
+  bpOpen(id, box?.display ?? null, bpLook === "schematic" ? bpDom?.names?.get(id) ?? null : null);
 }
 
 // Search: a module, namespace or type opens its sheet; a member opens its type's.
