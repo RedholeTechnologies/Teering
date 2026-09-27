@@ -995,10 +995,12 @@ static int Serve(string? dbPath, int port, int? watchMinutes)
     });
 
     // 설계도 한 장. id 가 없으면 모듈, 모듈·네임스페이스면 그 안, 타입이면 그 타입과 둘레.
-    app.MapGet("/api/blueprint", (long? id, int? at, int? from, int? own, string? project) =>
+    // die=1 이면 칩 평면도에 쓸 크기(줄 수의 어림값)와 상자 안의 블록도 함께 준다.
+    app.MapGet("/api/blueprint", (long? id, int? at, int? from, int? own, int? die, string? project) =>
     {
         using var db = GraphDb.Open(Resolve(project));
-        var sheet = Blueprint.Of(db, id, at, from, own == 1);
+        var plan = die == 1 ? Die.Of(db, id, at, from, own == 1) : null;
+        var sheet = plan?.Sheet ?? (die == 1 ? null : Blueprint.Of(db, id, at, from, own == 1));
         if (sheet is null) return Results.NotFound(new { error = $"no blueprint for {id}" });
 
         string State(EdgeState state) => state.ToString().ToLowerInvariant();
@@ -1021,6 +1023,11 @@ static int Serve(string? dbPath, int port, int? watchMinutes)
                 link.From, link.To, Kind = (int)link.Kind, link.Weight, link.Labels, State = State(link.State), link.Width,
             }),
             sheet.Hidden,
+            Lines = plan?.Lines.ToDictionary(pair => pair.Key.ToString(), pair => Math.Round(pair.Value)),
+            Blocks = plan?.Blocks.ToDictionary(pair => pair.Key.ToString(), pair => pair.Value.Select(block => new
+            {
+                block.Id, block.Display, Kind = (int)block.Kind, Lines = Math.Round(block.Lines),
+            })),
         });
     });
 
