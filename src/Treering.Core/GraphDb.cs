@@ -75,7 +75,9 @@ public static class GraphDb
             -- 우리 이름을 쓰면 또 틀린다. 색인기가 준 사실만 쓴다.
             own          INTEGER NOT NULL DEFAULT 0,
             -- 문서 주석을 읽을 글로 바꾼 것. 보통 주석(# · //)은 색인에 없어 담지 못한다.
-            doc          TEXT
+            doc          TEXT,
+            -- 우리 코드 가운데 테스트인가. 정의가 든 파일의 자리로 가린다(MarkTests).
+            test         INTEGER NOT NULL DEFAULT 0
         );
 
         -- 버전은 심볼의 속성이다. 「이 의존성이 언제 버전이 올랐나」가 여기서 나온다.
@@ -203,6 +205,31 @@ public static class GraphDb
             command.ExecuteNonQuery();
         }
 
+        // 옛 DB 를 지금 모양으로 맞춘다. 화면은 여러 요청을 한꺼번에 보내므로 같은 DB 가 동시에 처음
+        // 열린다 — 잠금 없이 맞추면 둘 다 «칸이 없다» 를 보고 둘 다 늘리려다 하나가
+        // duplicate column 으로 실패한다. 그래서 쓰기 잠금(BEGIN IMMEDIATE) 안에서, 잠근 뒤에 다시 보고
+        // 맞춘다. 이미 맞는 DB 는 잠그지 않는다.
+        if (NeedsCatchingUp(connection))
+        {
+            using var transaction = connection.BeginTransaction(deferred: false);
+            CatchUpSchema(connection);
+            transaction.Commit();
+        }
+
+        return connection;
+    }
+
+    private static readonly string[] AddedColumns = ["own", "doc", "test"];
+
+    private static bool NeedsCatchingUp(SqliteConnection connection)
+    {
+        using var look = connection.CreateCommand();
+        look.CommandText = "SELECT COUNT(*) FROM pragma_table_info('symbol') WHERE name IN ('own', 'doc', 'test')";
+        return Convert.ToInt32(look.ExecuteScalar()) < AddedColumns.Length || UserVersion(connection) < SchemaVersion;
+    }
+
+    private static void CatchUpSchema(SqliteConnection connection)
+    {
         // 열을 늘리기 전에 만든 DB 는 이 열이 0 인 채로 열린다. 그대로 두면 「우리 코드만」
         // 이 아무것도 없다고 조용히 거짓말을 한다. 한 번 채우고 넘어간다.
         if (AddColumnIfMissing(connection, "symbol", "own", "INTEGER NOT NULL DEFAULT 0"))
@@ -213,12 +240,16 @@ public static class GraphDb
         // 주석 칸이 생기기 전의 DB. 채울 원문이 DB 에 없으므로 다음 색인 때 채워진다.
         AddColumnIfMissing(connection, "symbol", "doc", "TEXT");
 
+        // 테스트 칸이 생기기 전의 DB. 파일 경로와 패키지 이름은 DB 에 있으니 여기서 바로 채운다.
+        if (AddColumnIfMissing(connection, "symbol", "test", "INTEGER NOT NULL DEFAULT 0"))
+        {
+            MarkTests(connection);
+        }
+
         var version = UserVersion(connection);
         if (version < 1) CatchUp(connection);
         if (version < 2) AdoptLifeless(connection);
         if (version < SchemaVersion) Stamp(connection);
-
-        return connection;
     }
 
     /// <summary>
@@ -331,11 +362,8 @@ public static class GraphDb
             while (reader.Read()) ords.Add(reader.GetInt32(0));
         }
 
-        using (var transaction = connection.BeginTransaction())
-        {
-            foreach (var ord in ords) RollEdges(connection, ord);
-            transaction.Commit();
-        }
+        // 여는 쪽이 이미 잡은 쓰기 잠금 안에서 돈다 — 한 번에 들어가거나 하나도 안 들어간다.
+        foreach (var ord in ords) RollEdges(connection, ord);
     }
 
     private static int UserVersion(SqliteConnection connection)
@@ -382,6 +410,91 @@ public static class GraphDb
                   AND substr(c.display, 1, length(symbol.display) + 1) = symbol.display || '.');
             """;
         command.ExecuteNonQuery();
+    }
+
+    /// <summary>
+    /// 우리 코드 가운데 테스트를 가린다. <see cref="MarkOwn"/> 다음에 부른다 — 우리 코드만 본다.
+    ///
+    /// 정의가 있는 심볼은 <b>살아 있는 정의가 전부</b> 테스트 파일에 있을 때 테스트다(partial 클래스가
+    /// 한 조각만 테스트 폴더에 있으면 테스트가 아니다). 어셈블리가 테스트 프로젝트면 그 안의 것은 다
+    /// 테스트다. 정의가 없는 것(폴더·네임스페이스·패키지)은 안에 든 우리 코드가 <b>전부</b> 테스트일
+    /// 때만 테스트다 — 하나라도 아니면, 끌 때 제품 코드까지 사라진다.
+    /// </summary>
+    public static void MarkTests(SqliteConnection connection)
+    {
+        var testFiles = new HashSet<long>();
+        var testPackages = new HashSet<long>();
+        using (var command = connection.CreateCommand())
+        {
+            command.CommandText = "SELECT id, path FROM file";
+            using var reader = command.ExecuteReader();
+            while (reader.Read()) if (TestCode.IsTestPath(reader.GetString(1))) testFiles.Add(reader.GetInt64(0));
+        }
+
+        using (var command = connection.CreateCommand())
+        {
+            command.CommandText = "SELECT id, name FROM package";
+            using var reader = command.ExecuteReader();
+            while (reader.Read()) if (TestCode.IsTestAssembly(reader.GetString(1))) testPackages.Add(reader.GetInt64(0));
+        }
+
+        // 우리 심볼, 그 주인, 패키지.
+        var ours = new Dictionary<long, (long? Container, long? Package)>();
+        using (var command = connection.CreateCommand())
+        {
+            command.CommandText = "SELECT id, container_id, package_id FROM symbol WHERE own = 1";
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                ours[reader.GetInt64(0)] = (reader.IsDBNull(1) ? null : reader.GetInt64(1), reader.IsDBNull(2) ? null : reader.GetInt64(2));
+            }
+        }
+
+        // 살아 있는 정의가 든 파일들.
+        var definedIn = new Dictionary<long, List<long>>();
+        using (var command = connection.CreateCommand())
+        {
+            command.CommandText = "SELECT symbol_id, file_id FROM definition WHERE died_ord IS NULL";
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                var symbol = reader.GetInt64(0);
+                if (!ours.ContainsKey(symbol)) continue;
+                if (!definedIn.TryGetValue(symbol, out var files)) definedIn[symbol] = files = [];
+                files.Add(reader.GetInt64(1));
+            }
+        }
+
+        var children = ours
+            .Where(pair => pair.Value.Container is { } parent && ours.ContainsKey(parent))
+            .GroupBy(pair => pair.Value.Container!.Value, pair => pair.Key)
+            .ToDictionary(group => group.Key, group => group.ToList());
+
+        var decided = new Dictionary<long, bool>();
+        bool IsTest(long id)
+        {
+            if (decided.TryGetValue(id, out var known)) return known;
+            decided[id] = false;   // 되돌아오는 사슬이 있으면 테스트가 아닌 쪽으로 끊는다
+
+            var (_, package) = ours[id];
+            bool test;
+            if (package is { } p && testPackages.Contains(p)) test = true;
+            else if (definedIn.TryGetValue(id, out var files)) test = files.All(testFiles.Contains);
+            else test = children.TryGetValue(id, out var kids) && kids.Count > 0 && kids.All(IsTest);
+
+            decided[id] = test;
+            return test;
+        }
+
+        var tests = ours.Keys.Where(IsTest).ToList();
+
+        using var update = connection.CreateCommand();
+        update.CommandText = """
+            UPDATE symbol SET test = 0 WHERE test = 1;
+            UPDATE symbol SET test = 1 WHERE id IN (SELECT value FROM json_each($ids));
+            """;
+        update.Parameters.AddWithValue("$ids", "[" + string.Join(',', tests) + "]");
+        update.ExecuteNonQuery();
     }
 
     /// <summary>먼저 만든 DB 를 지금 스키마에 맞춘다. 늘렸으면 참을 돌려준다.</summary>

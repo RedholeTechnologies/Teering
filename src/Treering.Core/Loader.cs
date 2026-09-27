@@ -121,6 +121,7 @@ public sealed class Loader
 
         // 되붙이기가 끝난 뒤에 정한다. 되붙인 멤버는 그 전까지 가짜 타입에 매달려 있다.
         GraphDb.MarkOwn(db);
+        GraphDb.MarkTests(db);
 
         // 층이 다 정해진 뒤에 만다. 그 전에 말면 가짜 타입으로 말려 올라간 간선이 박힌다.
         GraphDb.RollEdges(db, ord);

@@ -72,7 +72,7 @@ public sealed record SubgraphRequest
 /// </param>
 public sealed record SubgraphNode(
     long Id, string Display, SymbolKind Kind, string? Module, string? Flavor,
-    bool Own = false, long? ModuleId = null);
+    bool Own = false, long? ModuleId = null, bool Test = false);
 
 public enum EdgeState
 {
@@ -456,7 +456,7 @@ public static class Subgraph
     {
         using var command = db.CreateCommand();
         command.CommandText = """
-            SELECT s.id, s.display, s.kind, p.name, s.flavor, s.own, s.module_id
+            SELECT s.id, s.display, s.kind, p.name, s.flavor, s.own, s.module_id, s.test
             FROM symbol s
             LEFT JOIN package p ON p.id = s.package_id
             WHERE s.id IN (SELECT value FROM json_each($ids))
@@ -474,7 +474,8 @@ public static class Subgraph
                 reader.IsDBNull(3) ? null : reader.GetString(3),
                 reader.IsDBNull(4) ? null : reader.GetString(4),
                 reader.GetInt32(5) == 1,
-                reader.IsDBNull(6) ? null : reader.GetInt64(6)));
+                reader.IsDBNull(6) ? null : reader.GetInt64(6),
+                reader.GetInt32(7) == 1));
         }
 
         return nodes;

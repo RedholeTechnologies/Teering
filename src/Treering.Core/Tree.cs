@@ -22,7 +22,8 @@ public sealed record TreeNode(
     string? Module,
     int ChildCount,
     IReadOnlyList<long> Merged,
-    string? Shape = null);
+    string? Shape = null,
+    bool Test = false);
 
 public sealed record TreeChildren(IReadOnlyList<TreeNode> Nodes, int More);
 
@@ -190,7 +191,8 @@ public static class Tree
                    NULL,
                    (SELECT COUNT(*) FROM symbol c
                     WHERE c.container_id = s.id AND c.kind IN ({Kinds}) AND c.display <> '<invalid-global-code>'
-                      AND EXISTS (SELECT 1 FROM symbol_life l WHERE l.symbol_id = c.id AND l.died_ord IS NULL))
+                      AND EXISTS (SELECT 1 FROM symbol_life l WHERE l.symbol_id = c.id AND l.died_ord IS NULL)),
+                   s.test
             FROM symbol s
             WHERE s.kind = 10
               AND EXISTS (SELECT 1 FROM symbol_life l WHERE l.symbol_id = s.id AND l.died_ord IS NULL)
@@ -210,7 +212,8 @@ public static class Tree
             SELECT s.id, s.display, s.kind, s.flavor, s.own, p.name, s.signature,
                    (SELECT COUNT(*) FROM symbol c
                     WHERE c.container_id = s.id AND c.kind IN ({Kinds}) AND c.display <> '<invalid-global-code>'
-                      AND EXISTS (SELECT 1 FROM symbol_life l WHERE l.symbol_id = c.id AND l.died_ord IS NULL))
+                      AND EXISTS (SELECT 1 FROM symbol_life l WHERE l.symbol_id = c.id AND l.died_ord IS NULL)),
+                   s.test
             FROM symbol s
             LEFT JOIN package p ON p.id = s.package_id
             WHERE s.container_id = $parent AND s.kind IN ({Kinds})
@@ -397,7 +400,8 @@ public static class Tree
                 [id],
                 // A member says what it is - method, property, field, event - by the same rule the
                 // panel uses, so the tree can draw a function and a constant differently.
-                kind is SymbolKind.Method or SymbolKind.Term ? new MemberInfo(id, display, kind, signature).Shape : null));
+                kind is SymbolKind.Method or SymbolKind.Term ? new MemberInfo(id, display, kind, signature).Shape : null,
+                reader.GetInt32(8) == 1));
         }
 
         return nodes;

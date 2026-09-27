@@ -80,6 +80,89 @@
     font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
   }
 
+  /* Mac: the system's own look. Light or dark follows the system's appearance, as a Mac app
+     does; system blue for the accent, the system font at 13px, frosted bars and menus, a
+     white pill for the chosen segment, and the soft blue halo for focus. SF is used where it
+     is installed - on a Mac - and never fetched; elsewhere the platform's sans stands in. */
+  :root[data-theme="mac"] {
+    color-scheme: light;
+    --bg: #f5f5f7; --panel: #ffffff; --line: #dcdcdf;
+    --fg: #1d1d1f; --muted: #6e6e73; --warn: #8a5a00; --warn-bg: #fff3d6;
+    --born: #248a3d; --died: #d70015; --depth: #f5f5f7; --accent: #007aff;
+    --mac-bar: rgba(246, 246, 248, 0.8); --mac-glass: rgba(255, 255, 255, 0.72);
+    --mac-rim: rgba(0, 0, 0, 0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root[data-theme="mac"] {
+      color-scheme: dark;
+      --bg: #1e1e1e; --panel: #2c2c2e; --line: #3d3d40;
+      --fg: #f5f5f7; --muted: #98989d; --warn: #ffd60a; --warn-bg: #3a3000;
+      --born: #30d158; --died: #ff453a; --depth: #1e1e1e; --accent: #0a84ff;
+      --mac-bar: rgba(44, 44, 46, 0.78); --mac-glass: rgba(40, 40, 42, 0.72);
+      --mac-rim: rgba(255, 255, 255, 0.1);
+    }
+  }
+  :root[data-theme="mac"] body {
+    font: 13px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Apple SD Gothic Neo",
+      "Segoe UI Variable Text", "Segoe UI", "Malgun Gothic", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  :root[data-theme="mac"] .label { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif; }
+  :root[data-theme="mac"] #panel code, :root[data-theme="mac"] #panel .sig,
+  :root[data-theme="mac"] #panel .type, :root[data-theme="mac"] #importPath {
+    font-family: "SF Mono", Menlo, ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  /* The toolbar and the status bar are frosted, and so is everything that floats over the map. */
+  :root[data-theme="mac"] header, :root[data-theme="mac"] footer {
+    background: var(--mac-bar); backdrop-filter: saturate(180%) blur(20px);
+  }
+  :root[data-theme="mac"] .menu, :root[data-theme="mac"] #hits, :root[data-theme="mac"] #legendCard {
+    background: var(--mac-glass); backdrop-filter: saturate(180%) blur(30px);
+    border-color: var(--mac-rim); border-radius: 10px;
+    box-shadow: 0 0 0 0.5px var(--mac-rim), 0 12px 32px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+  :root[data-theme="mac"] #hits { padding: 5px; }
+  :root[data-theme="mac"] #hits li { border-radius: 5px; }
+  /* A menu's chosen row is filled with the accent, the way a Mac menu highlights. */
+  :root[data-theme="mac"] #hits li.on { background: var(--accent); color: #fff; box-shadow: none; }
+  :root[data-theme="mac"] #hits li.on .meta, :root[data-theme="mac"] #hits li.on.theirs b { color: rgba(255, 255, 255, 0.8); }
+  :root[data-theme="mac"] #importer .box { border-color: var(--mac-rim); border-radius: 12px; }
+  /* The segmented control: a grey track, and the chosen segment a raised white pill. */
+  :root[data-theme="mac"] .segmented { border-radius: 8px; background: color-mix(in srgb, var(--fg) 8%, transparent); }
+  :root[data-theme="mac"] .segmented button { border-radius: 6px; }
+  :root[data-theme="mac"] .segmented button[aria-checked="true"] {
+    background: color-mix(in srgb, #fff 90%, var(--panel)); color: #1d1d1f;
+    box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.14), 0 1px 3px rgba(0, 0, 0, 0.14);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root[data-theme="mac"] .segmented button[aria-checked="true"] {
+      background: #636366; color: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+  }
+  /* The search field is a filled capsule, not a box. */
+  :root[data-theme="mac"] #q {
+    border-color: transparent; border-radius: 7px; background: color-mix(in srgb, var(--fg) 7%, transparent);
+  }
+  :root[data-theme="mac"] select, :root[data-theme="mac"] #panel button:not(.link):not(.docToggle) {
+    border-radius: 6px; background: var(--panel); border-color: var(--mac-rim);
+    box-shadow: 0 0.5px 1.5px rgba(0, 0, 0, 0.12);
+  }
+  :root[data-theme="mac"] #projectBox select { box-shadow: none; background: transparent; border-color: transparent; }
+  :root[data-theme="mac"] .toggle[aria-pressed="true"] {
+    background: var(--accent); border-color: var(--accent); color: #fff;
+  }
+  :root[data-theme="mac"] .toggle[aria-pressed="true"]::before { background: #fff; border-color: #fff; }
+  :root[data-theme="mac"] #importer button.primary, :root[data-theme="mac"] #importer.no-pick #importGo { color: #fff !important; }
+  /* Focus: the system's soft halo round the control, not a hard outline beside it. */
+  :root[data-theme="mac"] :focus-visible {
+    outline: 3.5px solid color-mix(in srgb, var(--accent) 50%, transparent); outline-offset: 0;
+  }
+  :root[data-theme="mac"] #q:focus, :root[data-theme="mac"] #importPath:focus {
+    border-color: transparent; box-shadow: 0 0 0 3.5px color-mix(in srgb, var(--accent) 50%, transparent);
+  }
+  /* Overlay-style scrollbars: a thin rounded thumb and no track. */
+  :root[data-theme="mac"] * { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--fg) 28%, transparent) transparent; }
+
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
   body {
@@ -810,7 +893,7 @@ const STRINGS = {
     treeRows: "rows", treeMore: "more",
     hintTree: "click to open or close · point at one to see what it calls · Ctrl+wheel zooms",
     themeAuto: "System", themeLight: "Light", themeDark: "Dark", themeSkyfall: "Skyfall",
-    themeObsidian: "Obsidian", themeSlate: "Slate",
+    themeObsidian: "Obsidian", themeSlate: "Slate", themeMac: "Mac",
     compareNone: "Off",
     upLabel: "Up one level", timeMenu: "Time", viewMenu: "View options", settingsMenu: "Settings",
     autoUpdate: "Keep projects current",
@@ -826,7 +909,7 @@ const STRINGS = {
     legendShapes: "class · interface · enum · record · struct",
     legendBorn: "new dependency", legendDied: "broken dependency",
     legendTitle: "Legend", legendCode: "Code", legendLinks: "Links", legendKinds: "Kinds", legendChanges: "Changes",
-    legendOursItem: "Our code", legendTheirsItem: "Libraries",
+    legendOursItem: "Our code", legendTheirsItem: "Libraries", legendTestsItem: "Test code",
     legendReference: "References", legendInherits: "Inherits", legendContains: "Contains",
     legendAdded: "Added", legendRemoved: "Removed",
     legendModule: "Modules, namespaces", legendClass: "Class", legendInterface: "Interface",
@@ -883,7 +966,7 @@ const STRINGS = {
     treeRows: "줄", treeMore: "개 더",
     hintTree: "클릭: 펼치기·접기 · 마우스를 올리면 호출선 · Ctrl+휠: 확대",
     themeAuto: "시스템", themeLight: "밝게", themeDark: "어둡게", themeSkyfall: "스카이폴",
-    themeObsidian: "옵시디언", themeSlate: "슬레이트",
+    themeObsidian: "옵시디언", themeSlate: "슬레이트", themeMac: "맥",
     compareNone: "안 함",
     upLabel: "한 단계 위로", timeMenu: "시점", viewMenu: "보기 설정", settingsMenu: "설정",
     autoUpdate: "자동으로 최신 유지",
@@ -899,7 +982,7 @@ const STRINGS = {
     legendShapes: "클래스 · 인터페이스 · 열거형 · 레코드 · 구조체",
     legendBorn: "새 의존", legendDied: "끊긴 의존",
     legendTitle: "범례", legendCode: "코드", legendLinks: "선", legendKinds: "모양", legendChanges: "변화",
-    legendOursItem: "우리 코드", legendTheirsItem: "라이브러리",
+    legendOursItem: "우리 코드", legendTheirsItem: "라이브러리", legendTestsItem: "테스트 코드",
     legendReference: "참조", legendInherits: "상속", legendContains: "포함",
     legendAdded: "새로 생김", legendRemoved: "없어짐",
     legendModule: "모듈·네임스페이스", legendClass: "클래스", legendInterface: "인터페이스",
@@ -1004,7 +1087,7 @@ function applyLanguage(name) {
   fill(themeSelect, [
     ["auto", t("themeAuto")], ["light", t("themeLight")],
     ["dark", t("themeDark")], ["slate", t("themeSlate")], ["skyfall", t("themeSkyfall")],
-    ["obsidian", t("themeObsidian")],
+    ["obsidian", t("themeObsidian")], ["mac", t("themeMac")],
   ]);
 
   if (fromSelect.options.length) fromSelect.options[0].textContent = t("compareNone");
@@ -1048,6 +1131,8 @@ const nodeKind = node =>
 
 function legendHides(node) {
   if (!node) return false;
+  // Test code goes with its box - a bubble too, once everything in it is test code.
+  if (node.test && legendOff.has("tests")) return true;
   if (!node.container && node.own && legendOff.has("ours")) return true;
   return legendOff.has(nodeKind(node));
 }
@@ -1062,6 +1147,9 @@ function legendHidesEdge(edge) {
 function swatch(body) {
   return `<svg class="swatch" viewBox="0 0 30 14" aria-hidden="true">${body}</svg>`;
 }
+
+// Test code: our colour, drawn as an outline - there, but not the product.
+const testSwatch = colour => swatch(`<circle cx="15" cy="7" r="4.2" fill="${colour}" fill-opacity="0.18" stroke="${colour}" stroke-width="1.2" stroke-dasharray="2 1.6"/>`);
 
 const TREE_KIND_NAME = () => ({
   module: t("legendModuleOnly"), namespace: t("legendNamespace"),
@@ -1096,6 +1184,7 @@ function renderTreeLegend(body) {
       ["ours", t("legendOursItem"), treeMarkSvg("class", kindColour("class")), rows.filter(node => node.own).length, true],
       ["theirs", t("legendTheirsItem"), treeMarkSvg("class", kindColour("class")).replace("<g ", '<g opacity="0.45" '),
         rows.filter(node => !node.own).length, true],
+      ["tests", t("legendTestsItem"), testSwatch(kindColour("class")), rows.filter(node => node.test).length],
     ]],
     [t("legendStructure"), [row("module"), row("namespace")]],
     [t("legendTypes"), ["class", "interface", "enum", "record", "struct", "delegate"].map(row)],
@@ -1119,6 +1208,7 @@ function renderLegendCard() {
         count(nodes, n => n.own && !n.container)],
       ["theirs", t("legendTheirsItem"), swatch(`<circle cx="15" cy="7" r="4.5" fill="${palette().grey}"/>`),
         count(nodes, n => !n.own && !n.container)],
+      ["tests", t("legendTestsItem"), testSwatch(hues[0]), count(nodes, n => n.test && !n.container)],
     ]],
     [t("legendLinks"), [
       ["reference", t("legendReference"), swatch('<polygon points="2,4 28,6.3 28,7.7 2,10" fill="currentColor" fill-opacity="0.6"/>'),
@@ -1825,9 +1915,12 @@ function openModules(g) {
   const edges = [...merged.values()];
 
   const containers = new Map();
-  const hold = (containerId, memberId) => edges.push({
-    from: containerId, to: memberId, kind: KIND_CONTAINS, weight: 0, inferred: false, state: "same",
-  });
+  const membersOf = new Map();
+  const hold = (containerId, memberId) => {
+    edges.push({ from: containerId, to: memberId, kind: KIND_CONTAINS, weight: 0, inferred: false, state: "same" });
+    if (!membersOf.has(containerId)) membersOf.set(containerId, []);
+    membersOf.get(containerId).push(memberId);
+  };
 
   if (g.groups && g.groups.length) {
     // One package of ours: the server has split it into the branches worth seeing, so the
@@ -1853,6 +1946,12 @@ function openModules(g) {
       }
       hold(node.moduleId, node.id);
     }
+  }
+  // A bubble is test code when everything in it is, so switching tests off takes it away too.
+  const testIds = new Set(g.nodes.filter(node => node.test).map(node => node.id));
+  for (const [id, container] of containers) {
+    const members = membersOf.get(id) ?? [];
+    container.test = members.length > 0 && members.every(member => testIds.has(member));
   }
   nodes.push(...containers.values());
 
@@ -1934,6 +2033,15 @@ function palette() {
       hues: ["#6fa8dc", "#e5a86b", "#7ec699", "#e08a8a", "#d4c56b", "#6cc5c5", "#c49a6c", "#9fb3c8"],
       grey: "#5c5c5c",
     };
+  }
+  // Apple's system colours, less the blue that is the accent. Mac follows the system's
+  // appearance, so it takes the dark or the light set as the page is drawn.
+  if (document.documentElement.dataset.theme === "mac") {
+    return getComputedStyle(document.documentElement).colorScheme.includes("dark")
+      ? { hues: ["#ff9f0a", "#30d158", "#bf5af2", "#ff375f", "#5e5ce6", "#40c8e0", "#ac8e68", "#ffd60a"],
+          grey: "#636366" }
+      : { hues: ["#ff9500", "#34c759", "#af52de", "#ff2d55", "#5856d6", "#30b0c7", "#a2845e", "#e0a800"],
+          grey: "#c7c7cc" };
   }
   const dark = document.documentElement.dataset.theme === "dark"
     || (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
@@ -2948,7 +3056,8 @@ const TREE_MARKS = {
   event: c => [["path", { d: "M1 -4.2 L-2.4 0.6 L0.2 0.6 L-1 4.2 L2.6 -0.8 L0 -0.8 Z", fill: c }]],
 };
 const TREE_TOGGLES = ["class", "interface", "enum", "record", "struct", "delegate", "method", "property", "field", "event"];
-const treeHides = node => TREE_TOGGLES.includes(treeKind(node)) && legendOff.has(treeKind(node));
+const treeHides = node =>
+  (node.test && legendOff.has("tests")) || (TREE_TOGGLES.includes(treeKind(node)) && legendOff.has(treeKind(node)));
 
 function treeMark(node, colour) {
   const group = el("g", { class: "mark" });
@@ -3354,6 +3463,12 @@ granularitySelect.addEventListener("change", () => {
 
 labelSelect.addEventListener("change", () => { lastLabelPass = 0; paint(); });
 themeSelect.addEventListener("change", () => applyTheme(themeSelect.value));
+// The system turning dark or light repaints the themes that follow it - System and Mac -
+// whose node colours are picked in script, not by the stylesheet alone.
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+  const theme = document.documentElement.dataset.theme;
+  if (!theme || theme === "mac") applyTheme(theme || "auto");
+});
 langSelect.addEventListener("change", () => applyLanguage(langSelect.value));
 styleSelect.addEventListener("change", () => applyStyle(styleSelect.value));
 scopeSelect.addEventListener("change", () => {
