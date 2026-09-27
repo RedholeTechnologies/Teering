@@ -1,6 +1,6 @@
 # Installs the latest Treering for Windows.
 #
-#   irm https://raw.githubusercontent.com/RedholeTechnologies/Teering/main/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/RedholeTechnologies/Treering/main/install.ps1 | iex
 #
 # It goes to %LOCALAPPDATA%\Programs\Treering, onto your PATH, and into the Start menu.
 # Nothing needs administrator rights. Run it again to update.
@@ -8,7 +8,7 @@
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-$base = 'https://github.com/RedholeTechnologies/Teering/releases/latest/download'
+$base = 'https://github.com/RedholeTechnologies/Treering/releases/latest/download'
 $dir = Join-Path $env:LOCALAPPDATA 'Programs\Treering'
 $temp = Join-Path ([IO.Path]::GetTempPath()) ("treering-" + [guid]::NewGuid())
 New-Item -ItemType Directory -Force $temp | Out-Null

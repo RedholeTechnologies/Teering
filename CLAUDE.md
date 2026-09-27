@@ -1,6 +1,9 @@
-# Teering
+# Treering
 
 코드 구조를 **시간축과 함께** 보는 로컬 전용 코드 지도. 기획은 [treering-plan.md](treering-plan.md).
+
+리포 이름은 2026-09-28 에 오타(`Teering`)를 고쳐 `RedholeTechnologies/Treering` 이 됐다. 옛 주소는 GitHub 이
+새 주소로 넘겨 준다. 새로 쓰는 링크는 언제나 `Treering` 으로 적는다.
 
 ---
 

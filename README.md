@@ -30,16 +30,16 @@ Treering is still in development, and the database format may change between rel
 Windows (PowerShell):
 
 ```powershell
-irm https://raw.githubusercontent.com/RedholeTechnologies/Teering/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/RedholeTechnologies/Treering/main/install.ps1 | iex
 ```
 
 Linux (x86-64):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/RedholeTechnologies/Teering/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/RedholeTechnologies/Treering/main/install.sh | sh
 ```
 
-Each script downloads the latest build from [Releases](https://github.com/RedholeTechnologies/Teering/releases), checks it against the published checksum, and puts `treering` on your PATH. On Windows it also adds Treering to the Start menu. Neither needs administrator rights, and running a script again updates Treering. If you'd rather not run a script, download the zip or tarball from Releases and unpack it anywhere.
+Each script downloads the latest build from [Releases](https://github.com/RedholeTechnologies/Treering/releases), checks it against the published checksum, and puts `treering` on your PATH. On Windows it also adds Treering to the Start menu. Neither needs administrator rights, and running a script again updates Treering. If you'd rather not run a script, download the zip or tarball from Releases and unpack it anywhere.
 
 Then run `treering`, or open it from the Start menu. It starts the server and opens http://127.0.0.1:7377 in your browser. If Treering is already running, it only opens the browser.
 
