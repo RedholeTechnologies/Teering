@@ -4,6 +4,21 @@ English | [한국어](README.ko.md)
 
 Treering draws a map of your codebase and keeps a copy of it for every commit, so you can see how the structure changed: which types started depending on each other last week, or when a class began to collect callers. It runs entirely on your machine and sends nothing over the network. It doesn't use an LLM, so the same code always produces the same graph.
 
+![The blueprint as a schematic, compared with a month earlier: the Billing module is new and the web pages no longer call the database](docs/screenshots/schematic-compare.png)
+
+*The sample project's modules as a schematic, compared with a month earlier. Green is new: a Billing module now implements the payment interface. Red dashed is gone: the web pages used to call the database directly.*
+
+| | |
+|---|---|
+| ![The map, comparing two snapshots](docs/screenshots/map-compare.png) | ![The blueprint as a drawing](docs/screenshots/blueprint.png) |
+| **Map.** Modules as bubbles and the calls between them. New lines are green, broken ones red. | **Blueprint.** One level as boxes in tiers, each with its role and what the others use it for. |
+| ![Inside one module, drawn as a hierarchical sheet](docs/screenshots/schematic-inside.png) | ![One class with its members, and the types around it](docs/screenshots/class.png) |
+| **Inside a module.** The module you opened frames what it holds; wires cross its edge at sheet ports. | **One class.** Its fields and methods, the types it works with, and which member ties them. |
+| ![The chip floor plan, regions sized by code](docs/screenshots/chip.png) | |
+| **Chip.** Where the weight is: each region as big as its code, libraries as pads on the edge. | |
+
+All of these are the sample project that comes with Treering (`treering sample`), a small made-up shop.
+
 Treering is still in development, and the database format may change between releases. The design notes are in [treering-plan.md](treering-plan.md) (in Korean).
 
 ## Install
