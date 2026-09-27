@@ -4,7 +4,27 @@
 
 Treering 은 코드베이스의 구조를 지도로 그리고, 커밋마다 그 지도를 남겨 둡니다. 그래서 지난주 이후 어떤 타입들이 새로 엮였는지, 어떤 클래스를 부르는 곳이 언제부터 늘었는지를 볼 수 있습니다. 모든 작업은 내 컴퓨터에서 이루어지고 네트워크로 나가는 데이터는 없습니다. LLM 을 쓰지 않기 때문에 같은 코드에서는 언제나 같은 그래프가 나옵니다.
 
-아직 개발 중이라 릴리스가 없고, DB 형식도 바뀔 수 있습니다. 설계에 대한 기록은 [treering-plan.md](treering-plan.md) 에 있습니다.
+아직 개발 중이라 릴리스 사이에 DB 형식이 바뀔 수 있습니다. 설계에 대한 기록은 [treering-plan.md](treering-plan.md) 에 있습니다.
+
+## 설치
+
+Windows (PowerShell):
+
+```powershell
+irm https://raw.githubusercontent.com/RedholeTechnologies/Teering/main/install.ps1 | iex
+```
+
+Linux (x86-64):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/RedholeTechnologies/Teering/main/install.sh | sh
+```
+
+스크립트는 [Releases](https://github.com/RedholeTechnologies/Teering/releases) 에서 최신 빌드를 내려받아 함께 올라온 체크섬과 맞춰 본 뒤, `treering` 을 PATH 에 넣습니다. Windows 에서는 시작 메뉴에도 추가합니다. 관리자 권한은 필요 없고, 다시 실행하면 새 버전으로 바뀝니다. 스크립트를 쓰고 싶지 않다면 Releases 에서 zip 이나 tar.gz 를 받아 아무 곳에나 풀어도 됩니다.
+
+설치한 뒤 `treering` 을 실행하거나 시작 메뉴에서 여세요. 서버가 켜지고 브라우저에 http://127.0.0.1:7377 이 열립니다. 이미 켜져 있으면 브라우저만 엽니다.
+
+가져올 저장소 없이 먼저 둘러보려면 첫 화면에서 **먼저 예제 프로젝트로 둘러보기** 를 누르세요. 한 달 치 이력이 있는 작은 가상 온라인 상점 `acme-shop` 이 추가됩니다. 명령줄에서는 `treering sample` 로 추가할 수 있습니다.
 
 ## 색인기 설치
 
