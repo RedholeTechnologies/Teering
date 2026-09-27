@@ -49,6 +49,11 @@ feat/*  ──Squash──▶  develop  ──Merge commit──▶  main
    머지한 날로 맞춘다(`GIT_COMMITTER_DATE="$(git log -1 --format=%cI <커밋>)" git tag -a …`).
    이미 push 한 태그는 옮기지 않는다 — 잘못 붙였으면 다음 번호로 바로잡는다.
    (이 리포는 2026-09-27 에 새로 만들었고, 번호도 `v0.1.0` 부터 다시 시작했다.)
+9. **병합된 작업 브랜치는 원격에 남기지 않는다.** 리포 설정 「병합 후 브랜치 자동 삭제」
+   (`delete_branch_on_merge`)가 켜져 있어, PR 이 머지되면 GitHub 이 그 브랜치를 지운다.
+   `develop` 은 기본 브랜치라 지워지지 않고, `develop`·`main` 은 ruleset 으로도 삭제가 막혀 있다.
+   로컬에서는 `git fetch --prune` 로 걷고 머지된 브랜치를 지운다. 켜기 전에 쌓인 브랜치는 PR 이
+   MERGED 인지 확인하고 지운다(2026-09-28 에 10개를 이렇게 정리했다).
 
 ### 커밋 메시지
 
@@ -87,6 +92,8 @@ Vercel 은 커밋 작성자의 GitHub 계정에 Vercel 계정이 연결돼 있�
 | force push | 차단 | 차단 |
 | 브랜치 삭제 | 차단 | 차단 |
 | 예외(bypass) | 없음 | 없음 |
+
+작업 브랜치는 머지되면 자동으로 지워진다(리포 설정, 9번).
 
 직접 push 하면 `Changes must be made through a pull request.` 로 거부된다. 실측 확인했다.
 
