@@ -198,6 +198,12 @@ This produces a single executable of about 52 MB. The web page is embedded in it
 
 NativeAOT doesn't work yet, because JSON serialization uses reflection and the MCP SDK scans assemblies.
 
+## Why "Treering"
+
+A tree ring is one year of growth laid down around the years before it, so cutting a trunk shows its whole history at once. Treering does the same for code. It keeps a snapshot of the structure for every update, and lets you read back how the modules, types and their dependencies grew. The name says in one word what sets it apart from other code maps: time. It also nods to the trees code is already made of, from syntax trees to the tree of modules, namespaces and types.
+
+The logo is the end of a sawn log: uneven rings around an off-centre pith, a drying crack running in from the bark, and the outermost ring, which is now, in the accent colour.
+
 ## License
 
 [Apache-2.0](LICENSE). The components bundled into a published executable, and their licences, are listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
