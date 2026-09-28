@@ -176,6 +176,8 @@ Each language has its own quirks. TypeScript produces few inheritance edges, bec
 
 SCIP records where a reference is, but not which symbol it sits inside (`enclosing_symbol` is empty). Treering assigns each reference to the nearest definition before it. That's reliable at the type level, where a file's references belong to the types it defines. At the method level it goes wrong around nested types, lambdas, local functions, property accessors and field initializers, so the page and the MCP tools mark these edges as inferred.
 
+C# top-level statements, the usual `Program.cs` today, have no definition before them at all. scip-dotnet still writes `args` as a parameter of the compiler-generated `Program.<Main>$`, so Treering files those calls under the project's `Program`. That is how a service's startup registrations show up on the map. If the statements never use `args`, their calls are left out.
+
 An update can't take less than about 10 seconds, and the indexer accounts for nearly all of it. The smallest C# project spends 16.6s in scip-dotnet, and scip-typescript takes 50s over ShopWeb's one package. Treering's own part, comparing and loading, takes under half a second.
 
 ## Out of scope
