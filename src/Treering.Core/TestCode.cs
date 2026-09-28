@@ -12,8 +12,6 @@ public static class TestCode
     /// <summary>테스트가 사는 폴더. <c>spec</c> 은 넣지 않는다 — 명세 문서나 모델을 두는 폴더로도 흔하다.</summary>
     private static readonly string[] Folders = ["test", "tests", "__tests__"];
 
-    /// <summary>C# 테스트 프로젝트가 관례로 쓰는 끝말.</summary>
-    private static readonly string[] AssemblyEndings = [".Tests", ".Test", ".UnitTests", ".IntegrationTests"];
 
     /// <summary>색인 안의 상대 경로가 테스트 파일인가. 구분자는 <c>/</c> 든 <c>\</c> 든 받는다.</summary>
     public static bool IsTestPath(string relativePath)
@@ -45,7 +43,19 @@ public static class TestCode
 
     private static readonly string[] Scripts = ["ts", "tsx", "mts", "cts", "js", "jsx", "mjs", "cjs"];
 
-    /// <summary>C# 어셈블리(SCIP 의 패키지) 이름이 테스트 프로젝트의 것인가.</summary>
-    public static bool IsTestAssembly(string name) =>
-        AssemblyEndings.Any(ending => name.EndsWith(ending, StringComparison.OrdinalIgnoreCase));
+    /// <summary>
+    /// C# 어셈블리(SCIP 의 패키지) 이름이 테스트 프로젝트의 것인가. 마지막 점 뒤의 조각이 <c>Test</c> 이거나
+    /// <c>Tests</c> 로 끝나면 그렇다 — <c>.UnitTests</c> · <c>.IntegrationTests</c> 뿐 아니라
+    /// <c>.FunctionalTests</c> · <c>.E2ETests</c> 처럼 종류가 늘어나도 끝말 목록을 고칠 일이 없다.
+    /// 점이 없는 이름(<c>Contests</c>)은 보지 않는다.
+    /// </summary>
+    public static bool IsTestAssembly(string name)
+    {
+        var dot = name.LastIndexOf('.');
+        if (dot < 0) return false;
+
+        var last = name[(dot + 1)..];
+        return last.Equals("Test", StringComparison.OrdinalIgnoreCase)
+            || last.EndsWith("Tests", StringComparison.OrdinalIgnoreCase);
+    }
 }

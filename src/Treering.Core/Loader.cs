@@ -331,6 +331,8 @@ public sealed class Loader
         }
 
         // 참조. enclosing_symbol 이 비어 있으므로 위치로 «누가» 를 추론한다.
+        long? topLevel = null;
+        var lookedForTopLevel = false;
         foreach (var occurrence in document.Occurrences)
         {
             if ((occurrence.SymbolRoles & (int)SymbolRole.Definition) != 0) continue;
@@ -344,6 +346,13 @@ public sealed class Loader
 
             var (line, character) = PositionOf(occurrence);
             var fromId = EnclosingDefinition(definitions, line, character);
+            if (fromId is null && !lookedForTopLevel)
+            {
+                topLevel = TopLevelOwner(document);
+                lookedForTopLevel = true;
+            }
+
+            fromId ??= topLevel;
             if (fromId is null)
             {
                 // 파일 상단의 using 지시문처럼 어떤 정의보다도 앞선 참조.
@@ -354,6 +363,32 @@ public sealed class Loader
             AddEdge(fromId.Value, InternSymbol(parsed).Id, EdgeKind.Reference);
             _referenceEdges++;
         }
+    }
+
+    private const string TopLevelMain = "/Program#`<Main>$`(";
+
+    /// <summary>
+    /// C# 최상위 문(top-level statements)의 주인인 <c>Program</c>, 없으면 <c>null</c>.
+    ///
+    /// 컴파일러는 <c>Program.cs</c> 맨 위의 문장들을 <c>Program.&lt;Main&gt;$</c> 로 감싸지만
+    /// scip-dotnet 은 그 메서드를 정의로 적지 않는다. 앞선 정의가 없으니 그 안의 호출이 모두 주인 없이
+    /// 버려졌고, 요즘 .NET 서비스가 시작할 때 무엇을 등록하는지가 지도에서 빠졌다. 다만 <c>args</c> 는
+    /// 그 메서드의 매개변수(<c>…``/Program#`&lt;Main&gt;$`().(args)</c>)로 적히므로 거기서 프로젝트를
+    /// 읽는다. 주인은 메서드가 아니라 <c>Program</c> 타입으로 둔다 — 메서드 쪽은 <c>(+1)</c> 같은
+    /// 겹침 표시가 시점마다 바뀌어 같은 코드가 죽고 다시 난 것처럼 보인다.
+    /// <c>args</c> 를 한 번도 쓰지 않는 최상위 문은 여전히 주인이 없다.
+    /// </summary>
+    private long? TopLevelOwner(Document document)
+    {
+        foreach (var occurrence in document.Occurrences)
+        {
+            var at = occurrence.Symbol.IndexOf(TopLevelMain, StringComparison.Ordinal);
+            if (at < 0 || !occurrence.Symbol.StartsWith("scip-dotnet ", StringComparison.Ordinal)) continue;
+
+            return InternSymbol(Parse(occurrence.Symbol[..(at + "/Program#".Length)])).Id;
+        }
+
+        return null;
     }
 
     /// <summary>

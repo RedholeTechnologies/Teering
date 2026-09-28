@@ -38,7 +38,9 @@ jobs:
       # The tests are written against Windows paths in places; they run where the tool is used most.
       - name: Test
         if: matrix.rid == 'win-x64'
-        run: dotnet test tests/Treering.Core.Tests -c Release
+        run: |
+          dotnet test tests/Treering.Core.Tests -c Release
+          dotnet test tests/Treering.Cli.Tests -c Release
 
       - name: Publish
         run: >
