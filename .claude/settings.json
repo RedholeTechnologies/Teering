@@ -1,0 +1,14 @@
+{
+  "extraKnownMarketplaces": {
+    "claude-config": {
+      "source": {
+        "source": "github",
+        "repo": "RedholeTechnologies/claude-config",
+        "ref": "main"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "redhole@claude-config": true
+  }
+}
