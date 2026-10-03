@@ -7,6 +7,8 @@
 
 ---
 
+- **답은 항상 한국어로 한다.** 공통 규칙(한국어·깃·문서)과 명령어(`/git`·`/handoff`·`/docsync`…)의 정본은 플러그인 `redhole@claude-config`(리포 `RedholeTechnologies/claude-config`) — 이 리포는 `.claude/settings.json` 으로 켠다. 처음이면 `claude plugin install redhole@claude-config` 를 한 번. 이 파일의 규칙이 공통 규칙과 다르면 여기가 우선.
+
 ## 브랜치 · 머지
 
 ```
